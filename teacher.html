@@ -304,6 +304,110 @@ td { padding: 9px 12px; white-space: nowrap; }
 .attention-tag.gray { border-color: #bbb; color: #888; }
 .none-msg { font-size: 12px; color: #aaa; font-style: italic; }
 
+/* Weakness analysis */
+.weakness-panel {
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 10px;
+}
+.weakness-panel h3 {
+  font-size: 1rem;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.weakness-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.weakness-bar-row:last-child { border-bottom: none; }
+.weakness-label { width: 140px; font-weight: 600; flex-shrink: 0; }
+.weakness-track {
+  flex: 1;
+  height: 22px;
+  background: #f0ede6;
+  border-radius: 11px;
+  overflow: hidden;
+  position: relative;
+}
+.weakness-fill {
+  height: 100%;
+  border-radius: 11px;
+  transition: width .4s;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  min-width: 38px;
+}
+.weakness-fill.bar-red { background: linear-gradient(90deg, var(--bad), #f07070); }
+.weakness-fill.bar-yellow { background: linear-gradient(90deg, #d4960a, var(--gold)); }
+.weakness-fill.bar-green { background: linear-gradient(90deg, #13945a, var(--ok)); }
+.weakness-fill.bar-gray { background: #ccc; }
+.weakness-val { width: 54px; text-align: right; font-weight: 600; flex-shrink: 0; font-size: 13px; }
+.weakness-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 10px;
+  margin: 3px;
+}
+.weakness-tag.critical { background: #fdd; color: var(--bad); border: 1px solid var(--bad); }
+.weakness-tag.warning { background: #fef3d0; color: #9a7000; border: 1px solid var(--gold); }
+.weakness-tag.ok { background: #d6f5e3; color: #157a48; border: 1px solid var(--ok); }
+.reinforce-card {
+  background: #fef0f0;
+  border: 2px solid var(--bad);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 10px;
+}
+.reinforce-card h3 {
+  font-size: 1rem;
+  color: var(--bad);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.reinforce-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f5d5d5;
+  font-size: 13px;
+}
+.reinforce-row:last-child { border-bottom: none; }
+.reinforce-rank {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--bad);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.reinforce-info { flex: 1; }
+.reinforce-info .name { font-weight: 700; }
+.reinforce-info .detail { font-size: 12px; color: #8a8a8a; }
+
 /* Loading */
 .loading-overlay {
   text-align: center;
@@ -380,7 +484,9 @@ const SKILLS = [
   { key: 'fpc', label: 'Fut. Perf. Cont.' },
   { key: 'zero', label: 'Zero Cond.' },
   { key: 'first', label: 'First Cond.' },
-  { key: 'second', label: 'Second Cond.' }
+  { key: 'second', label: 'Second Cond.' },
+  { key: 'mixed', label: 'Mixed Cond.' },
+  { key: 'inversion', label: 'Cond. Inversion' }
 ];
 
 async function fetchStudents() {
@@ -522,6 +628,118 @@ function render() {
     html += `</tr>`;
   }
   html += `</tbody></table></div>`;
+
+  // === WEAKNESS ANALYSIS ===
+  // 1. Aggregate skill accuracy across all filtered students
+  const skillStats = SKILLS.map(sk => {
+    let totalSeen = 0, totalCorrect = 0;
+    const struggling = []; // students with < 50% on this skill
+    for (const s of students) {
+      const m = mastery(s.mastery, sk.key);
+      if (m.seen > 0) {
+        totalSeen += m.seen;
+        totalCorrect += Math.round(m.pct * m.seen / 100);
+        if (m.pct < 50) struggling.push({ name: s.student_name, pct: m.pct, seen: m.seen });
+      }
+    }
+    const pct = totalSeen > 0 ? Math.round(totalCorrect / totalSeen * 100) : null;
+    return { ...sk, pct, totalSeen, totalCorrect, struggling };
+  }).filter(s => s.totalSeen > 0);
+
+  // Sort by accuracy ascending (weakest first)
+  const weakestFirst = [...skillStats].sort((a, b) => (a.pct ?? 999) - (b.pct ?? 999));
+
+  html += `<div class="section-title">&#128270; Skill Weakness Analysis</div>`;
+
+  // Reinforcement priorities card (top 3 weakest skills)
+  const topWeak = weakestFirst.filter(s => s.pct !== null).slice(0, 5);
+  if (topWeak.length) {
+    html += `<div class="reinforce-card">
+      <h3>&#127919; Priority Skills to Reinforce for Exam Prep</h3>`;
+    topWeak.forEach((sk, i) => {
+      const barCls = sk.pct < 40 ? 'bar-red' : sk.pct < 70 ? 'bar-yellow' : 'bar-green';
+      const strugs = sk.struggling.sort((a,b) => a.pct - b.pct).slice(0, 5);
+      const strugNames = strugs.length ? strugs.map(s => s.name + ' (' + s.pct + '%)').join(', ') : 'None below 50%';
+      html += `<div class="reinforce-row">
+        <div class="reinforce-rank">${i + 1}</div>
+        <div class="reinforce-info">
+          <div class="name">${sk.label} <span style="color:${sk.pct<40?'var(--bad)':sk.pct<70?'var(--gold)':'var(--ok)'};font-size:12px;margin-left:6px">${sk.pct}% class avg</span></div>
+          <div class="detail">${sk.totalSeen} total attempts &middot; Struggling: ${strugNames}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Skill accuracy bars (all skills ranked)
+  html += `<div class="weakness-panel">
+    <h3>&#128202; Class Skill Accuracy (Lowest → Highest)</h3>`;
+  for (const sk of weakestFirst) {
+    const barCls = sk.pct < 40 ? 'bar-red' : sk.pct < 70 ? 'bar-yellow' : 'bar-green';
+    html += `<div class="weakness-bar-row">
+      <div class="weakness-label">${sk.label}</div>
+      <div class="weakness-track"><div class="weakness-fill ${barCls}" style="width:${sk.pct}%">${sk.pct}%</div></div>
+      <div class="weakness-val" style="color:${sk.pct<40?'var(--bad)':sk.pct<70?'var(--gold)':'var(--ok)'}">${sk.totalSeen} Q</div>
+    </div>`;
+  }
+  html += `</div>`;
+
+  // Per-section weakness comparison
+  const blueStudents = students.filter(s => s.section === 'blue');
+  const redStudents = students.filter(s => s.section === 'red');
+  function sectionSkillAcc(arr, key) {
+    let seen = 0, correct = 0;
+    for (const s of arr) {
+      const m = mastery(s.mastery, key);
+      if (m.seen > 0) { seen += m.seen; correct += Math.round(m.pct * m.seen / 100); }
+    }
+    return seen > 0 ? Math.round(correct / seen * 100) : null;
+  }
+  if (blueStudents.length && redStudents.length) {
+    html += `<div class="weakness-panel">
+      <h3>&#9878; Section Weakness Comparison</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">`;
+    ['blue','red'].forEach(sec => {
+      const arr = sec === 'blue' ? blueStudents : redStudents;
+      const label = sec === 'blue' ? '8th Blue' : '8th Red';
+      const badgeCls = sec === 'blue' ? 'badge-blue' : 'badge-red';
+      const secSkills = SKILLS.map(sk => ({ ...sk, pct: sectionSkillAcc(arr, sk.key) })).filter(s => s.pct !== null).sort((a,b) => a.pct - b.pct);
+      html += `<div>
+        <div style="margin-bottom:10px"><span class="badge ${badgeCls}">${label}</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">`;
+      for (const sk of secSkills) {
+        const cls = sk.pct < 40 ? 'critical' : sk.pct < 70 ? 'warning' : 'ok';
+        html += `<span class="weakness-tag ${cls}">${sk.label}: ${sk.pct}%</span>`;
+      }
+      html += `</div></div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  // Students with lowest accuracy (bottom 5)
+  const studentsWithAnswers = students.filter(s => (s.answered || 0) >= 3);
+  const lowestStudents = [...studentsWithAnswers].sort((a,b) => parseFloat(a.accuracy || 0) - parseFloat(b.accuracy || 0)).slice(0, 5);
+  if (lowestStudents.length) {
+    html += `<div class="attention-panel" style="border-color:var(--bad);background:#fef0f0;margin-bottom:10px">
+      <h3 style="color:var(--bad)">&#9888; Students with Lowest Overall Accuracy</h3>`;
+    for (const s of lowestStudents) {
+      const acc = parseFloat(s.accuracy || 0);
+      // Find their weakest skill
+      let worstSkill = null, worstPct = 999;
+      for (const sk of SKILLS) {
+        const m = mastery(s.mastery, sk.key);
+        if (m.seen >= 2 && m.pct < worstPct) { worstPct = m.pct; worstSkill = sk.label; }
+      }
+      html += `<div class="reinforce-row" style="border-color:#f5d5d5">
+        <div class="reinforce-rank" style="background:${acc<40?'var(--bad)':'var(--gold)'}">${acc.toFixed(0)}%</div>
+        <div class="reinforce-info">
+          <div class="name">${s.student_name} <span class="badge ${s.section==='blue'?'badge-blue':'badge-red'}" style="font-size:10px">${s.section==='blue'?'Blue':'Red'}</span></div>
+          <div class="detail">${s.answered} answered &middot; Level ${s.level || 0} &middot; Weakest: ${worstSkill ? worstSkill + ' (' + worstPct + '%)' : 'Not enough data'}</div>
+        </div>
+      </div>`;
+    }
+    html += `</div>`;
+  }
 
   // Section comparison
   html += `<div class="section-title">Section Comparison</div>`;

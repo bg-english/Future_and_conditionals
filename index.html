@@ -153,6 +153,7 @@ button{font-family:'Lexend';cursor:pointer}
 .fb.show{display:block;animation:fade .3s}
 .fb.right{background:#E5F7F0;border:2px solid var(--ok)}
 .fb.wrong{background:#FFF3D6;border:2px solid var(--gold)}
+.fb.hint{background:#EDE7F6;border:2px solid #7A4FB5}
 .fb .fb-head{font-weight:800;font-family:'Bricolage Grotesque';display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .fb .fb-rule{font-size:.9rem}
 .fb .fb-rule b{color:var(--blue-dk)}
@@ -511,7 +512,7 @@ const Store=(()=>{let ok=false,mem={};try{const k="__fl";localStorage.setItem(k,
          set(k,v){try{if(ok){localStorage.setItem(k,JSON.stringify(v));return;}}catch(e){}mem[k]=v;}};})();
 
 /* ===== state ===== */
-const SKILLS={'present-simple':'Present Simple','present-continuous':'Present Continuous','will':'will','going-to':'going to','future-perfect':'Future Perfect','fpc':'Fut. Perf. Continuous','zero':'Zero Cond.','first':'First Cond.','second':'Second Cond.'};
+const SKILLS={'present-simple':'Present Simple','present-continuous':'Present Continuous','will':'will','going-to':'going to','future-perfect':'Future Perfect','fpc':'Fut. Perf. Continuous','zero':'Zero Cond.','first':'First Cond.','second':'Second Cond.','mixed':'Mixed Cond.','inversion':'Cond. Inversion'};
 let state=Store.get('flstate',null)||{xp:0,level:1,streak:0,lastDay:null,answered:0,correct:0,mastery:{},review:[],badges:[],cardBox:{}};
 Object.keys(SKILLS).forEach(s=>{if(!state.mastery[s])state.mastery[s]={seen:0,correct:0};});
 function save(){Store.set('flstate',state);} // namespaced
@@ -533,8 +534,8 @@ function go(id){document.querySelectorAll('.view').forEach(v=>v.classList.add('h
 
 /* ===== HUD ===== */
 function renderHUD(){document.getElementById('sLevel').textContent=state.level;document.getElementById('sXp').textContent=state.xp;document.getElementById('sStreak').textContent=state.streak;}
-function addXP(n){state.xp+=n;const need=state.level*100;if(state.xp>=need){state.level++;showLevelUp();}persist();renderHUD();}
-function showLevelUp(){document.getElementById('lvlupTxt').textContent='Level '+state.level;document.getElementById('lvlupMsg').textContent=['Keep it up!','You are unstoppable!','You are a Great Disciple!','Judah is proud of you!'][state.level%4];document.getElementById('lvlup').classList.add('show');confetti();}
+function addXP(n){state.xp+=n;const need=state.level<=3?100:state.level<=6?150:state.level<=9?200:250;if(state.xp>=need){state.xp-=need;state.level++;showLevelUp();}persist();renderHUD();}
+function showLevelUp(){var msg=['Keep it up!','You are unstoppable!','You are a Great Disciple!','Judah is proud of you!'][state.level%4];var tierMsg='';if(state.level===4)tierMsg='B1+ questions unlocked! The challenge increases!';else if(state.level===6)tierMsg='B2 questions unlocked! You are reaching advanced level!';else if(state.level===8)tierMsg='B2+ questions unlocked! You are at the highest level!';document.getElementById('lvlupTxt').textContent='Level '+state.level;document.getElementById('lvlupMsg').innerHTML=(tierMsg?'<b>'+tierMsg+'</b><br>':'')+msg;document.getElementById('lvlup').classList.add('show');confetti();}
 
 /* ===== toast + tts + confetti ===== */
 function toast(msg,type){const t=document.getElementById('toast');document.getElementById('toastMsg').textContent=msg;document.getElementById('toastFace').src=IMG.face;t.className='toast show '+(type||'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',2200);}
@@ -544,7 +545,7 @@ function confetti(){const cs=['#1E50A0','#C8202E','#E9A72C','#1FAA66'];for(let i
 /* ===== badges ===== */
 const BADGES=[{id:'first',ic:'🎯',nm:'First correct'},{id:'streak3',ic:'🔥',nm:'3-day streak'},{id:'tense',ic:'⏳',nm:'Future tense master'},{id:'cond',ic:'🔀',nm:'Conditional king'},{id:'exam',ic:'🏆',nm:'Exam passed'},{id:'perfect',ic:'💯',nm:'Perfect exam'}];
 function award(id){if(!state.badges.includes(id)){state.badges.push(id);persist();const b=BADGES.find(x=>x.id===id);toast('Badge: '+b.nm+'! '+b.ic,'good');confetti();}}
-function checkBadges(){const tn=['present-simple','present-continuous','will','going-to','future-perfect','fpc'];if(tn.every(s=>masteryPct(s)>=80))award('tense');if(['zero','first','second'].every(s=>masteryPct(s)>=80))award('cond');if(state.streak>=3)award('streak3');}
+function checkBadges(){const tn=['present-simple','present-continuous','will','going-to','future-perfect','fpc'];if(tn.every(s=>masteryPct(s)>=80))award('tense');if(['zero','first','second','mixed','inversion'].every(s=>masteryPct(s)>=80))award('cond');if(state.streak>=3)award('streak3');}
 
 /* ===== mastery ===== */
 function masteryPct(s){const m=state.mastery[s];return m&&m.seen?Math.round(m.correct/m.seen*100):0;}
@@ -689,51 +690,104 @@ function renderCompare(){const tog=document.getElementById('cmpToggle');tog.inne
    PRACTICE ENGINE
    ============================================================ */
 const ITEMS=[
- {sk:'present-simple',type:'mc',q:'The plane ___ at 6 PM every day.',o:['will leave','leaves','is leaving','would leave'],a:1,fb:'Fixed and repeated schedule → <b>Present Simple</b>: leaves.'},
- {sk:'present-continuous',type:'mc',q:'I ___ the dentist at 4 tomorrow (appointment already made).',o:['see','am seeing','will see','saw'],a:1,fb:'Arranged appointment with a time → <b>Present Continuous</b>: am seeing.'},
- {sk:'will',type:'mc',q:"That bag looks heavy. ___ I help you?",o:['Do','Will','Am','Going'],a:1,fb:'Spontaneous offer → <b>will</b>.'},
- {sk:'going-to',type:'mc',q:"She has bought paint. She ___ paint her room.",o:['will','is going to','paints','would'],a:1,fb:'Plan already decided (bought paint) → <b>going to</b>.'},
- {sk:'future-perfect',type:'mc',q:'By the time you arrive, the show ___ .',o:['will start','will have started','starts','is starting'],a:1,fb:'Will have started BEFORE you arrive → <b>Future Perfect</b>.'},
- {sk:'fpc',type:'mc',q:'By midnight, we ___ for six hours.',o:['will drive','will have driven','will have been driving','drive'],a:2,fb:'Emphasizes duration up to a point → <b>Future Perfect Continuous</b>.'},
- {sk:'zero',type:'mc',q:'If you mix blue and yellow, you ___ green.',o:['will get','get','would get','are getting'],a:1,fb:'General truth → <b>Zero</b>: present + present (get).'},
- {sk:'first',type:'mc',q:'If it ___ tomorrow, we will cancel the picnic.',o:['will rain','rains','rained','would rain'],a:1,fb:'First conditional: after "if" use present (rains); never "will".'},
- {sk:'second',type:'mc',q:'If I ___ a millionaire, I would help my school.',o:['am','was','were','will be'],a:2,fb:'Unreal hypothesis → <b>Second</b>; with "to be" use <b>were</b>.'},
- {sk:'will',type:'fill',q:'Prediction: I think our team ___ (win) the match.',a:'will win',fb:'Prediction/opinion → <b>will</b> + base: will win.'},
- {sk:'going-to',type:'fill',q:'Plan: This weekend I ___ (visit) my grandparents.',a:'am going to visit',fb:'Decided plan → <b>am going to</b> + base: am going to visit.'},
- {sk:'future-perfect',type:'fill',q:'By 2040, scientists ___ (find) new cures.',a:'will have found',fb:'Completed before 2040 → <b>will have</b> + past participle: will have found.'},
- {sk:'first',type:'fill',q:'If you ___ (study), you will pass.',a:'study',fb:'After "if" → present simple: study.'},
- {sk:'second',type:'fill',q:'If we ___ (have) more time, we would travel.',a:'had',fb:'Second conditional: after "if" → past simple: had.'},
- {sk:'present-simple',type:'error',q:'Correct: "The class will start at 9 every day." (write only the correct verb form)',a:'starts',fb:'Fixed schedule → present simple: starts (no "will").'},
- {sk:'first',type:'error',q:'Correct: "If it will rain, we stay home." (write the correct form after "if")',a:'rains',fb:'Never "will" after "if" in first conditional → rains.'},
- {sk:'fpc',type:'mc',q:'How long emphasis: By June she ___ here for a year.',o:['will work','will have worked','will have been working','works'],a:2,fb:'Emphasis on duration → <b>FPC</b>: will have been working.'},
- {sk:'zero',type:'fill',q:'If you heat ice, it ___ (melt).',a:'melts',fb:'Zero conditional → present simple in both parts: melts.'}
+ /* ====== TIER 1 — A2/B1 (Levels 1-3) ====== */
+ {sk:'present-simple',type:'mc',q:'The plane ___ at 6 PM every day.',o:['will leave','leaves','is leaving','would leave'],a:1,fb:'Fixed and repeated schedule → <b>Present Simple</b>: leaves.',tier:1},
+ {sk:'present-continuous',type:'mc',q:'I ___ the dentist at 4 tomorrow (appointment already made).',o:['see','am seeing','will see','saw'],a:1,fb:'Arranged appointment with a time → <b>Present Continuous</b>: am seeing.',tier:1},
+ {sk:'will',type:'mc',q:"That bag looks heavy. ___ I help you?",o:['Do','Will','Am','Going'],a:1,fb:'Spontaneous offer → <b>will</b>.',tier:1},
+ {sk:'going-to',type:'mc',q:"She has bought paint. She ___ paint her room.",o:['will','is going to','paints','would'],a:1,fb:'Plan already decided (bought paint) → <b>going to</b>.',tier:1},
+ {sk:'future-perfect',type:'mc',q:'By the time you arrive, the show ___ .',o:['will start','will have started','starts','is starting'],a:1,fb:'Will have started BEFORE you arrive → <b>Future Perfect</b>.',tier:1},
+ {sk:'fpc',type:'mc',q:'By midnight, we ___ for six hours.',o:['will drive','will have driven','will have been driving','drive'],a:2,fb:'Emphasizes duration up to a point → <b>Future Perfect Continuous</b>.',tier:1},
+ {sk:'zero',type:'mc',q:'If you mix blue and yellow, you ___ green.',o:['will get','get','would get','are getting'],a:1,fb:'General truth → <b>Zero</b>: present + present (get).',tier:1},
+ {sk:'first',type:'mc',q:'If it ___ tomorrow, we will cancel the picnic.',o:['will rain','rains','rained','would rain'],a:1,fb:'First conditional: after "if" use present (rains); never "will".',tier:1},
+ {sk:'second',type:'mc',q:'If I ___ a millionaire, I would help my school.',o:['am','was','were','will be'],a:2,fb:'Unreal hypothesis → <b>Second</b>; with "to be" use <b>were</b>.',tier:1},
+ {sk:'will',type:'fill',q:'Prediction: I think our team ___ (win) the match.',a:'will win',fb:'Prediction/opinion → <b>will</b> + base: will win.',tier:1},
+ {sk:'going-to',type:'fill',q:'Plan: This weekend I ___ (visit) my grandparents.',a:'am going to visit',fb:'Decided plan → <b>am going to</b> + base: am going to visit.',tier:1},
+ {sk:'first',type:'fill',q:'If you ___ (study), you will pass.',a:'study',fb:'After "if" → present simple: study.',tier:1},
+ {sk:'second',type:'fill',q:'If we ___ (have) more time, we would travel.',a:'had',fb:'Second conditional: after "if" → past simple: had.',tier:1},
+ {sk:'present-simple',type:'error',q:'Correct: "The class will start at 9 every day." (write only the correct verb form)',a:'starts',fb:'Fixed schedule → present simple: starts (no "will").',tier:1},
+ {sk:'zero',type:'fill',q:'If you heat ice, it ___ (melt).',a:'melts',fb:'Zero conditional → present simple in both parts: melts.',tier:1},
+
+ /* ====== TIER 2 — B1/B1+ (Levels 4-5) ====== */
+ {sk:'will',type:'mc',q:'I promise I ___ tell anyone your secret.',o:['am not going to','will not','do not','am not'],a:1,fb:'A promise → <b>will not</b> (spontaneous commitment).',tier:2,hint:'Think about what word we use for promises and spontaneous decisions.'},
+ {sk:'going-to',type:'mc',q:'Look at those dark clouds! It ___ rain any minute.',o:['will','is going to','rains','would'],a:1,fb:'Prediction based on visible evidence → <b>going to</b>.',tier:2,hint:'There is visible evidence (dark clouds). Which future form do we use when we can SEE evidence?'},
+ {sk:'present-continuous',type:'mc',q:'We ___ dinner with the Smiths on Saturday.',o:['have','will have','are having','had'],a:2,fb:'Arranged plan with another party → <b>Present Continuous</b>: are having.',tier:2,hint:'This is a planned arrangement with other people. Think: which tense expresses fixed personal arrangements?'},
+ {sk:'future-perfect',type:'fill',q:'By 2040, scientists ___ (find) new cures.',a:'will have found',fb:'Completed before 2040 → <b>will have</b> + past participle: will have found.',tier:2,hint:'"By 2040" = completed before that time. Use: will have + past participle.'},
+ {sk:'fpc',type:'mc',q:'How long emphasis: By June she ___ here for a year.',o:['will work','will have worked','will have been working','works'],a:2,fb:'Emphasis on duration → <b>FPC</b>: will have been working.',tier:2,hint:'The emphasis is on HOW LONG (duration). Which future form stresses ongoing duration up to a point?'},
+ {sk:'first',type:'mc',q:'___ you finish early, you can leave.',o:['Unless','If','Would','Were'],a:1,fb:'Real possibility → <b>First conditional</b>: If you finish early...',tier:2,hint:'This is a real, possible situation. What simple word introduces a real condition?'},
+ {sk:'first',type:'mc',q:'You will fail ___ you study harder.',o:['if','when','unless','because'],a:2,fb:'Unless = if not. You will fail if you do NOT study → <b>unless</b>.',tier:2,hint:'The meaning is: "You will fail IF you do NOT study harder." Which word means "if not"?'},
+ {sk:'second',type:'mc',q:'If she ___ the answer, she would tell us.',o:['knows','knew','will know','has known'],a:1,fb:'Unreal present → <b>Second conditional</b>: past simple (knew).',tier:2,hint:'The result uses "would" — that means this is unreal/hypothetical. What tense goes after "if" in unreal conditions?'},
+ {sk:'first',type:'fill',q:'As long as you ___ (be) careful, nothing will go wrong.',a:'are',fb:'As long as = if. First conditional after "as long as" → present simple: are.',tier:2,hint:'"As long as" works like "if." The result is "will go wrong" — so what tense comes in the condition part?'},
+ {sk:'second',type:'fill',q:'If I ___ (speak) French, I would move to Paris.',a:'spoke',fb:'Unreal hypothesis → past simple: spoke.',tier:2,hint:'The result is "would move" — this is an unreal/imaginary situation. Put the verb in past simple.'},
+ {sk:'will',type:'mc',q:'I am sure she ___ a great doctor one day.',o:['is being','is going to be','will be','would be'],a:2,fb:'Confident prediction about the future → <b>will be</b>.',tier:2,hint:'"I am sure" shows personal belief/prediction. Which future form do we use for predictions based on opinion?'},
+ {sk:'going-to',type:'error',q:'Correct: "I will visit my aunt this weekend. I already bought the ticket." (write the correct future form of "visit")',a:'am going to visit',fb:'Plan already decided (ticket bought) → <b>going to</b>: am going to visit.',tier:2,hint:'The ticket is ALREADY bought — this is a decided plan. Which future form expresses pre-made plans?'},
+ {sk:'first',type:'error',q:'Correct: "If it will snow, the school will close." (write the correct form after "if")',a:'snows',fb:'Never "will" after "if" in first conditional → snows.',tier:2,hint:'Remember the golden rule: we NEVER put "will" right after "if" in first conditionals. Use present simple instead.'},
+ {sk:'present-simple',type:'mc',q:'The conference ___ at 9 AM sharp on Monday.',o:['will begin','begins','is beginning','began'],a:1,fb:'Official schedule → <b>Present Simple</b>: begins.',tier:2,hint:'This is an official, fixed schedule (like a timetable). Which tense do we use for timetables and schedules?'},
+ {sk:'future-perfect',type:'mc',q:'By the end of this year, he ___ three marathons.',o:['will run','will have run','is running','runs'],a:1,fb:'Completed before end of this year → <b>Future Perfect</b>: will have run.',tier:2,hint:'"By the end of this year" = completed before a future point. Think: will have + past participle.'},
+
+ /* ====== TIER 3 — B2 (Levels 6-7) ====== */
+ {sk:'will',type:'mc',q:'The meeting ___ about two hours, I expect.',o:['is lasting','is going to last','will last','lasts'],a:2,fb:'Prediction based on opinion/expectation (no evidence) → <b>will last</b>.',tier:3,hint:'"I expect" = personal opinion with no visible evidence. Which future form is for opinion-based predictions?'},
+ {sk:'going-to',type:'mc',q:'She has been training hard. She ___ the race easily.',o:['will win','is going to win','wins','would win'],a:1,fb:'Prediction based on present evidence (training hard) → <b>going to win</b>.',tier:3,hint:'She has been training hard — that is visible evidence. Evidence-based prediction = ?'},
+ {sk:'mixed',type:'mc',q:'If I had studied harder at school, I ___ a better job now.',o:['will have','would have','would have had','had'],a:1,fb:'<b>Mixed conditional</b>: past condition (had studied) → present result (would have).',tier:3,hint:'The condition is in the past (had studied) but the result is about NOW. Past cause → present result = would + base verb.'},
+ {sk:'mixed',type:'mc',q:'If she ___ so shy, she would have spoken at the meeting yesterday.',o:['was not','is not','were not','had not been'],a:2,fb:'<b>Mixed conditional</b>: present condition (were not shy) → past result (would have spoken).',tier:3,hint:'She IS shy (present trait) → she did not speak yesterday (past result). For unreal present conditions with "be," always use...?'},
+ {sk:'second',type:'mc',q:'If the government ___ more in education, the country would prosper.',o:['invests','invested','will invest','had invested'],a:1,fb:'Unreal present/future hypothesis → <b>Second conditional</b>: past simple (invested).',tier:3,hint:'"Would prosper" tells you this is unreal/hypothetical. In second conditional, after "if" we use...?'},
+ {sk:'first',type:'mc',q:'Provided that everyone ___, we will start the meeting.',o:['agrees','will agree','agreed','would agree'],a:0,fb:'"Provided that" = if. First conditional → present simple: agrees.',tier:3,hint:'"Provided that" is a formal way to say "if." The result uses "will" — so the condition needs what tense?'},
+ {sk:'fpc',type:'fill',q:'By the time he retires, he ___ (teach) for 40 years.',a:'will have been teaching',fb:'Duration up to a future point → <b>FPC</b>: will have been teaching.',tier:3,hint:'40 years = emphasis on DURATION up to a future point. Structure: will have been + verb-ing.'},
+ {sk:'second',type:'fill',q:'If I ___ (be) in your position, I would accept the offer.',a:'were',fb:'Unreal hypothesis with "be" → always use <b>were</b>.',tier:3,hint:'This is unreal (you are NOT in their position). With "be" in second conditional, we always use one special form for all persons...'},
+ {sk:'mixed',type:'fill',q:'If they had saved money, they ___ (be) rich now.',a:'would be',fb:'<b>Mixed conditional</b>: past cause → present result: would be.',tier:3,hint:'Past cause (had saved) → present result (rich NOW). Present result in mixed conditional = would + base verb.'},
+ {sk:'first',type:'error',q:'Correct: "If you will arrive on time, I will wait for you." (write the correct form after "if")',a:'arrive',fb:'First conditional: no "will" after "if" → arrive.',tier:3,hint:'There is a "will" after "if" — that breaks a fundamental rule. Remove "will" and use present simple.'},
+ {sk:'second',type:'error',q:'Correct: "If I was you, I would apologize." (write the correct form of "be")',a:'were',fb:'Second conditional with "be" → <b>were</b> for all persons.',tier:3,hint:'In second conditional, "was" is considered incorrect with "be." There is a special form we ALWAYS use...'},
+ {sk:'future-perfect',type:'mc',q:'By next month, the builders ___ the new wing of the school.',o:['will complete','will have completed','complete','are completing'],a:1,fb:'Action completed before a future deadline → <b>Future Perfect</b>.',tier:3,hint:'"By next month" = action finished BEFORE a future deadline. Which tense shows completion before a future point?'},
+ {sk:'will',type:'fill',q:'I am not sure, but I think the price ___ (rise) next year.',a:'will rise',fb:'Uncertain prediction/opinion → <b>will</b> + base: will rise.',tier:3,hint:'"I think" and "I am not sure" = personal opinion/prediction. Opinion-based predictions use which word + base verb?'},
+ {sk:'going-to',type:'fill',q:'He has been feeling dizzy all day. He ___ (faint).',a:'is going to faint',fb:'Evidence-based prediction → <b>going to</b>: is going to faint.',tier:3,hint:'Feeling dizzy all day = present evidence pointing to a likely result. Evidence → is/am/are going to + base verb.'},
+ {sk:'present-continuous',type:'error',q:'Correct: "I will meet Sarah for lunch tomorrow, we booked the restaurant." (rewrite the future verb)',a:'am meeting',fb:'Arrangement already made → <b>Present Continuous</b>: am meeting.',tier:3,hint:'They BOOKED the restaurant — this is a fixed personal arrangement. Which tense expresses confirmed arrangements?'},
+
+ /* ====== TIER 4 — B2+ (Levels 8+) ====== */
+ {sk:'inversion',type:'mc',q:'___ I known about the delay, I would have taken an earlier flight.',o:['If','Had','Would','Should'],a:1,fb:'<b>Conditional inversion</b>: Had I known = If I had known.',tier:4,hint:'This is a formal inversion of "If I had known..." In inversion, we move the auxiliary to the front. Which auxiliary goes with "known"?'},
+ {sk:'inversion',type:'mc',q:'___ you need any assistance, please do not hesitate to contact us.',o:['If','Had','Were','Should'],a:3,fb:'<b>Conditional inversion</b> (formal): Should you need = If you should need.',tier:4,hint:'This is formal/polite style. "If you should need" inverts to: ___ + subject + base verb. Which modal fits?'},
+ {sk:'inversion',type:'mc',q:'___ I to win the lottery, I would donate half to charity.',o:['Had','Should','Were','If'],a:2,fb:'<b>Conditional inversion</b>: Were I to win = If I were to win.',tier:4,hint:'"If I were to win" can be inverted. Which word replaces "if" when inverting "were"?'},
+ {sk:'mixed',type:'mc',q:'If she had taken the medicine, she ___ better today.',o:['will feel','would feel','feels','felt'],a:1,fb:'<b>Mixed conditional</b>: if + past perfect → would + base (present result).',tier:4,hint:'Past condition (had taken) → result about TODAY. For a present result of a past condition: would + base verb.'},
+ {sk:'mixed',type:'mc',q:'If he were more organized, he ___ his passport yesterday.',o:['would not lose','would not have lost','did not lose','will not lose'],a:1,fb:'<b>Mixed conditional</b>: present trait (were organized) → past result (would not have lost).',tier:4,hint:'Present trait (were organized) → past result (yesterday). For a past result: would + have + past participle.'},
+ {sk:'mixed',type:'fill',q:'If I had not moved to Boston, I ___ (not know) any of you today.',a:'would not know',fb:'<b>Mixed conditional</b>: past action → present result: would not know.',tier:4,hint:'Past action (had not moved) → present result (today). Present result = would + base verb. Do not forget the negation!'},
+ {sk:'inversion',type:'fill',q:'Rewrite: "If I had seen you, I would have said hello." Start with "Had".',a:'Had I seen you, I would have said hello',fb:'<b>Conditional inversion</b>: Had + subject + past participle.',tier:4,hint:'Remove "if," move "had" to the front: Had + subject + past participle, then keep the result clause the same.'},
+ {sk:'mixed',type:'error',q:'Correct: "If she studied law, she will be a lawyer now." (write the corrected result clause verb)',a:'would be',fb:'Unreal present result needs <b>would + base</b>: would be.',tier:4,hint:'The result is unreal/hypothetical (she did NOT study law). Unreal results never use "will" — they use...?'},
+ {sk:'second',type:'mc',q:'Without your help, we ___ never have finished on time.',o:['will','would','could','can'],a:1,fb:'<b>Implied conditional</b>: Without your help = If it had not been for your help → would.',tier:4,hint:'"Without your help" = an implied condition (If you had not helped). Implied past conditionals use which modal?'},
+ {sk:'fpc',type:'mc',q:'By the time the rescue team arrives, the hikers ___ in the cold for over 12 hours.',o:['will wait','will have waited','will have been waiting','are waiting'],a:2,fb:'Duration emphasis up to a future point → <b>FPC</b>: will have been waiting.',tier:4,hint:'"For over 12 hours" emphasizes DURATION. Which future form stresses the ongoing nature of an action up to a future point?'},
+ {sk:'future-perfect',type:'fill',q:'By the time this court case is resolved, the lawyers ___ (review) thousands of documents.',a:'will have reviewed',fb:'Action completed before a future event → <b>Future Perfect</b>: will have reviewed.',tier:4,hint:'"By the time" = completed before that moment. Use: will have + past participle of "review."'},
+ {sk:'inversion',type:'error',q:'Correct: "If she should call, tell her I am busy." Rewrite using inversion (start with "Should").',a:'Should she call, tell her I am busy',fb:'<b>Conditional inversion</b>: Should + subject + base verb.',tier:4,hint:'Remove "if" and move "should" to the front: Should + subject + base verb. Keep the main clause unchanged.'},
+ {sk:'second',type:'mc',q:'But for the goalkeeper, the team ___ the match.',o:['will lose','loses','would have lost','lost'],a:2,fb:'<b>Implied conditional</b>: But for = If it had not been for → would have lost.',tier:4,hint:'"But for" = If it had not been for. This implies a past unreal condition. Past unreal result = would have + past participle.'},
+ {sk:'mixed',type:'mc',q:'If I were not afraid of heights, I ___ bungee jumping with you last weekend.',o:['will go','would go','would have gone','went'],a:2,fb:'<b>Mixed conditional</b>: permanent trait (were not afraid) → past result (would have gone).',tier:4,hint:'Present trait (afraid of heights) → past event (last weekend). Past result of a present condition = would have + past participle.'},
+ {sk:'will',type:'mc',q:'The government has announced it ___ new environmental policies next year. (formal register)',o:['will introduce','is introducing','introduces','would introduce'],a:0,fb:'Formal announcement about the future → <b>will introduce</b>.',tier:4,hint:'A formal, official announcement about the future. In formal contexts, which word signals a definite future action?'}
 ];
-let queue=[],qIdx=0,sessionMode='all',curItem=null;
-function buildQueue(mode){if(mode==='review'){const ids=state.review.slice();queue=ids.map(i=>ITEMS[i]).filter(Boolean);if(!queue.length){queue=[];}}else{queue=shuffle(ITEMS.map((_,i)=>i)).slice(0,10).map(i=>ITEMS[i]);} }
+let queue=[],qIdx=0,sessionMode='all',curItem=null,hintUsed=false;
+function buildQueue(mode){if(mode==='review'){const ids=state.review.slice();queue=ids.map(i=>ITEMS[i]).filter(Boolean);if(!queue.length){queue=[];}}else{var maxTier=1;if(state.level>=4)maxTier=2;if(state.level>=6)maxTier=3;if(state.level>=8)maxTier=4;var eligible=ITEMS.map(function(_,i){return i;}).filter(function(i){return ITEMS[i].tier<=maxTier;});var currentTier=eligible.filter(function(i){return ITEMS[i].tier===maxTier;});var lowerTier=eligible.filter(function(i){return ITEMS[i].tier<maxTier;});var picked=[];for(var j=0;j<10;j++){if(j<7&&currentTier.length)picked.push(currentTier[Math.floor(Math.random()*currentTier.length)]);else if(lowerTier.length)picked.push(lowerTier[Math.floor(Math.random()*lowerTier.length)]);else if(currentTier.length)picked.push(currentTier[Math.floor(Math.random()*currentTier.length)]);}queue=picked.map(function(i){return ITEMS[i];});} }
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);}
 function startPractice(mode){sessionMode=mode;buildQueue(mode);qIdx=0;if(mode==='review'&&!queue.length){document.getElementById('engine').innerHTML='<div style="text-align:center;padding:20px"><img src="'+IMG.wave+'" style="width:120px"><h3 style="margin:10px 0">Review queue empty!</h3><p style="opacity:.7">You have no pending errors. Do a mixed practice to fill your review if you miss something.</p><button class="btn btn-blue" style="margin-top:14px" onclick="startPractice(\'all\')">Mixed Practice</button></div>';return;}renderItem();}
 function renderItem(){const e=document.getElementById('engine');if(qIdx>=queue.length){const acc=Math.round(state.correct/Math.max(1,state.answered)*100);e.innerHTML='<div style="text-align:center;padding:10px"><img src="'+IMG.wave+'" style="width:130px"><h3 style="margin:10px 0">Session complete! 🎉</h3><p style="opacity:.75">Overall accuracy: '+acc+'%. What you missed has been saved for Smart Review.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><button class="btn btn-blue" onclick="startPractice(\'all\')">Another round</button><button class="btn btn-ghost" onclick="go(\'cards\')">Go to flashcards →</button></div></div>';confetti();return;}
-  curItem=queue[qIdx];const it=curItem;const idx=ITEMS.indexOf(it);
+  curItem=queue[qIdx];hintUsed=false;const it=curItem;const idx=ITEMS.indexOf(it);
   let body;
   if(it.type==='fill'||it.type==='error'){body='<div class="eq-fill"><input id="fillInput" placeholder="Type here…" autocomplete="off" onkeydown="if(event.key===\'Enter\')submitAnswer()"></div>';}
   else{body='<div class="eq-opts">'+it.o.map((o,j)=>'<button class="eq-opt" onclick="submitAnswer('+j+')">'+o+'</button>').join('')+'</div>';}
   const instr=it.type==='fill'?'Type the correct form and press Enter.':it.type==='error'?'Find the error and type the correction.':'Choose the correct option.';
-  e.innerHTML='<div class="engine-top"><span class="skilltag">'+SKILLS[it.sk]+'</span><div class="barwrap"><i style="width:'+(qIdx/queue.length*100)+'%"></i></div><span class="cnt">'+(qIdx+1)+'/'+queue.length+'</span></div>'
+  var tierLabels=['','A2/B1','B1+','B2','B2+'];var tierColors=['','var(--ok)','var(--gold)','var(--red)','#7A4FB5'];
+  e.innerHTML='<div class="engine-top"><span class="skilltag">'+SKILLS[it.sk]+'</span><span class="skilltag" style="background:'+tierColors[it.tier]+';color:#fff">'+tierLabels[it.tier]+'</span><div class="barwrap"><i style="width:'+(qIdx/queue.length*100)+'%"></i></div><span class="cnt">'+(qIdx+1)+'/'+queue.length+'</span></div>'
     +'<div class="eq-q">'+it.q+'</div><div class="eq-instr">'+instr+'</div>'+body
     +'<div class="fb" id="engFb"></div><div class="engine-foot" id="engFoot"></div>';
   if(it.type!=='mc')setTimeout(()=>document.getElementById('fillInput').focus(),50);
 }
 function norm(s){return s.trim().toLowerCase().replace(/\s+/g,' ').replace(/[.]/g,'');}
+var ENCOURAGE=['You can do this! 💪','Almost there, keep trying! 🌟','Great effort — think again! 🧠','Do not give up, you are learning! 🚀','Take your time, you will get it! ✨','Challenge accepted! Try once more! 🔥','Mistakes help you grow — try again! 🌱'];
 function submitAnswer(choice){const it=curItem;const idx=ITEMS.indexOf(it);let correct;
-  if(it.type==='mc'){const btns=document.querySelectorAll('.eq-opt');if(btns[0].disabled)return;btns.forEach(b=>b.disabled=true);correct=(choice===it.a);btns[it.a].classList.add('correct');if(!correct)btns[choice].classList.add('wrong');}
-  else{const inp=document.getElementById('fillInput');if(inp.disabled)return;inp.disabled=true;correct=norm(inp.value)===norm(it.a);inp.style.borderColor=correct?'var(--ok)':'var(--bad)';}
-  const fb=document.getElementById('engFb');fb.className='fb show '+(correct?'right':'wrong');
-  fb.innerHTML='<div class="fb-head">'+(correct?'✅ Correct!':'💡 Answer: '+it.a)+'</div><div class="fb-rule">'+it.fb+'</div>';
+  if(it.type==='mc'){const btns=document.querySelectorAll('.eq-opt');if(btns[0].disabled)return;btns.forEach(b=>b.disabled=true);correct=(choice===it.a);if(!correct&&it.tier>=2&&!hintUsed){btns[choice].classList.add('wrong');var enc=ENCOURAGE[Math.floor(Math.random()*ENCOURAGE.length)];var fb=document.getElementById('engFb');fb.className='fb show hint';fb.innerHTML='<div class="fb-head">'+enc+'</div><div class="fb-rule"><b>Hint:</b> '+it.hint+'</div>';hintUsed=true;var foot=document.getElementById('engFoot');var retry=document.createElement('button');retry.className='btn btn-gold';retry.textContent='Try again ↻';retry.onclick=function(){fb.className='fb';fb.innerHTML='';foot.innerHTML='';btns.forEach(function(b2){b2.disabled=false;b2.classList.remove('wrong');});};foot.appendChild(retry);return;}btns[it.a].classList.add('correct');if(!correct)btns[choice].classList.add('wrong');}
+  else{const inp=document.getElementById('fillInput');if(inp.disabled)return;inp.disabled=true;correct=norm(inp.value)===norm(it.a);if(!correct&&it.tier>=2&&!hintUsed){inp.style.borderColor='var(--gold)';var enc=ENCOURAGE[Math.floor(Math.random()*ENCOURAGE.length)];var fb=document.getElementById('engFb');fb.className='fb show hint';fb.innerHTML='<div class="fb-head">'+enc+'</div><div class="fb-rule"><b>Hint:</b> '+it.hint+'</div>';hintUsed=true;var foot=document.getElementById('engFoot');var retry=document.createElement('button');retry.className='btn btn-gold';retry.textContent='Try again ↻';retry.onclick=function(){fb.className='fb';fb.innerHTML='';foot.innerHTML='';inp.disabled=false;inp.value='';inp.style.borderColor='';inp.focus();};foot.appendChild(retry);return;}inp.style.borderColor=correct?'var(--ok)':'var(--bad)';}
+  var fb=document.getElementById('engFb');fb.className='fb show '+(correct?'right':'wrong');
+  fb.innerHTML='<div class="fb-head">'+(correct?(hintUsed?'✅ You got it on the second try!':'✅ Correct!'):'💡 Answer: '+it.a)+'</div><div class="fb-rule">'+it.fb+'</div>';
   recordAnswer(it.sk,correct);
-  if(correct){addXP(10);toast('Correct! +10 XP','good');state.review=state.review.filter(x=>x!==idx);}
+  var xpReward=curItem.tier===1?10:curItem.tier===2?15:curItem.tier===3?20:30;
+  if(correct&&hintUsed)xpReward=Math.ceil(xpReward*0.6);
+  if(correct){addXP(xpReward);toast('Correct! +'+xpReward+' XP','good');state.review=state.review.filter(x=>x!==idx);}
   else{toast('Review the rule 👇','bad');if(!state.review.includes(idx))state.review.push(idx);}
   persist();updateReviewBadge();
-  const foot=document.getElementById('engFoot');const b=document.createElement('button');b.className='btn btn-blue';b.textContent=(qIdx+1>=queue.length)?'See results →':'Next →';b.onclick=()=>{qIdx++;renderItem();};foot.appendChild(b);}
+  var foot=document.getElementById('engFoot');foot.innerHTML='';var b=document.createElement('button');b.className='btn btn-blue';b.textContent=(qIdx+1>=queue.length)?'See results →':'Next →';b.onclick=()=>{qIdx++;renderItem();};foot.appendChild(b);}
 function updateReviewBadge(){const n=state.review.length;document.getElementById('reviewBtn').textContent='🔁 Smart Review'+(n?' ('+n+')':'');document.getElementById('statReview')&&(document.getElementById('statReview').textContent=n);}
 
 /* ============================================================
@@ -821,18 +875,26 @@ function checkWrite(i){const x=WRITES[i];const v=document.getElementById('wt'+i)
    EXAM
    ============================================================ */
 const EXAM=[
- {sk:'present-simple',q:'The train ___ at 7 PM. (schedule)',o:['will leave','leaves','is leaving','would leave'],a:1},
- {sk:'will',q:"Don't worry, I ___ help you carry that.",o:['am going to','leave','will','leaves'],a:2},
- {sk:'going-to',q:'Watch out! You ___ drop the plate!',o:['will','are going to','leave','would'],a:1},
- {sk:'future-perfect',q:'By 2040, scientists ___ a cure for many diseases.',o:['will find','will have found','find','are finding'],a:1},
- {sk:'zero',q:'If you heat water to 100°C, it ___ .',o:['will boil','would boil','boils','boiled'],a:2},
- {sk:'first',q:'If it rains tomorrow, we ___ the trip.',o:['cancel','will cancel','would cancel','cancelled'],a:1},
- {sk:'second',q:'If I ___ rich, I would help everyone.',o:['am','will be','were','be'],a:2},
- {sk:'fpc',q:'By next month, I ___ studying here for a year.',o:['will have been','will have','am','have been'],a:0},
- {sk:'first',q:'___ you hurry, you will miss the bus. (= if not)',o:['If','When','Unless','Because'],a:2},
- {sk:'second',q:'If I were you, I ___ apologize.',o:['will','would','am going to','do'],a:1},
- {sk:'present-continuous',q:"I ___ Maria at the airport at 6 (ya quedamos).",o:['meet','am meeting','will meet','meets'],a:1},
- {sk:'future-perfect',q:'By the time the movie ends, we ___ here for 3 hours.',o:['will sit','will have sat','will have been sitting','sit'],a:2}
+ {sk:'present-simple',q:'The train ___ at 7 PM. (schedule)',o:['will leave','leaves','is leaving','would leave'],a:1,tier:1},
+ {sk:'will',q:"Don't worry, I ___ help you carry that.",o:['am going to','leave','will','leaves'],a:2,tier:1},
+ {sk:'going-to',q:'Watch out! You ___ drop the plate!',o:['will','are going to','leave','would'],a:1,tier:1},
+ {sk:'future-perfect',q:'By 2040, scientists ___ a cure for many diseases.',o:['will find','will have found','find','are finding'],a:1,tier:1},
+ {sk:'zero',q:'If you heat water to 100°C, it ___ .',o:['will boil','would boil','boils','boiled'],a:2,tier:1},
+ {sk:'first',q:'If it rains tomorrow, we ___ the trip.',o:['cancel','will cancel','would cancel','cancelled'],a:1,tier:1},
+ {sk:'second',q:'If I ___ rich, I would help everyone.',o:['am','will be','were','be'],a:2,tier:1},
+ {sk:'fpc',q:'By next month, I ___ studying here for a year.',o:['will have been','will have','am','have been'],a:0,tier:2},
+ {sk:'first',q:'___ you hurry, you will miss the bus. (= if not)',o:['If','When','Unless','Because'],a:2,tier:2},
+ {sk:'second',q:'If I were you, I ___ apologize.',o:['will','would','am going to','do'],a:1,tier:2},
+ {sk:'present-continuous',q:"I ___ Maria at the airport at 6 (we already arranged it).",o:['meet','am meeting','will meet','meets'],a:1,tier:1},
+ {sk:'future-perfect',q:'By the time the movie ends, we ___ here for 3 hours.',o:['will sit','will have sat','will have been sitting','sit'],a:2,tier:2},
+ {sk:'mixed',q:'If I had accepted that job, I ___ in New York now.',o:['will live','would live','would have lived','lived'],a:1,tier:3},
+ {sk:'mixed',q:'If she were not so stubborn, she ___ the compromise yesterday.',o:['would accept','would have accepted','will accept','accepts'],a:1,tier:4},
+ {sk:'inversion',q:'___ I known the truth, I would never have agreed.',o:['If','Had','Should','Were'],a:1,tier:4},
+ {sk:'inversion',q:'___ you require further information, please contact our office.',o:['Had','Were','If','Should'],a:3,tier:4},
+ {sk:'fpc',q:'By the end of this decade, researchers ___ on this problem for over 20 years.',o:['will work','will have worked','will have been working','work'],a:2,tier:3},
+ {sk:'first',q:'You will succeed provided that you ___ focused.',o:['will stay','stay','stayed','would stay'],a:1,tier:3},
+ {sk:'second',q:'Without sunlight, life on Earth ___ impossible.',o:['will be','is','would be','was'],a:2,tier:3},
+ {sk:'inversion',q:'___ I to discover a new planet, I would name it after my teacher.',o:['Had','Should','Were','If'],a:2,tier:4}
 ];
 let exIdx=0,exScore=0,exBySkill={};
 function startExam(){exIdx=0;exScore=0;exBySkill={};document.getElementById('examResult').classList.remove('show');document.getElementById('examJudah').style.opacity='.95';document.getElementById('examTitle').textContent='Exam · Futures + Conditionals';renderExamQ();}
@@ -850,13 +912,15 @@ function recordExamToReview(){EXAM.forEach(()=>{});}
 /* ===== dashboard render ===== */
 function renderDash(){
   const mg=document.getElementById('masteryGrid');mg.innerHTML='';
-  ['present-simple','present-continuous','will','going-to','future-perfect','fpc','zero','first','second'].forEach(s=>{const p=masteryPct(s);const col=p>=70?'#1FAA66':p>=40?'#E9A72C':'#C8202E';const circ=2*Math.PI*34;const off=circ*(1-p/100);
-    const d=document.createElement('div');d.className='ring-card';d.onclick=()=>{go(['zero','first','second'].includes(s)?'cond':'learn');setTimeout(()=>{const t=document.getElementById('lesson-'+s);if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},250);};
+  ['present-simple','present-continuous','will','going-to','future-perfect','fpc','zero','first','second','mixed','inversion'].forEach(s=>{const p=masteryPct(s);const col=p>=70?'#1FAA66':p>=40?'#E9A72C':'#C8202E';const circ=2*Math.PI*34;const off=circ*(1-p/100);
+    const d=document.createElement('div');d.className='ring-card';d.onclick=()=>{go(['zero','first','second','mixed','inversion'].includes(s)?'cond':'learn');setTimeout(()=>{const t=document.getElementById('lesson-'+s);if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},250);};
     d.innerHTML='<div class="ring"><svg width="84" height="84"><circle cx="42" cy="42" r="34" fill="none" stroke="#E7DCC6" stroke-width="8"/><circle cx="42" cy="42" r="34" fill="none" stroke="'+col+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'"/></svg><div class="pct">'+p+'%</div></div><div class="nm">'+SKILLS[s]+'</div>';mg.appendChild(d);});
   const br=document.getElementById('badgeRow');br.innerHTML='';BADGES.forEach(b=>{const e=document.createElement('div');e.className='badge'+(state.badges.includes(b.id)?' earned':'');e.innerHTML='<div class="ic">'+b.ic+'</div><div class="nm">'+b.nm+'</div>';br.appendChild(e);});
   document.getElementById('statAnswered').textContent=state.answered;document.getElementById('statAcc').textContent=state.answered?Math.round(state.correct/state.answered*100)+'%':'—';document.getElementById('statReview').textContent=state.review.length;
   const hr=new Date().getHours();const greet=hr<12?'Good morning':hr<19?'Good afternoon':'Good evening';
-  document.getElementById('dashGreeting').innerHTML=greet+', future Great Disciple! '+(state.streak>1?'You have had <b>'+state.streak+' days</b> in a row 🔥. ':'')+'Your platform to master futures and conditionals with animations, practice with feedback, and a diagnostic exam.';
+  var tierName=state.level>=8?'B2+ Champion':state.level>=6?'B2 Challenger':state.level>=4?'B1+ Explorer':'Future Learner';
+  var tierHint=state.level<8?' Keep going to unlock harder questions!':'';
+  document.getElementById('dashGreeting').innerHTML=greet+'! You are a <b>'+tierName+'</b>! '+(state.streak>1?'You have had <b>'+state.streak+' days</b> in a row 🔥. ':'')+tierHint+' Your platform to master futures and conditionals with animations, practice with feedback, and a diagnostic exam.';
 }
 
 /* ===== init ===== */
