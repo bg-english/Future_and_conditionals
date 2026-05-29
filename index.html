@@ -479,6 +479,7 @@ footer img{width:42px;margin-bottom:6px}
         <button class="btn btn-blue" style="flex:1" onclick="pickSection('blue')">8th Blue</button>
         <button class="btn btn-primary" style="flex:1" onclick="pickSection('red')">8th Red</button>
       </div>
+      <button style="margin-top:12px;background:none;border:none;color:var(--blue);font-weight:600;font-size:.82rem;cursor:pointer;opacity:.7" onclick="pickSection('teacher')">I am the teacher</button>
     </div>
     <div id="nmStep2" style="display:none">
       <div style="font-size:.78rem;font-weight:700;margin:10px 0 6px;opacity:.6;text-transform:uppercase;letter-spacing:.08em" id="nmSecLabel"></div>
@@ -889,6 +890,9 @@ const ROSTER={
     'Valentino Martinez','Sara Meza','Juan S. Ortiz','Mateo Pachon','Mariana Pareja',
     'Moises Pomarico','Santiago Porto','Isabel Pua','Maryann Renteria','Juan E. Romero',
     'Danna Sarmiento'
+  ],
+  teacher:[
+    'Edoardo Ortiz'
   ]
 };
 
@@ -909,7 +913,7 @@ function pickSection(sec){
   Store.set('fl_player_section',sec);
   document.getElementById('nmStep1').style.display='none';
   document.getElementById('nmStep2').style.display='';
-  document.getElementById('nmSecLabel').textContent='8th '+(sec==='blue'?'Blue':'Red');
+  document.getElementById('nmSecLabel').textContent=sec==='teacher'?'Teacher':('8th '+(sec==='blue'?'Blue':'Red'));
   const sel=document.getElementById('nmSelect');
   sel.innerHTML='<option value="">-- Choose your name --</option>';
   ROSTER[sec].forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
