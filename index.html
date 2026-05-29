@@ -449,6 +449,11 @@ footer img{width:42px;margin-bottom:6px}
   <span class="eyebrow">Leaderboard</span>
   <h1 class="h-title">Class Rankings</h1>
   <p class="h-sub">See how you compare with your classmates. Your scores sync automatically.</p>
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <button class="btn btn-ghost" style="font-size:.82rem;padding:8px 16px" id="secAll" onclick="filterSection('all')">All</button>
+    <button class="btn btn-blue" style="font-size:.82rem;padding:8px 16px" id="secBlue" onclick="filterSection('blue')">8th Blue</button>
+    <button class="btn btn-primary" style="font-size:.82rem;padding:8px 16px" id="secRed" onclick="filterSection('red')">8th Red</button>
+  </div>
   <div class="lb-tabs">
     <button class="active" onclick="loadBoard('xp',this)">By XP</button>
     <button onclick="loadBoard('exam',this)">By Exam Score</button>
@@ -456,8 +461,8 @@ footer img{width:42px;margin-bottom:6px}
   </div>
   <div class="panel">
     <table class="lb-table">
-      <thead><tr><th>#</th><th>Student</th><th>Level</th><th>XP</th><th>Accuracy</th><th>Exam</th><th>Progress</th></tr></thead>
-      <tbody id="lbBody"><tr><td colspan="7" style="text-align:center;opacity:.5;padding:30px">Loading...</td></tr></tbody>
+      <thead><tr><th>#</th><th>Student</th><th>Section</th><th>Level</th><th>XP</th><th>Accuracy</th><th>Exam</th><th>Progress</th></tr></thead>
+      <tbody id="lbBody"><tr><td colspan="8" style="text-align:center;opacity:.5;padding:30px">Loading...</td></tr></tbody>
     </table>
     <div class="lb-refresh" id="lbRefresh"></div>
   </div>
@@ -468,10 +473,22 @@ footer img{width:42px;margin-bottom:6px}
   <div class="nm-card">
     <img id="nmImg" alt="Judah">
     <h2>Welcome to FutureLab!</h2>
-    <p>Enter your full name to save your progress and appear on the leaderboard.</p>
-    <input id="nmInput" placeholder="Your full name" maxlength="40" autocomplete="off">
-    <div class="nm-err" id="nmErr"></div>
-    <button class="btn btn-primary" style="margin-top:14px;width:100%" onclick="submitName()">Start Learning</button>
+    <p>Select your section and then your name.</p>
+    <div id="nmStep1">
+      <div style="display:flex;gap:10px;margin-top:10px">
+        <button class="btn btn-blue" style="flex:1" onclick="pickSection('blue')">8th Blue</button>
+        <button class="btn btn-primary" style="flex:1" onclick="pickSection('red')">8th Red</button>
+      </div>
+    </div>
+    <div id="nmStep2" style="display:none">
+      <div style="font-size:.78rem;font-weight:700;margin:10px 0 6px;opacity:.6;text-transform:uppercase;letter-spacing:.08em" id="nmSecLabel"></div>
+      <select id="nmSelect" style="font-family:'Lexend';font-size:1rem;font-weight:600;border:3px solid var(--line);border-radius:14px;padding:12px 16px;width:100%;color:var(--ink);background:var(--cream);cursor:pointer">
+        <option value="">-- Choose your name --</option>
+      </select>
+      <div class="nm-err" id="nmErr"></div>
+      <button class="btn btn-primary" style="margin-top:14px;width:100%" onclick="submitName()">Start Learning</button>
+      <button style="margin-top:8px;background:none;border:none;color:var(--blue);font-weight:600;font-size:.85rem;cursor:pointer" onclick="backToSections()">← Change section</button>
+    </div>
   </div>
 </div>
 
@@ -857,21 +874,57 @@ const SB_TABLE='futurelab_scores';
 
 function sbHeaders(){return{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'};}
 
+// Student roster
+const ROSTER={
+  blue:[
+    'Fiorella Aronna','Mathias Bello','Danette Caicedo','Juan S. Calvo','Diego Castilla',
+    'Sebastian Castro','Gabriela Diaz','Lionel Floriano','Valerie Lizarazo','Sofia Maradei',
+    'Samuel Nino','Miguel Panciera','Luciana Pedraza','Sarah Perez','Samuel Porto',
+    'Jose A. Quintero','Valentina Reyes','Nadia Rodriguez','Kendall Rojano','Samuel Sabalza',
+    'Emanuel Sierra'
+  ],
+  red:[
+    'Alejandra Alvarez','Sofia Arevalo','Victoria Ariza','Jose M. Castellon','Andres Chima',
+    'Cristina Contreras','Susan Crespo','Vivian Gil','Andres C. Gonzalez','Nicolle Manosalva',
+    'Valentino Martinez','Sara Meza','Juan S. Ortiz','Mateo Pachon','Mariana Pareja',
+    'Moises Pomarico','Santiago Porto','Isabel Pua','Maryann Renteria','Juan E. Romero',
+    'Danna Sarmiento'
+  ]
+};
+
 // Name management
 let playerName=Store.get('fl_player_name',null);
+let playerSection=Store.get('fl_player_section',null);
 
 function showNameModal(){
   const modal=document.getElementById('nameModal');
   modal.classList.remove('hidden');
   document.getElementById('nmImg').src=IMG.wave;
-  setTimeout(()=>document.getElementById('nmInput').focus(),300);
+  document.getElementById('nmStep1').style.display='';
+  document.getElementById('nmStep2').style.display='none';
+}
+
+function pickSection(sec){
+  playerSection=sec;
+  Store.set('fl_player_section',sec);
+  document.getElementById('nmStep1').style.display='none';
+  document.getElementById('nmStep2').style.display='';
+  document.getElementById('nmSecLabel').textContent='8th '+(sec==='blue'?'Blue':'Red');
+  const sel=document.getElementById('nmSelect');
+  sel.innerHTML='<option value="">-- Choose your name --</option>';
+  ROSTER[sec].forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
+}
+
+function backToSections(){
+  document.getElementById('nmStep1').style.display='';
+  document.getElementById('nmStep2').style.display='none';
+  document.getElementById('nmErr').textContent='';
 }
 
 function submitName(){
-  const inp=document.getElementById('nmInput');
-  const name=inp.value.trim();
-  if(name.length<2){document.getElementById('nmErr').textContent='Please enter at least 2 characters.';return;}
-  if(name.length>40){document.getElementById('nmErr').textContent='Name is too long (max 40 characters).';return;}
+  const sel=document.getElementById('nmSelect');
+  const name=sel.value;
+  if(!name){document.getElementById('nmErr').textContent='Please select your name.';return;}
   playerName=name;
   Store.set('fl_player_name',playerName);
   document.getElementById('nameModal').classList.add('hidden');
@@ -887,6 +940,7 @@ function syncToSupabase(){
   syncTimer=setTimeout(()=>{
     const body={
       student_name:playerName,
+      section:playerSection||null,
       xp:state.xp,
       level:state.level,
       streak:state.streak,
@@ -911,17 +965,31 @@ persist=function(){_origPersist();syncToSupabase();};
 
 // Load leaderboard
 let currentSort='xp';
+let currentFilter='all';
+function filterSection(sec){
+  currentFilter=sec;
+  document.getElementById('secAll').className='btn btn-ghost';
+  document.getElementById('secBlue').className='btn btn-ghost';
+  document.getElementById('secRed').className='btn btn-ghost';
+  if(sec==='all')document.getElementById('secAll').className='btn btn-ghost';
+  if(sec==='blue')document.getElementById('secBlue').className='btn btn-blue';
+  if(sec==='red')document.getElementById('secRed').className='btn btn-primary';
+  if(sec==='all'){document.getElementById('secAll').style.borderColor='var(--ink)';document.getElementById('secAll').style.fontWeight='800';}
+  loadBoard(currentSort);
+}
 function loadBoard(sort,btn){
   currentSort=sort||'xp';
   if(btn){document.querySelectorAll('.lb-tabs button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
   const order=sort==='exam'?'exam_score.desc.nullslast':sort==='accuracy'?'accuracy.desc':'xp.desc';
-  fetch(SB_URL+'/rest/v1/'+SB_TABLE+'?select=student_name,xp,level,streak,answered,correct,accuracy,exam_score,badges&order='+order+'&limit=50',{
+  let url=SB_URL+'/rest/v1/'+SB_TABLE+'?select=student_name,section,xp,level,streak,answered,correct,accuracy,exam_score,badges&order='+order+'&limit=50';
+  if(currentFilter!=='all')url+='&section=eq.'+currentFilter;
+  fetch(url,{
     headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}
   })
   .then(r=>r.json())
   .then(rows=>{
     const tb=document.getElementById('lbBody');
-    if(!rows.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;opacity:.5;padding:30px">No students yet. Be the first!</td></tr>';return;}
+    if(!rows.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;opacity:.5;padding:30px">No students yet. Be the first!</td></tr>';return;}
     const maxXp=Math.max(...rows.map(r=>r.xp||1));
     tb.innerHTML=rows.map((r,i)=>{
       const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
@@ -930,12 +998,13 @@ function loadBoard(sort,btn){
       const acc=r.accuracy!=null?r.accuracy+'%':'—';
       const exam=r.exam_score!=null?r.exam_score+'%':'—';
       const pct=Math.round((r.xp||0)/maxXp*100);
-      return '<tr class="'+cls+'"><td>'+(medal?'<span class="lb-medal">'+medal+'</span>':(i+1))+'</td><td class="lb-name">'+r.student_name+(isMe?' (you)':'')+'</td><td>'+r.level+'</td><td>'+r.xp+'</td><td>'+acc+'</td><td>'+exam+'</td><td><div class="lb-bar"><i style="width:'+pct+'%"></i></div></td></tr>';
+      const secBadge=r.section==='blue'?'<span style="background:#E4ECF8;color:#1E50A0;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:10px">BLUE</span>':r.section==='red'?'<span style="background:#FCE6C4;color:#C8202E;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:10px">RED</span>':'—';
+      return '<tr class="'+cls+'"><td>'+(medal?'<span class="lb-medal">'+medal+'</span>':(i+1))+'</td><td class="lb-name">'+r.student_name+(isMe?' (you)':'')+'</td><td>'+secBadge+'</td><td>'+r.level+'</td><td>'+r.xp+'</td><td>'+acc+'</td><td>'+exam+'</td><td><div class="lb-bar"><i style="width:'+pct+'%"></i></div></td></tr>';
     }).join('');
     document.getElementById('lbRefresh').textContent='Last updated: '+new Date().toLocaleTimeString();
   })
   .catch(()=>{
-    document.getElementById('lbBody').innerHTML='<tr><td colspan="7" style="text-align:center;opacity:.5;padding:30px">Could not load leaderboard. Check your connection.</td></tr>';
+    document.getElementById('lbBody').innerHTML='<tr><td colspan="8" style="text-align:center;opacity:.5;padding:30px">Could not load leaderboard. Check your connection.</td></tr>';
   });
 }
 
