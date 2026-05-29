@@ -955,11 +955,11 @@ function syncToSupabase(){
       mastery:state.mastery,
       updated_at:new Date().toISOString()
     };
-    fetch(SB_URL+'/rest/v1/'+SB_TABLE,{
+    fetch(SB_URL+'/rest/v1/'+SB_TABLE+'?on_conflict=student_name',{
       method:'POST',
       headers:sbHeaders(),
       body:JSON.stringify(body)
-    }).catch(()=>{});
+    }).then(r=>{if(!r.ok)console.warn('Sync failed:',r.status);}).catch(e=>console.warn('Sync error:',e));
   },1500);
 }
 
