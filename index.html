@@ -502,7 +502,7 @@ function saveAll(){Store.set('flstate',state);}
 state=Store.get('flstate',state);
 Object.keys(SKILLS).forEach(s=>{if(!state.mastery[s])state.mastery[s]={seen:0,correct:0};});
 
-function persist(){Store.set('flstate',state);}
+var persist=function(){Store.set('flstate',state);};
 
 /* ===== streak ===== */
 (function(){const today=new Date().toDateString();if(state.lastDay!==today){const y=new Date(Date.now()-864e5).toDateString();state.streak=(state.lastDay===y)?state.streak+1:1;state.lastDay=today;persist();}})();
@@ -907,7 +907,7 @@ function syncToSupabase(){
 
 // Patch persist to also sync
 const _origPersist=persist;
-function persist(){_origPersist();syncToSupabase();}
+persist=function(){_origPersist();syncToSupabase();};
 
 // Load leaderboard
 let currentSort='xp';
