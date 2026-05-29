@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FutureLab - Teacher Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700&family=Lexend:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #FBF6EA;
+  --paper: #FFFDF7;
+  --ink: #16244A;
+  --blue: #1E50A0;
+  --blue-lt: #E4ECF8;
+  --red: #C8202E;
+  --gold: #E9A72C;
+  --ok: #1FAA66;
+  --bad: #E64545;
+  --line: #E7DCC6;
+  --soft: #FCE6C4;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Lexend', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+h1, h2, h3, h4 { font-family: 'Bricolage Grotesque', sans-serif; }
+
+/* Top bar */
+.topbar {
+  background: var(--paper);
+  border-bottom: 2px solid var(--line);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(22,36,74,0.06);
+}
+.topbar h1 {
+  font-size: 1.35rem;
+  color: var(--ink);
+  margin-right: auto;
+  white-space: nowrap;
+}
+.topbar h1 span { color: var(--blue); }
+.filter-btns { display: flex; gap: 6px; }
+.filter-btn {
+  font-family: 'Lexend', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 16px;
+  border: 2px solid var(--line);
+  border-radius: 20px;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all .2s;
+}
+.filter-btn:hover { border-color: var(--blue); }
+.filter-btn.active {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+.filter-btn.blue-active {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+.filter-btn.red-active {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+}
+.icon-btn {
+  font-family: 'Lexend', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border: 2px solid var(--line);
+  border-radius: 20px;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all .2s;
+}
+.icon-btn:hover { border-color: var(--blue); background: var(--blue-lt); }
+.refresh-spin { display: inline-block; transition: transform .4s; }
+.refresh-spin.spinning { animation: spin .6s linear; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.last-refresh {
+  font-size: 11px;
+  color: #8a8a8a;
+  white-space: nowrap;
+}
+
+/* Main container */
+.main { max-width: 1340px; margin: 0 auto; padding: 20px 24px 40px; }
+
+/* Summary cards */
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.summary-card {
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 20px;
+  text-align: center;
+}
+.summary-card .label {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: #6b7a9e;
+  margin-bottom: 4px;
+}
+.summary-card .value {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.summary-card .value.blue { color: var(--blue); }
+.summary-card .value.green { color: var(--ok); }
+.summary-card .value.gold { color: var(--gold); }
+
+/* Section panels */
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 28px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: var(--line);
+}
+
+/* Table wrapper */
+.table-wrap {
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  overflow-x: auto;
+  margin-bottom: 10px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+thead th {
+  position: sticky;
+  top: 0;
+  background: var(--blue-lt);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--ink);
+  border-bottom: 2px solid var(--line);
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+thead th:hover { background: #d3deef; }
+thead th .sort-arrow { font-size: 10px; margin-left: 3px; opacity: .4; }
+thead th.sorted .sort-arrow { opacity: 1; color: var(--blue); }
+tbody tr { border-bottom: 1px solid var(--line); transition: background .15s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #f5f0e1; }
+tbody tr.no-exam { background: #fef8e8; }
+tbody tr.no-exam:hover { background: #faf0d4; }
+td { padding: 9px 12px; white-space: nowrap; }
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 10px;
+  text-transform: uppercase;
+}
+.badge-blue { background: var(--blue-lt); color: var(--blue); }
+.badge-red { background: #fbe4e6; color: var(--red); }
+.status-dot {
+  display: inline-block;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+.status-green { background: var(--ok); }
+.status-yellow { background: var(--gold); }
+.status-gray { background: #c5c5c5; }
+.accuracy-good { color: var(--ok); font-weight: 600; }
+.accuracy-mid { color: var(--gold); font-weight: 600; }
+.accuracy-bad { color: var(--bad); font-weight: 600; }
+
+/* Heatmap */
+.heatmap-wrap {
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  overflow-x: auto;
+  margin-bottom: 10px;
+}
+.heatmap-wrap table { font-size: 12px; }
+.heatmap-wrap thead th { font-size: 11px; text-align: center; padding: 8px 6px; }
+.heatmap-wrap td { text-align: center; padding: 6px; font-weight: 500; font-size: 12px; min-width: 70px; }
+.heatmap-wrap td:first-child { text-align: left; font-weight: 600; min-width: 140px; }
+.heat-red { background: #fdd; color: var(--bad); }
+.heat-yellow { background: #fef3d0; color: #9a7000; }
+.heat-green { background: #d6f5e3; color: #157a48; }
+.heat-gray { background: #f0ede6; color: #aaa; }
+
+/* Comparison cards */
+.compare-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+.compare-card {
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  padding: 20px;
+}
+.compare-card h3 {
+  font-size: 1rem;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.compare-card .stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.compare-card .stat-row:last-child { border-bottom: none; }
+.compare-card .stat-val { font-weight: 600; }
+
+/* Attention panel */
+.attention-panel {
+  background: #fef8e8;
+  border: 2px solid var(--gold);
+  border-radius: 14px;
+  padding: 20px;
+}
+.attention-panel h3 {
+  color: var(--gold);
+  font-size: 1rem;
+  margin-bottom: 12px;
+}
+.attention-group { margin-bottom: 14px; }
+.attention-group:last-child { margin-bottom: 0; }
+.attention-group h4 {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  margin-bottom: 6px;
+  color: #8a7540;
+}
+.attention-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.attention-tag {
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+.attention-tag.red { border-color: var(--bad); color: var(--bad); }
+.attention-tag.yellow { border-color: var(--gold); color: #9a7000; }
+.attention-tag.gray { border-color: #bbb; color: #888; }
+.none-msg { font-size: 12px; color: #aaa; font-style: italic; }
+
+/* Loading */
+.loading-overlay {
+  text-align: center;
+  padding: 60px 20px;
+  color: #8a8a8a;
+  font-size: 15px;
+}
+.loading-overlay .spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--line);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  margin: 0 auto 14px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .topbar { padding: 12px 14px; }
+  .topbar h1 { font-size: 1.1rem; }
+  .main { padding: 14px 12px 30px; }
+  .compare-row { grid-template-columns: 1fr; }
+  .summary-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .summary-row { grid-template-columns: 1fr; }
+  .filter-btns { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <h1><span>FutureLab</span> &middot; Teacher Dashboard</h1>
+  <div class="filter-btns">
+    <button class="filter-btn active" data-section="all" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" data-section="blue" onclick="setFilter('blue',this)">8th Blue</button>
+    <button class="filter-btn" data-section="red" onclick="setFilter('red',this)">8th Red</button>
+  </div>
+  <button class="icon-btn" onclick="refreshData()" id="refreshBtn">
+    <span class="refresh-spin" id="refreshIcon">&#x21bb;</span> Refresh
+  </button>
+  <button class="icon-btn" onclick="exportCSV()">&#x2913; Export CSV</button>
+  <span class="last-refresh" id="lastRefresh">Last refreshed: --:--:--</span>
+</div>
+
+<!-- Main content -->
+<div class="main" id="mainContent">
+  <div class="loading-overlay" id="loadingState">
+    <div class="spinner"></div>
+    Loading student data...
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://gfjiicfnwpkbkptwgnte.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmamlpY2Zud3BrYmtwdHdnbnRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNzU0NjQsImV4cCI6MjA5Mjc1MTQ2NH0.yFNCdZ5euxNFneh885pPg3t04KBdwJ6uF3BfQAHTXE4';
+const TABLE = 'futurelab_scores';
+
+let allStudents = [];
+let currentFilter = 'all';
+let sortCol = 'student_name';
+let sortAsc = true;
+let autoRefreshTimer = null;
+
+const SKILLS = [
+  { key: 'present-simple', label: 'Present Simple' },
+  { key: 'present-continuous', label: 'Present Cont.' },
+  { key: 'will', label: 'Will' },
+  { key: 'going-to', label: 'Going To' },
+  { key: 'future-perfect', label: 'Future Perfect' },
+  { key: 'fpc', label: 'Fut. Perf. Cont.' },
+  { key: 'zero', label: 'Zero Cond.' },
+  { key: 'first', label: 'First Cond.' },
+  { key: 'second', label: 'Second Cond.' }
+];
+
+async function fetchStudents() {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/${TABLE}?section=neq.teacher&select=*`,
+    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+  );
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+function filtered() {
+  if (currentFilter === 'all') return allStudents;
+  return allStudents.filter(s => s.section === currentFilter);
+}
+
+function relativeTime(dateStr) {
+  if (!dateStr) return '---';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins} min ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
+
+function statusClass(dateStr) {
+  if (!dateStr) return 'status-gray';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  if (diff < 30 * 60000) return 'status-green';
+  if (diff < 2 * 3600000) return 'status-yellow';
+  return 'status-gray';
+}
+
+function accClass(v) {
+  if (v >= 70) return 'accuracy-good';
+  if (v >= 50) return 'accuracy-mid';
+  return 'accuracy-bad';
+}
+
+function mastery(m, key) {
+  if (!m || !m[key] || !m[key].seen) return { pct: null, seen: 0 };
+  return { pct: Math.round((m[key].correct / m[key].seen) * 100), seen: m[key].seen };
+}
+
+function heatClass(pct) {
+  if (pct === null) return 'heat-gray';
+  if (pct < 40) return 'heat-red';
+  if (pct < 70) return 'heat-yellow';
+  return 'heat-green';
+}
+
+function avg(arr, key) {
+  const vals = arr.map(s => s[key]).filter(v => v != null);
+  if (!vals.length) return null;
+  return vals.reduce((a, b) => a + b, 0) / vals.length;
+}
+
+function render() {
+  const students = filtered();
+  const totalStudents = students.length;
+  const avgAcc = avg(students, 'accuracy');
+  const examStudents = students.filter(s => s.exam_score != null);
+  const avgExam = avg(examStudents, 'exam_score');
+
+  let html = '';
+
+  // Summary cards
+  html += `<div class="summary-row">
+    <div class="summary-card"><div class="label">Total Students</div><div class="value blue">${totalStudents}</div></div>
+    <div class="summary-card"><div class="label">Avg Accuracy</div><div class="value green">${avgAcc != null ? avgAcc.toFixed(1) + '%' : '---'}</div></div>
+    <div class="summary-card"><div class="label">Avg Exam Score</div><div class="value gold">${avgExam != null ? avgExam.toFixed(1) + '%' : '---'}</div></div>
+    <div class="summary-card"><div class="label">Exams Completed</div><div class="value">${examStudents.length}<span style="font-size:.9rem;color:#8a8a8a">/${totalStudents}</span></div></div>
+  </div>`;
+
+  // Class overview table
+  html += `<div class="section-title">Class Overview</div>`;
+  const sorted = [...students].sort((a, b) => {
+    let va = a[sortCol], vb = b[sortCol];
+    if (sortCol === 'student_name') { va = (va || '').toLowerCase(); vb = (vb || '').toLowerCase(); }
+    if (sortCol === 'updated_at') { va = va ? new Date(va).getTime() : 0; vb = vb ? new Date(vb).getTime() : 0; }
+    if (va == null) va = -Infinity;
+    if (vb == null) vb = -Infinity;
+    if (va < vb) return sortAsc ? -1 : 1;
+    if (va > vb) return sortAsc ? 1 : -1;
+    return 0;
+  });
+
+  function thSort(col, label) {
+    const arrow = sortCol === col ? (sortAsc ? '&#x25B2;' : '&#x25BC;') : '&#x25B2;';
+    const cls = sortCol === col ? 'sorted' : '';
+    return `<th class="${cls}" onclick="toggleSort('${col}')">${label} <span class="sort-arrow">${arrow}</span></th>`;
+  }
+
+  html += `<div class="table-wrap"><table>
+    <thead><tr>
+      ${thSort('student_name','Name')}
+      ${thSort('section','Section')}
+      ${thSort('level','Level')}
+      ${thSort('xp','XP')}
+      ${thSort('answered','Answered')}
+      ${thSort('accuracy','Accuracy')}
+      ${thSort('exam_score','Exam Score')}
+      ${thSort('updated_at','Last Active')}
+      <th>Status</th>
+    </tr></thead><tbody>`;
+
+  for (const s of sorted) {
+    const noExam = s.exam_score == null;
+    const accVal = s.accuracy != null ? parseFloat(s.accuracy) : 0;
+    html += `<tr class="${noExam ? 'no-exam' : ''}">
+      <td style="font-weight:600">${s.student_name || '---'}</td>
+      <td><span class="badge ${s.section === 'blue' ? 'badge-blue' : 'badge-red'}">${s.section === 'blue' ? '8th Blue' : '8th Red'}</span></td>
+      <td>${s.level ?? 0}</td>
+      <td>${(s.xp ?? 0).toLocaleString()}</td>
+      <td>${s.answered ?? 0}</td>
+      <td class="${accClass(accVal)}">${accVal.toFixed(1)}%</td>
+      <td>${noExam ? '<span style="color:#bbb">&mdash;</span>' : s.exam_score + '%'}</td>
+      <td>${relativeTime(s.updated_at)}</td>
+      <td><span class="status-dot ${statusClass(s.updated_at)}"></span></td>
+    </tr>`;
+  }
+  html += `</tbody></table></div>`;
+
+  // Skill mastery heatmap
+  html += `<div class="section-title">Skill Mastery Heatmap</div>`;
+  html += `<div class="heatmap-wrap"><table>
+    <thead><tr><th style="text-align:left">Student</th>`;
+  for (const sk of SKILLS) html += `<th>${sk.label}</th>`;
+  html += `</tr></thead><tbody>`;
+  for (const s of sorted) {
+    html += `<tr><td>${s.student_name || '---'}</td>`;
+    for (const sk of SKILLS) {
+      const m = mastery(s.mastery, sk.key);
+      html += `<td class="${heatClass(m.pct)}">${m.pct != null ? m.pct + '%' : '-'}</td>`;
+    }
+    html += `</tr>`;
+  }
+  html += `</tbody></table></div>`;
+
+  // Section comparison
+  html += `<div class="section-title">Section Comparison</div>`;
+  const blues = allStudents.filter(s => s.section === 'blue');
+  const reds = allStudents.filter(s => s.section === 'red');
+  function compCard(label, badgeCls, arr) {
+    const a = avg(arr, 'accuracy');
+    const x = avg(arr, 'xp');
+    const exArr = arr.filter(s => s.exam_score != null);
+    const e = avg(exArr, 'exam_score');
+    return `<div class="compare-card">
+      <h3><span class="badge ${badgeCls}">${label}</span> <span style="font-size:.85rem;color:#8a8a8a">${arr.length} students</span></h3>
+      <div class="stat-row"><span>Avg XP</span><span class="stat-val">${x != null ? Math.round(x).toLocaleString() : '---'}</span></div>
+      <div class="stat-row"><span>Avg Accuracy</span><span class="stat-val">${a != null ? a.toFixed(1) + '%' : '---'}</span></div>
+      <div class="stat-row"><span>Avg Exam Score</span><span class="stat-val">${e != null ? e.toFixed(1) + '%' : '---'}</span></div>
+      <div class="stat-row"><span>Exams Completed</span><span class="stat-val">${exArr.length} / ${arr.length}</span></div>
+    </div>`;
+  }
+  html += `<div class="compare-row">
+    ${compCard('8th Blue', 'badge-blue', blues)}
+    ${compCard('8th Red', 'badge-red', reds)}
+  </div>`;
+
+  // Students needing attention
+  html += `<div class="section-title">Students Needing Attention</div>`;
+  const now = Date.now();
+  const lowAcc = students.filter(s => s.accuracy != null && parseFloat(s.accuracy) < 50 && (s.answered || 0) > 0);
+  const noExam = students.filter(s => s.exam_score == null);
+  const inactive = students.filter(s => {
+    if (!s.updated_at) return true;
+    return (now - new Date(s.updated_at).getTime()) > 24 * 3600000;
+  });
+
+  html += `<div class="attention-panel">
+    <h3>&#9888; Needs Attention</h3>
+    <div class="attention-group">
+      <h4>Low Accuracy (&lt; 50%)</h4>
+      <div class="attention-list">
+        ${lowAcc.length ? lowAcc.map(s => `<span class="attention-tag red">${s.student_name} (${parseFloat(s.accuracy).toFixed(0)}%)</span>`).join('') : '<span class="none-msg">None</span>'}
+      </div>
+    </div>
+    <div class="attention-group">
+      <h4>Exam Not Taken</h4>
+      <div class="attention-list">
+        ${noExam.length ? noExam.map(s => `<span class="attention-tag yellow">${s.student_name}</span>`).join('') : '<span class="none-msg">None</span>'}
+      </div>
+    </div>
+    <div class="attention-group">
+      <h4>Inactive (&gt; 24 hours)</h4>
+      <div class="attention-list">
+        ${inactive.length ? inactive.map(s => `<span class="attention-tag gray">${s.student_name} (${relativeTime(s.updated_at)})</span>`).join('') : '<span class="none-msg">None</span>'}
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('mainContent').innerHTML = html;
+}
+
+function setFilter(section, btn) {
+  currentFilter = section;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.remove('active', 'blue-active', 'red-active');
+  });
+  if (section === 'blue') btn.classList.add('active', 'blue-active');
+  else if (section === 'red') btn.classList.add('active', 'red-active');
+  else btn.classList.add('active');
+  render();
+}
+
+function toggleSort(col) {
+  if (sortCol === col) sortAsc = !sortAsc;
+  else { sortCol = col; sortAsc = true; }
+  render();
+}
+
+async function refreshData() {
+  const icon = document.getElementById('refreshIcon');
+  icon.classList.add('spinning');
+  try {
+    allStudents = await fetchStudents();
+    render();
+    const now = new Date();
+    document.getElementById('lastRefresh').textContent =
+      `Last refreshed: ${now.toLocaleTimeString('en-US', { hour12: false })}`;
+  } catch (e) {
+    console.error('Fetch error:', e);
+    document.getElementById('mainContent').innerHTML =
+      `<div class="loading-overlay" style="color:var(--bad)">Failed to load data. Check console for details.</div>`;
+  }
+  setTimeout(() => icon.classList.remove('spinning'), 600);
+}
+
+function exportCSV() {
+  const students = filtered();
+  const headers = ['Name','Section','Level','XP','Answered','Accuracy','Exam Score','Last Active'];
+  const rows = students.map(s => [
+    s.student_name,
+    s.section === 'blue' ? '8th Blue' : '8th Red',
+    s.level,
+    s.xp,
+    s.answered,
+    s.accuracy != null ? parseFloat(s.accuracy).toFixed(1) + '%' : '',
+    s.exam_score != null ? s.exam_score + '%' : '',
+    s.updated_at || ''
+  ]);
+  let csv = headers.join(',') + '\n';
+  for (const r of rows) {
+    csv += r.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',') + '\n';
+  }
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `futurelab_students_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// Initial load + auto-refresh
+refreshData();
+autoRefreshTimer = setInterval(refreshData, 30000);
+</script>
+</body>
+</html>
