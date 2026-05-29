@@ -91,6 +91,56 @@ button{font-family:'Lexend';cursor:pointer}
 .badge .ic{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:1.5rem;margin:0 auto 4px;background:var(--soft);border:3px solid var(--gold)}
 .badge .nm{font-size:.62rem;font-weight:700;line-height:1.1}
 
+/* ===== BADGE SHOWCASE ===== */
+.badge-showcase{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px}
+.badge-card{background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:16px 10px;text-align:center;transition:.3s;position:relative;overflow:hidden}
+.badge-card.earned{border-color:var(--gold);box-shadow:0 4px 20px rgba(233,167,44,.25)}
+.badge-card.locked{opacity:.45;filter:grayscale(.8)}
+.badge-card:hover{transform:translateY(-3px)}
+.badge-card .badge-icon{width:64px;height:64px;margin:0 auto 8px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;position:relative}
+.badge-card .badge-icon::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:3px solid transparent}
+.badge-card.earned .badge-icon::after{border-color:var(--gold);animation:pulse-ring 2s ease-out infinite}
+@keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(233,167,44,.4)}70%{box-shadow:0 0 0 10px rgba(233,167,44,0)}100%{box-shadow:0 0 0 0 rgba(233,167,44,0)}}
+.badge-card .badge-nm{font-weight:700;font-size:.78rem;margin-bottom:2px}
+.badge-card .badge-desc{font-size:.68rem;opacity:.6;line-height:1.2}
+.badge-card .badge-check{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:var(--ok);color:#fff;font-size:12px;display:grid;place-items:center}
+.badge-card.locked .badge-check{display:none}
+.badge-card .badge-ribbon{position:absolute;top:0;left:0;right:0;height:4px}
+.badge-card.earned .badge-ribbon{background:linear-gradient(90deg,var(--gold),var(--red),var(--blue),var(--gold))}
+
+/* ===== REINFORCE ===== */
+.rf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:28px}
+.rf-card{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:20px;cursor:pointer;transition:.25s;position:relative;overflow:hidden}
+.rf-card:hover{border-color:var(--blue);transform:translateY(-3px);box-shadow:var(--shadow-sm)}
+.rf-card.weak{border-color:var(--bad);background:#fef8f8}
+.rf-card.weak::before{content:'NEEDS WORK';position:absolute;top:10px;right:-28px;background:var(--bad);color:#fff;font-size:.6rem;font-weight:800;padding:2px 34px;transform:rotate(35deg);letter-spacing:.5px}
+.rf-card.strong{border-color:var(--ok);background:#f4fcf7}
+.rf-card .rf-icon{font-size:2rem;margin-bottom:8px}
+.rf-card .rf-name{font-family:'Bricolage Grotesque';font-weight:800;font-size:1.05rem;margin-bottom:4px}
+.rf-card .rf-pct{font-size:.82rem;font-weight:600}
+.rf-card .rf-bar{height:6px;background:#eee;border-radius:3px;margin-top:8px;overflow:hidden}
+.rf-card .rf-bar i{display:block;height:100%;border-radius:3px;transition:width .4s}
+.rf-detail{background:var(--paper);border:2px solid var(--line);border-radius:22px;padding:30px;margin-bottom:20px;animation:fade .4s}
+.rf-detail .rf-back{font-size:.85rem;cursor:pointer;color:var(--blue);font-weight:600;margin-bottom:16px;display:inline-block}
+.rf-detail .rf-back:hover{text-decoration:underline}
+.rf-theory{background:var(--blue-lt);border-radius:16px;padding:22px;margin-bottom:20px}
+.rf-theory h3{font-family:'Bricolage Grotesque';margin-bottom:10px}
+.rf-theory .rf-formula{background:var(--paper);border:2px solid var(--blue);border-radius:12px;padding:14px;margin:12px 0;font-family:'Bricolage Grotesque';font-size:1rem;font-weight:700;text-align:center}
+.rf-theory .rf-examples{margin-top:12px}
+.rf-theory .rf-ex{background:var(--paper);border-radius:10px;padding:10px 14px;margin:6px 0;font-size:.9rem;border-left:4px solid var(--blue)}
+.rf-theory .rf-ex b{color:var(--blue)}
+.rf-theory .rf-tip{background:var(--soft);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:.85rem;border-left:4px solid var(--gold)}
+.rf-exercises h3{font-family:'Bricolage Grotesque';margin-bottom:14px}
+.rf-exercise{background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:18px;margin-bottom:12px;transition:.3s}
+.rf-exercise.completed{border-color:var(--ok);background:#f4fcf7}
+.rf-exercise .rf-diff{display:inline-block;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:10px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.rf-exercise .rf-diff.easy{background:#d6f5e3;color:#157a48}
+.rf-exercise .rf-diff.medium{background:#fef3d0;color:#9a7000}
+.rf-exercise .rf-diff.hard{background:#fdd;color:var(--bad)}
+.rf-exercise .rf-q{font-size:1rem;font-weight:600;margin-bottom:10px}
+.rf-encourage{text-align:center;padding:20px;background:linear-gradient(135deg,#E4ECF8,#FCE6C4);border-radius:16px;margin-top:20px}
+.rf-encourage h3{font-family:'Bricolage Grotesque';margin-bottom:6px}
+
 /* ===== LEARN ===== */
 .lesson{background:var(--paper);border:2px solid var(--line);border-radius:24px;padding:28px;margin-bottom:24px;scroll-margin-top:90px}
 .lesson .lhead{display:flex;align-items:center;gap:12px;margin-bottom:4px}
@@ -323,8 +373,8 @@ footer img{width:42px;margin-bottom:6px}
       <div class="mastery-grid" id="masteryGrid"></div>
     </div>
     <div class="panel">
-      <h3>🏅 Badges</h3>
-      <div class="badge-row" id="badgeRow"></div>
+      <h3 style="display:flex;align-items:center;gap:10px">🏅 Badges <span id="badgeProgress" style="font-size:.78rem;font-weight:500;opacity:.6"></span></h3>
+      <div class="badge-showcase" id="badgeRow"></div>
       <h3 style="margin-top:22px">📊 Your Session</h3>
       <div class="grid cards-3" style="gap:10px">
         <div style="text-align:center"><div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:1.8rem;color:var(--blue)" id="statAnswered">0</div><div style="font-size:.76rem;opacity:.6">answered</div></div>
@@ -341,8 +391,9 @@ footer img{width:42px;margin-bottom:6px}
       <div class="ring-card" onclick="go('practice')"><div style="font-size:2rem">🎮</div><div class="nm" style="margin-top:8px;font-weight:800">2. Practice</div><div style="font-size:.78rem;opacity:.6">adaptive engine + review</div></div>
       <div class="ring-card" onclick="go('cards')"><div style="font-size:2rem">🃏</div><div class="nm" style="margin-top:8px;font-weight:800">3. Flashcards</div><div style="font-size:.78rem;opacity:.6">memorize with repetition</div></div>
       <div class="ring-card" onclick="go('cond')"><div style="font-size:2rem">🔀</div><div class="nm" style="margin-top:8px;font-weight:800">4. Conditionals</div><div style="font-size:.78rem;opacity:.6">the big section</div></div>
-      <div class="ring-card" onclick="go('write')"><div style="font-size:2rem">✍️</div><div class="nm" style="margin-top:8px;font-weight:800">5. Write</div><div style="font-size:.78rem;opacity:.6">with self-review</div></div>
-      <div class="ring-card" onclick="go('exam')"><div style="font-size:2rem">🏆</div><div class="nm" style="margin-top:8px;font-weight:800">6. Exam</div><div style="font-size:.78rem;opacity:.6">final diagnostic</div></div>
+      <div class="ring-card" onclick="go('reinforce')"><div style="font-size:2rem">💪</div><div class="nm" style="margin-top:8px;font-weight:800">5. Reinforce</div><div style="font-size:.78rem;opacity:.6">theory + progressive practice</div></div>
+      <div class="ring-card" onclick="go('write')"><div style="font-size:2rem">✍️</div><div class="nm" style="margin-top:8px;font-weight:800">6. Write</div><div style="font-size:.78rem;opacity:.6">with self-review</div></div>
+      <div class="ring-card" onclick="go('exam')"><div style="font-size:2rem">🏆</div><div class="nm" style="margin-top:8px;font-weight:800">7. Exam</div><div style="font-size:.78rem;opacity:.6">final diagnostic</div></div>
     </div>
   </div>
 </div>
@@ -445,6 +496,14 @@ footer img{width:42px;margin-bottom:6px}
   </div>
 </div>
 
+<!-- REINFORCE -->
+<div class="view hidden" id="v-reinforce">
+  <span class="eyebrow">Skill Lab</span>
+  <h1 class="h-title">Reinforcement Zone</h1>
+  <p class="h-sub" id="rfIntro">Choose a skill to review its theory and practice from easy to hard. Focus on your weakest areas to build confidence for the exam.</p>
+  <div id="rfContent"></div>
+</div>
+
 <!-- LEADERBOARD -->
 <div class="view hidden" id="v-board">
   <span class="eyebrow">Leaderboard</span>
@@ -527,10 +586,10 @@ var persist=function(){Store.set('flstate',state);};
 (function(){const today=new Date().toDateString();if(state.lastDay!==today){const y=new Date(Date.now()-864e5).toDateString();state.streak=(state.lastDay===y)?state.streak+1:1;state.lastDay=today;persist();}})();
 
 /* ===== nav ===== */
-const VIEWS=[['dash','🏠 Home'],['learn','📖 Learn'],['practice','🎮 Practice'],['cards','🃏 Flashcards'],['cond','🔀 Conditionals'],['write','✍️ Write'],['exam','🏆 Exam'],['board','🏅 Leaderboard']];
+const VIEWS=[['dash','🏠 Home'],['learn','📖 Learn'],['practice','🎮 Practice'],['cards','🃏 Flashcards'],['cond','🔀 Conditionals'],['reinforce','💪 Reinforce'],['write','✍️ Write'],['exam','🏆 Exam'],['board','🏅 Leaderboard']];
 const tabsEl=document.getElementById('tabs');
 VIEWS.forEach(([id,label])=>{const b=document.createElement('button');b.className='tab';b.textContent=label;b.dataset.v=id;b.onclick=()=>go(id);tabsEl.appendChild(b);});
-function go(id){document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));document.getElementById('v-'+id).classList.remove('hidden');document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.v===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='dash')renderDash();if(id==='learn')playTimelines();if(id==='board')loadBoard('xp');}
+function go(id){document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));document.getElementById('v-'+id).classList.remove('hidden');document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.v===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='dash')renderDash();if(id==='learn')playTimelines();if(id==='reinforce')renderReinforce();if(id==='board')loadBoard('xp');}
 
 /* ===== HUD ===== */
 function renderHUD(){document.getElementById('sLevel').textContent=state.level;document.getElementById('sXp').textContent=state.xp;document.getElementById('sStreak').textContent=state.streak;}
@@ -543,9 +602,33 @@ function speak(text){if(!('speechSynthesis'in window))return;try{speechSynthesis
 function confetti(){const cs=['#1E50A0','#C8202E','#E9A72C','#1FAA66'];for(let i=0;i<70;i++){const d=document.createElement('div');d.className='confetti';d.style.left=Math.random()*100+'vw';d.style.background=cs[i%4];d.style.transform='rotate('+Math.random()*360+'deg)';document.body.appendChild(d);const dur=2200+Math.random()*1500;d.animate([{transform:'translateY(0) rotate(0)',opacity:1},{transform:'translateY(105vh) rotate('+(360+Math.random()*360)+'deg)',opacity:.9}],{duration:dur,easing:'cubic-bezier(.3,.6,.4,1)'});setTimeout(()=>d.remove(),dur);}}
 
 /* ===== badges ===== */
-const BADGES=[{id:'first',ic:'🎯',nm:'First correct'},{id:'streak3',ic:'🔥',nm:'3-day streak'},{id:'tense',ic:'⏳',nm:'Future tense master'},{id:'cond',ic:'🔀',nm:'Conditional king'},{id:'exam',ic:'🏆',nm:'Exam passed'},{id:'perfect',ic:'💯',nm:'Perfect exam'}];
-function award(id){if(!state.badges.includes(id)){state.badges.push(id);persist();const b=BADGES.find(x=>x.id===id);toast('Badge: '+b.nm+'! '+b.ic,'good');confetti();}}
-function checkBadges(){const tn=['present-simple','present-continuous','will','going-to','future-perfect','fpc'];if(tn.every(s=>masteryPct(s)>=80))award('tense');if(['zero','first','second','mixed','inversion'].every(s=>masteryPct(s)>=80))award('cond');if(state.streak>=3)award('streak3');}
+const BADGES=[
+  {id:'first',ic:'🎯',nm:'First Hit',desc:'Answer your first question correctly',color:'#1FAA66',gradient:'linear-gradient(135deg,#d6f5e3,#1FAA66)'},
+  {id:'streak3',ic:'🔥',nm:'On Fire',desc:'Maintain a 3-day streak',color:'#E64545',gradient:'linear-gradient(135deg,#fdd,#E64545)'},
+  {id:'practice50',ic:'⚡',nm:'Practice Star',desc:'Answer 50 questions total',color:'#E9A72C',gradient:'linear-gradient(135deg,#fef3d0,#E9A72C)'},
+  {id:'practice100',ic:'💫',nm:'Unstoppable',desc:'Answer 100 questions total',color:'#BE8418',gradient:'linear-gradient(135deg,#FCE6C4,#BE8418)'},
+  {id:'accuracy80',ic:'🎖️',nm:'Accuracy Ace',desc:'Maintain 80%+ accuracy (30+ Qs)',color:'#1E50A0',gradient:'linear-gradient(135deg,#E4ECF8,#1E50A0)'},
+  {id:'tense',ic:'⏳',nm:'Tense Master',desc:'80%+ mastery on all 6 future tenses',color:'#7A4FB5',gradient:'linear-gradient(135deg,#EDE7F6,#7A4FB5)'},
+  {id:'cond',ic:'🔀',nm:'Conditional King',desc:'80%+ mastery on all 5 conditionals',color:'#C8202E',gradient:'linear-gradient(135deg,#fbe4e6,#C8202E)'},
+  {id:'tierB1',ic:'🧭',nm:'B1+ Explorer',desc:'Reach Level 4 — B1+ unlocked',color:'#1FAA66',gradient:'linear-gradient(135deg,#d6f5e3,#1E50A0)'},
+  {id:'tierB2',ic:'⚔️',nm:'B2 Challenger',desc:'Reach Level 6 — B2 unlocked',color:'#E9A72C',gradient:'linear-gradient(135deg,#fef3d0,#C8202E)'},
+  {id:'tierB2plus',ic:'👑',nm:'B2+ Champion',desc:'Reach Level 8 — highest tier!',color:'#7A4FB5',gradient:'linear-gradient(135deg,#EDE7F6,#E9A72C)'},
+  {id:'exam',ic:'🏆',nm:'Exam Warrior',desc:'Complete the final exam',color:'#E9A72C',gradient:'linear-gradient(135deg,#FCE6C4,#E9A72C)'},
+  {id:'perfect',ic:'💯',nm:'Perfection',desc:'Score 100% on the final exam',color:'#16244A',gradient:'linear-gradient(135deg,#E4ECF8,#16244A)'}
+];
+function award(id){if(!state.badges.includes(id)){state.badges.push(id);persist();const b=BADGES.find(x=>x.id===id);toast('🏅 Badge Earned: '+b.nm+'! '+b.ic,'good');confetti();}}
+function checkBadges(){
+  const tn=['present-simple','present-continuous','will','going-to','future-perfect','fpc'];
+  if(tn.every(s=>masteryPct(s)>=80))award('tense');
+  if(['zero','first','second','mixed','inversion'].every(s=>masteryPct(s)>=80))award('cond');
+  if(state.streak>=3)award('streak3');
+  if(state.answered>=50)award('practice50');
+  if(state.answered>=100)award('practice100');
+  if(state.answered>=30&&state.correct/state.answered>=0.8)award('accuracy80');
+  if(state.level>=4)award('tierB1');
+  if(state.level>=6)award('tierB2');
+  if(state.level>=8)award('tierB2plus');
+}
 
 /* ===== mastery ===== */
 function masteryPct(s){const m=state.mastery[s];return m&&m.seen?Math.round(m.correct/m.seen*100):0;}
@@ -915,12 +998,368 @@ function renderDash(){
   ['present-simple','present-continuous','will','going-to','future-perfect','fpc','zero','first','second','mixed','inversion'].forEach(s=>{const p=masteryPct(s);const col=p>=70?'#1FAA66':p>=40?'#E9A72C':'#C8202E';const circ=2*Math.PI*34;const off=circ*(1-p/100);
     const d=document.createElement('div');d.className='ring-card';d.onclick=()=>{go(['zero','first','second','mixed','inversion'].includes(s)?'cond':'learn');setTimeout(()=>{const t=document.getElementById('lesson-'+s);if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},250);};
     d.innerHTML='<div class="ring"><svg width="84" height="84"><circle cx="42" cy="42" r="34" fill="none" stroke="#E7DCC6" stroke-width="8"/><circle cx="42" cy="42" r="34" fill="none" stroke="'+col+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'"/></svg><div class="pct">'+p+'%</div></div><div class="nm">'+SKILLS[s]+'</div>';mg.appendChild(d);});
-  const br=document.getElementById('badgeRow');br.innerHTML='';BADGES.forEach(b=>{const e=document.createElement('div');e.className='badge'+(state.badges.includes(b.id)?' earned':'');e.innerHTML='<div class="ic">'+b.ic+'</div><div class="nm">'+b.nm+'</div>';br.appendChild(e);});
+  const br=document.getElementById('badgeRow');br.innerHTML='';
+  var earnedCount=0;
+  BADGES.forEach(b=>{
+    var earned=state.badges.includes(b.id);
+    if(earned)earnedCount++;
+    var card=document.createElement('div');
+    card.className='badge-card'+(earned?' earned':' locked');
+    card.innerHTML='<div class="badge-ribbon"></div>'
+      +'<div class="badge-icon" style="background:'+(earned?b.gradient:'#f0ede6')+'">'+b.ic+'</div>'
+      +'<div class="badge-nm">'+b.nm+'</div>'
+      +'<div class="badge-desc">'+b.desc+'</div>'
+      +(earned?'<div class="badge-check">✓</div>':'');
+    br.appendChild(card);
+  });
+  br.className='badge-showcase';
+  // Badge progress summary
+  var bpEl=document.getElementById('badgeProgress');
+  if(bpEl)bpEl.innerHTML='<b>'+earnedCount+'</b> / '+BADGES.length+' badges earned';
   document.getElementById('statAnswered').textContent=state.answered;document.getElementById('statAcc').textContent=state.answered?Math.round(state.correct/state.answered*100)+'%':'—';document.getElementById('statReview').textContent=state.review.length;
   const hr=new Date().getHours();const greet=hr<12?'Good morning':hr<19?'Good afternoon':'Good evening';
   var tierName=state.level>=8?'B2+ Champion':state.level>=6?'B2 Challenger':state.level>=4?'B1+ Explorer':'Future Learner';
   var tierHint=state.level<8?' Keep going to unlock harder questions!':'';
   document.getElementById('dashGreeting').innerHTML=greet+'! You are a <b>'+tierName+'</b>! '+(state.streak>1?'You have had <b>'+state.streak+' days</b> in a row 🔥. ':'')+tierHint+' Your platform to master futures and conditionals with animations, practice with feedback, and a diagnostic exam.';
+}
+
+/* ============================================================
+   REINFORCEMENT SYSTEM
+   ============================================================ */
+const RF_THEORY={
+'present-simple':{
+  icon:'🕐',color:'#1E50A0',
+  title:'Present Simple for Future',
+  formula:'Subject + verb (+s/es)',
+  when:'Use for <b>fixed schedules, timetables, and official programs</b> — things decided by an external authority, not by you.',
+  examples:['The train <b>leaves</b> at 6 PM.','The movie <b>starts</b> at 8 tonight.','School <b>begins</b> on September 1st.','The shop <b>closes</b> at 9 PM.'],
+  tip:'If a schedule is printed (bus, plane, class), use Present Simple. Never use "will" for timetables.',
+  common_error:'"The class will start at 9." → "The class <b>starts</b> at 9." (fixed schedule)'
+},
+'present-continuous':{
+  icon:'📅',color:'#E9A72C',
+  title:'Present Continuous for Future',
+  formula:'Subject + am/is/are + verb-ING',
+  when:'Use for <b>personal arrangements already confirmed</b> — you made a plan with someone or booked something.',
+  examples:['I <b>am meeting</b> Sarah for lunch tomorrow.','We <b>are having</b> dinner with the Smiths on Saturday.','She <b>is flying</b> to London next week.','They <b>are moving</b> to a new house in July.'],
+  tip:'The key difference from "going to": Present Continuous implies an arrangement with another person or a booking. "Going to" is just a personal decision.',
+  common_error:'"I will meet Sarah tomorrow (we booked)." → "I <b>am meeting</b> Sarah tomorrow."'
+},
+'will':{
+  icon:'🔮',color:'#7A4FB5',
+  title:'Will — Predictions, Promises & Spontaneous Decisions',
+  formula:'Subject + will + base verb',
+  when:'Use for: <b>1) Predictions based on opinion</b> (I think, I believe), <b>2) Promises</b>, <b>3) Spontaneous decisions</b> (decided right now), <b>4) Offers</b>.',
+  examples:['I think it <b>will rain</b> tomorrow. (opinion)','I <b>will help</b> you with that. (offer)','I promise I <b>will not tell</b> anyone. (promise)','That looks heavy — I <b>will carry</b> it. (spontaneous)'],
+  tip:'If you decided RIGHT NOW (not before), use "will." If you already had a plan, use "going to."',
+  common_error:'Confusing "will" with "going to" — "will" = no prior plan; "going to" = already decided.'
+},
+'going-to':{
+  icon:'🎯',color:'#C8202E',
+  title:'Going To — Plans & Evidence-Based Predictions',
+  formula:'Subject + am/is/are + going to + base verb',
+  when:'Use for: <b>1) Plans already decided</b> (before speaking), <b>2) Predictions based on visible evidence</b> (you can see it happening).',
+  examples:['I <b>am going to visit</b> my aunt. (already decided)','Look at those clouds! It <b>is going to rain</b>. (evidence)','She has bought paint. She <b>is going to paint</b> her room. (plan)','He is running toward the edge — he <b>is going to fall</b>! (evidence)'],
+  tip:'Evidence you can SEE right now → "going to." Opinion/belief → "will."',
+  common_error:'"I will visit my aunt (I already bought a ticket)." → "I <b>am going to visit</b> my aunt."'
+},
+'future-perfect':{
+  icon:'✅',color:'#1FAA66',
+  title:'Future Perfect — Completed Before a Future Point',
+  formula:'Subject + will have + past participle',
+  when:'Use when an action <b>will be completed BEFORE a specific future time</b>. Key signal words: <b>by, by the time, before</b>.',
+  examples:['<b>By</b> 9 PM, she <b>will have finished</b> her homework.','<b>By</b> 2030, scientists <b>will have found</b> new cures.','<b>By the time</b> you arrive, we <b>will have left</b>.','He <b>will have run</b> three marathons <b>by</b> December.'],
+  tip:'Always look for "by" or "by the time" — these are your signals for Future Perfect.',
+  common_error:'"By 2030, scientists will find cures." → "By 2030, scientists <b>will have found</b> cures."'
+},
+'fpc':{
+  icon:'⏳',color:'#BE8418',
+  title:'Future Perfect Continuous — Duration Up to a Future Point',
+  formula:'Subject + will have been + verb-ING',
+  when:'Use to emphasize <b>how long</b> an action will have been going on up to a future point. Focus is on <b>duration</b>.',
+  examples:['By June, she <b>will have been working</b> here for a year.','By 10 PM, I <b>will have been studying</b> for 5 hours.','By the time he retires, he <b>will have been teaching</b> for 40 years.','The hikers <b>will have been waiting</b> for over 12 hours.'],
+  tip:'Future Perfect = completed action. Future Perfect Continuous = ongoing duration. "For + time" is your clue for FPC.',
+  common_error:'"By June she will have worked here for a year." → Better: "...will have been working" (emphasizes ongoing duration).'
+},
+'zero':{
+  icon:'🔬',color:'#16244A',
+  title:'Zero Conditional — Facts & General Truths',
+  formula:'If + present simple, present simple',
+  when:'Use for things that are <b>always true</b> — scientific facts, general truths, natural laws.',
+  examples:['If you heat ice, it <b>melts</b>.','If you mix blue and yellow, you <b>get</b> green.','If it rains, the ground <b>gets</b> wet.','If you do not sleep, you <b>feel</b> tired.'],
+  tip:'Both clauses use PRESENT SIMPLE. No "will" anywhere. Think: "Every time X happens, Y happens."',
+  common_error:'"If you heat ice, it will melt." → "If you heat ice, it <b>melts</b>." (always true = zero)'
+},
+'first':{
+  icon:'☁️',color:'#1E50A0',
+  title:'First Conditional — Real Possibilities',
+  formula:'If + present simple, will + base verb',
+  when:'Use for <b>real, possible situations</b> in the future. The condition is likely or possible.',
+  examples:['If it <b>rains</b>, I <b>will stay</b> home.','If you <b>study</b>, you <b>will pass</b>.','<b>Unless</b> you hurry, you <b>will</b> be late. (unless = if not)','<b>As long as</b> you <b>are</b> careful, nothing <b>will</b> go wrong.'],
+  tip:'GOLDEN RULE: NEVER put "will" after "if" in first conditional. Also know: unless = if not, as long as = if, provided that = if.',
+  common_error:'"If it <b>will rain</b>, I will stay." → "If it <b>rains</b>, I will stay." (NEVER will after if!)'
+},
+'second':{
+  icon:'💭',color:'#9E1623',
+  title:'Second Conditional — Unreal/Hypothetical Situations',
+  formula:'If + past simple, would + base verb',
+  when:'Use for <b>unreal, imaginary, or unlikely</b> situations in the present or future. The condition is NOT true.',
+  examples:['If I <b>were</b> rich, I <b>would</b> travel the world.','If she <b>knew</b> the answer, she <b>would</b> tell us.','If I <b>spoke</b> French, I <b>would</b> move to Paris.','If the government <b>invested</b> more, the country <b>would</b> prosper.'],
+  tip:'With "to be" in second conditional, ALWAYS use "were" for all persons (I were, she were, he were). "Was" is considered incorrect.',
+  common_error:'"If I <b>was</b> you..." → "If I <b>were</b> you..." (always WERE in second conditional)'
+},
+'mixed':{
+  icon:'🔄',color:'#7A4FB5',
+  title:'Mixed Conditionals — Crossing Time Zones',
+  formula:'Type A: If + past perfect, would + base (past→present)<br>Type B: If + past simple, would have + PP (present→past)',
+  when:'Use when the condition and result are in <b>different time zones</b>. Example: past cause → present result, or present trait → past result.',
+  examples:['If I <b>had studied</b> harder, I <b>would have</b> a better job <b>now</b>. (past→present)','If she <b>were not</b> so shy, she <b>would have spoken</b> yesterday. (present→past)','If they <b>had saved</b> money, they <b>would be</b> rich <b>now</b>. (past→present)','If I <b>were not</b> afraid of heights, I <b>would have gone</b> bungee jumping. (present→past)'],
+  tip:'Look for time clues: "now" or "today" in result = present result (would + base). "Yesterday" or "last week" = past result (would have + PP).',
+  common_error:'"If I had studied harder, I will have a better job." → "...I <b>would have</b> a better job." (unreal = would, never will)'
+},
+'inversion':{
+  icon:'🔃',color:'#143A77',
+  title:'Conditional Inversion — Formal Style Without "If"',
+  formula:'Had + S + PP (3rd) | Were + S + to-inf (2nd) | Should + S + base (1st)',
+  when:'Use in <b>formal writing and speech</b> to replace "if" by moving the auxiliary verb to the front.',
+  examples:['<b>Had</b> I known, I would have come. (= If I had known)','<b>Were</b> I to win, I would donate half. (= If I were to win)','<b>Should</b> you need help, contact us. (= If you should need)','<b>Had</b> she studied, she would have passed. (= If she had studied)'],
+  tip:'Remove "if" and move Had/Were/Should to the FRONT. The result clause stays exactly the same.',
+  common_error:'"If I had seen you" → "<b>Had I seen you</b>, I would have said hello."'
+}
+};
+
+const RF_EXERCISES={
+'present-simple':[
+  {diff:'easy',type:'mc',q:'The bus ___ at 7:30 every morning.',o:['will leave','leaves','is leaving','left'],a:1,fb:'Fixed daily schedule → present simple: leaves.'},
+  {diff:'easy',type:'fill',q:'The concert ___ (start) at 8 PM tonight.',a:'starts',fb:'Official event time → present simple: starts.'},
+  {diff:'medium',type:'mc',q:'According to the timetable, the flight ___ at noon.',o:['will depart','departs','is departing','departed'],a:1,fb:'"According to the timetable" = fixed schedule → present simple.'},
+  {diff:'medium',type:'fill',q:'What time ___ the museum ___ (open) on Sundays?',a:'does the museum open',fb:'Question about schedule → does + subject + base verb.'},
+  {diff:'hard',type:'error',q:'Correct: "The semester will begin on January 15th." (official academic calendar)',a:'begins',fb:'Official calendar = timetable → present simple: begins.'}
+],
+'present-continuous':[
+  {diff:'easy',type:'mc',q:'I ___ my friend for coffee tomorrow.',o:['meet','am meeting','will meet','met'],a:1,fb:'Arranged plan with a friend → present continuous: am meeting.'},
+  {diff:'easy',type:'fill',q:'We ___ (have) a party this Saturday.',a:'are having',fb:'Confirmed plan with others → present continuous: are having.'},
+  {diff:'medium',type:'mc',q:'She ___ to London next Monday. She already booked the ticket.',o:['flies','is flying','will fly','flew'],a:1,fb:'Ticket already booked = confirmed arrangement → present continuous.'},
+  {diff:'medium',type:'fill',q:'They ___ (move) to a new apartment next month.',a:'are moving',fb:'Decided and arranged plan → present continuous: are moving.'},
+  {diff:'hard',type:'mc',q:'The CEO ___ a press conference at 3 PM. It was announced yesterday.',o:['holds','will hold','is holding','held'],a:2,fb:'Pre-arranged, announced event → present continuous: is holding.'}
+],
+'will':[
+  {diff:'easy',type:'mc',q:'I think it ___ tomorrow.',o:['rains','is raining','will rain','rained'],a:2,fb:'"I think" = personal opinion/prediction → will.'},
+  {diff:'easy',type:'fill',q:'I promise I ___ (call) you tonight.',a:'will call',fb:'Promise → will: will call.'},
+  {diff:'medium',type:'mc',q:'Someone is at the door. I ___ get it!',o:['am going to','will','am getting','get'],a:1,fb:'Spontaneous decision (decided right now) → will.'},
+  {diff:'medium',type:'fill',q:'Do not worry, everything ___ (be) fine.',a:'will be',fb:'Reassurance/prediction → will be.'},
+  {diff:'hard',type:'mc',q:'I am sure the project ___ a huge success. (personal belief)',o:['is being','is going to be','will be','would be'],a:2,fb:'Strong personal belief about future → will be.'}
+],
+'going-to':[
+  {diff:'easy',type:'mc',q:'Look at those clouds! It ___ rain.',o:['will','is going to','rains','rained'],a:1,fb:'Visible evidence (dark clouds) → going to.'},
+  {diff:'easy',type:'fill',q:'She has saved money. She ___ (buy) a new phone.',a:'is going to buy',fb:'Pre-made plan (saved money) → going to: is going to buy.'},
+  {diff:'medium',type:'mc',q:'He has been training for months. He ___ the marathon.',o:['will run','is going to run','runs','would run'],a:1,fb:'Evidence of preparation → going to.'},
+  {diff:'medium',type:'fill',q:'We ___ (travel) to Japan this summer. We already have the tickets.',a:'are going to travel',fb:'Decided plan with evidence (tickets) → going to.'},
+  {diff:'hard',type:'error',q:'Correct: "I will paint my room this weekend. I already bought the paint."',a:'am going to paint',fb:'Already bought paint = decided plan → going to: am going to paint.'}
+],
+'future-perfect':[
+  {diff:'easy',type:'mc',q:'By 9 PM, she ___ her homework.',o:['will finish','will have finished','finishes','finished'],a:1,fb:'"By 9 PM" = completed before that time → future perfect.'},
+  {diff:'easy',type:'fill',q:'By next year, I ___ (graduate) from school.',a:'will have graduated',fb:'Completed before next year → will have graduated.'},
+  {diff:'medium',type:'mc',q:'By the time we arrive, the movie ___.',o:['will start','will have started','starts','is starting'],a:1,fb:'"By the time" = action completed before arrival → future perfect.'},
+  {diff:'medium',type:'fill',q:'By 2050, technology ___ (change) our lives completely.',a:'will have changed',fb:'Completed before 2050 → will have changed.'},
+  {diff:'hard',type:'fill',q:'By the end of this course, students ___ (complete) over 200 exercises.',a:'will have completed',fb:'Completed before the end of the course → will have completed.'}
+],
+'fpc':[
+  {diff:'easy',type:'mc',q:'By June, I ___ here for two years.',o:['will work','will have worked','will have been working','am working'],a:2,fb:'Duration emphasis (for two years) → FPC: will have been working.'},
+  {diff:'easy',type:'fill',q:'By 10 PM, she ___ (study) for five hours.',a:'will have been studying',fb:'Duration up to a future point → will have been studying.'},
+  {diff:'medium',type:'mc',q:'Next month, they ___ on this project for a year.',o:['will work','will have been working','are working','worked'],a:1,fb:'"For a year" = duration emphasis → FPC.'},
+  {diff:'medium',type:'fill',q:'By the time the bus arrives, we ___ (wait) for 40 minutes.',a:'will have been waiting',fb:'Duration emphasis → will have been waiting.'},
+  {diff:'hard',type:'mc',q:'By his retirement, Professor Clark ___ for over 35 years.',o:['will teach','will have taught','will have been teaching','teaches'],a:2,fb:'"For over 35 years" = emphasis on continuous duration → FPC.'}
+],
+'zero':[
+  {diff:'easy',type:'mc',q:'If you heat water to 100°C, it ___.',o:['will boil','boils','is boiling','would boil'],a:1,fb:'Scientific fact (always true) → zero conditional: boils.'},
+  {diff:'easy',type:'fill',q:'If plants do not get water, they ___ (die).',a:'die',fb:'General truth → zero conditional: die.'},
+  {diff:'medium',type:'mc',q:'If you ___ ice in water, it floats.',o:['will put','put','would put','are putting'],a:1,fb:'Scientific fact → present simple in both clauses: put.'},
+  {diff:'medium',type:'fill',q:'If it ___ (rain) a lot, the rivers flood.',a:'rains',fb:'General truth → zero conditional: rains.'},
+  {diff:'hard',type:'error',q:'Correct: "If you will touch fire, you get burned."',a:'touch',fb:'Zero conditional: no "will" → If you touch fire, you get burned.'}
+],
+'first':[
+  {diff:'easy',type:'mc',q:'If it rains, I ___ an umbrella.',o:['take','will take','would take','took'],a:1,fb:'Real possibility → first conditional: will take.'},
+  {diff:'easy',type:'fill',q:'If you ___ (not hurry), you will be late.',a:'do not hurry',fb:'First conditional: present simple after "if": do not hurry.'},
+  {diff:'medium',type:'mc',q:'___ you study hard, you will get good grades.',o:['Unless','If','Would','Were'],a:1,fb:'Real condition → first conditional: If.'},
+  {diff:'medium',type:'fill',q:'You will not pass ___ you study. (= if you do not study)',a:'unless',fb:'Unless = if not: You will not pass unless you study.'},
+  {diff:'hard',type:'error',q:'Correct: "If you will arrive on time, we will start together."',a:'arrive',fb:'NEVER "will" after "if" in first conditional → arrive.'}
+],
+'second':[
+  {diff:'easy',type:'mc',q:'If I ___ rich, I would travel the world.',o:['am','was','were','will be'],a:2,fb:'Unreal/hypothetical → second conditional with "were" (not was).'},
+  {diff:'easy',type:'fill',q:'If she ___ (know) the answer, she would tell us.',a:'knew',fb:'Unreal present → past simple: knew.'},
+  {diff:'medium',type:'mc',q:'If the government invested more, the country ___.',o:['will prosper','prospers','would prosper','prospered'],a:2,fb:'Unreal hypothesis → would + base: would prosper.'},
+  {diff:'medium',type:'fill',q:'If I ___ (be) you, I would accept the offer.',a:'were',fb:'Second conditional + "be" → ALWAYS were: If I were you.'},
+  {diff:'hard',type:'mc',q:'If humans ___ fly, we would not need airplanes.',o:['can','could','will','are able to'],a:1,fb:'Unreal ability → second conditional: could.'}
+],
+'mixed':[
+  {diff:'easy',type:'mc',q:'If I had studied harder, I ___ a better job now.',o:['will have','would have','would have had','had'],a:1,fb:'Past cause → present result: would + base verb.'},
+  {diff:'easy',type:'fill',q:'If they had saved money, they ___ (be) rich now.',a:'would be',fb:'Past action → present result: would be.'},
+  {diff:'medium',type:'mc',q:'If she were not so shy, she ___ at the meeting yesterday.',o:['will speak','would speak','would have spoken','spoke'],a:2,fb:'Present trait → past result: would have + PP.'},
+  {diff:'medium',type:'fill',q:'If I had not moved to Boston, I ___ (not know) any of you today.',a:'would not know',fb:'Past cause → present result: would not know.'},
+  {diff:'hard',type:'mc',q:'If he ___ more organized, he would not have lost his passport yesterday.',o:['was','is','were','had been'],a:2,fb:'Present trait (permanent) → past result: were (not "had been").'}
+],
+'inversion':[
+  {diff:'easy',type:'mc',q:'___ I known about the delay, I would have left earlier.',o:['If','Had','Would','Should'],a:1,fb:'Inversion of "If I had known" → Had I known.'},
+  {diff:'easy',type:'fill',q:'Rewrite with inversion: "If she had called, I would have answered." Start with "Had".',a:'Had she called, I would have answered',fb:'Had + subject + PP: Had she called.'},
+  {diff:'medium',type:'mc',q:'___ you need any help, please ask.',o:['If','Had','Were','Should'],a:3,fb:'Formal first cond. inversion: Should you need = If you should need.'},
+  {diff:'medium',type:'fill',q:'Rewrite: "If I were to win the lottery, I would donate half." Start with "Were".',a:'Were I to win the lottery, I would donate half',fb:'Were + subject + to-infinitive: Were I to win.'},
+  {diff:'hard',type:'mc',q:'___ it not been for your help, we would have failed.',o:['Had','Were','Should','If'],a:0,fb:'Inversion of "If it had not been for" → Had it not been for.'}
+]
+};
+
+var rfCurrentSkill=null;
+var rfExState={};
+
+function getWeakestSkill(){
+  var skills=Object.keys(SKILLS);
+  var weakest=null,lowestPct=101;
+  for(var i=0;i<skills.length;i++){
+    var s=skills[i];
+    var m=state.mastery[s];
+    if(m&&m.seen>=1){
+      var pct=Math.round(m.correct/m.seen*100);
+      if(pct<lowestPct){lowestPct=pct;weakest=s;}
+    }
+  }
+  return weakest;
+}
+
+function renderReinforce(skillToOpen){
+  var container=document.getElementById('rfContent');
+  if(skillToOpen){rfCurrentSkill=skillToOpen;renderRfDetail(container);return;}
+  if(rfCurrentSkill){renderRfDetail(container);return;}
+  // Show skill grid
+  var skills=Object.keys(SKILLS);
+  var weakest=getWeakestSkill();
+  var html='<div class="rf-grid">';
+  for(var i=0;i<skills.length;i++){
+    var s=skills[i];
+    var th=RF_THEORY[s];
+    var pct=masteryPct(s);
+    var seen=state.mastery[s]?state.mastery[s].seen:0;
+    var cls='rf-card';
+    if(seen>=3&&pct<50)cls+=' weak';
+    else if(seen>=3&&pct>=80)cls+=' strong';
+    var barColor=pct<40?'var(--bad)':pct<70?'var(--gold)':'var(--ok)';
+    html+='<div class="'+cls+'" onclick="rfCurrentSkill=\''+s+'\';renderReinforce(\''+s+'\')">';
+    html+='<div class="rf-icon">'+th.icon+'</div>';
+    html+='<div class="rf-name">'+th.title.split('—')[0].split('for')[0].trim()+'</div>';
+    html+='<div class="rf-pct" style="color:'+barColor+'">'+pct+'% mastery'+(seen===0?' · Not started':'')+'</div>';
+    html+='<div class="rf-bar"><i style="width:'+pct+'%;background:'+barColor+'"></i></div>';
+    if(s===weakest&&seen>=3)html+='<div style="margin-top:8px;font-size:.72rem;color:var(--bad);font-weight:700">⚠ Your weakest skill — start here!</div>';
+    html+='</div>';
+  }
+  html+='</div>';
+  // Encourage
+  var totalPct=0,totalSkills=0;
+  skills.forEach(function(s){var p=masteryPct(s);if(state.mastery[s]&&state.mastery[s].seen>0){totalPct+=p;totalSkills++;}});
+  var avgPct=totalSkills?Math.round(totalPct/totalSkills):0;
+  if(totalSkills>0){
+    var msg=avgPct>=80?'You are doing amazing! Keep pushing to master every skill!':avgPct>=60?'Great progress! Focus on the red cards to strengthen your weak areas.':'Every expert was once a beginner. Pick a skill and start learning — you can do this!';
+    html+='<div class="rf-encourage"><h3>'+msg+'</h3><p style="font-size:.85rem;opacity:.7;margin-top:4px">Average mastery: '+avgPct+'% across '+totalSkills+' skills</p></div>';
+  }
+  container.innerHTML=html;
+}
+
+function renderRfDetail(container){
+  var s=rfCurrentSkill;
+  var th=RF_THEORY[s];
+  var exs=RF_EXERCISES[s];
+  if(!rfExState[s])rfExState[s]={answered:[],correct:0};
+  var es=rfExState[s];
+  var html='<div class="rf-detail">';
+  html+='<span class="rf-back" onclick="rfCurrentSkill=null;renderReinforce()">← Back to all skills</span>';
+  // Header
+  html+='<div style="display:flex;align-items:center;gap:14px;margin-bottom:20px"><div style="font-size:2.5rem">'+th.icon+'</div><div><h2 style="font-family:Bricolage Grotesque;margin-bottom:2px">'+th.title+'</h2><div style="font-size:.85rem;opacity:.7">'+es.answered.length+'/'+exs.length+' exercises completed</div></div></div>';
+  // Theory
+  html+='<div class="rf-theory">';
+  html+='<h3>📖 Theory</h3>';
+  html+='<p style="margin-bottom:10px">'+th.when+'</p>';
+  html+='<div class="rf-formula">'+th.formula+'</div>';
+  html+='<div class="rf-examples"><b>Examples:</b>';
+  th.examples.forEach(function(ex){html+='<div class="rf-ex">'+ex+'</div>';});
+  html+='</div>';
+  html+='<div class="rf-tip"><b>💡 Pro Tip:</b> '+th.tip+'</div>';
+  html+='<div class="rf-ex" style="border-left-color:var(--bad);background:#fef8f8;margin-top:12px"><b>❌ Common Error:</b> '+th.common_error+'</div>';
+  html+='</div>';
+  // Exercises
+  html+='<div class="rf-exercises"><h3>🏋️ Progressive Exercises</h3>';
+  for(var i=0;i<exs.length;i++){
+    var ex=exs[i];
+    var done=es.answered.includes(i);
+    var diffLabel=ex.diff==='easy'?'Easy':ex.diff==='medium'?'Medium':'Hard';
+    html+='<div class="rf-exercise'+(done?' completed':'')+'" id="rfEx'+i+'">';
+    html+='<span class="rf-diff '+ex.diff+'">'+diffLabel+'</span>';
+    html+='<div class="rf-q">'+ex.q+'</div>';
+    if(done){
+      html+='<div class="fb show right" style="margin-top:10px"><div class="fb-head">✅ Completed</div><div class="fb-rule">'+ex.fb+'</div></div>';
+    }else{
+      if(ex.type==='mc'){
+        html+='<div class="eq-opts" id="rfOpts'+i+'">';
+        for(var j=0;j<ex.o.length;j++){
+          html+='<button class="eq-opt" onclick="submitRfAnswer('+i+','+j+')">'+ex.o[j]+'</button>';
+        }
+        html+='</div>';
+      }else if(ex.type==='fill'||ex.type==='error'){
+        html+='<div class="eq-fill"><input id="rfFill'+i+'" placeholder="Type here…" autocomplete="off" onkeydown="if(event.key===\'Enter\')submitRfAnswer('+i+')"></div>';
+      }
+      html+='<div class="fb" id="rfFb'+i+'"></div>';
+    }
+    html+='</div>';
+  }
+  html+='</div>';
+  // Completion message
+  if(es.answered.length>=exs.length){
+    var score=Math.round(es.correct/exs.length*100);
+    html+='<div class="rf-encourage"><h3>🎉 Skill Reinforcement Complete!</h3><p style="font-size:.9rem;margin-top:6px">You scored <b>'+score+'%</b> on '+th.title.split('—')[0].trim()+'. '+(score>=80?'Excellent work! You really understand this!':'Keep practicing to strengthen this skill further.')+'</p><div style="margin-top:12px"><button class="btn btn-gold" onclick="rfExState[\''+s+'\']={answered:[],correct:0};renderRfDetail(document.getElementById(\'rfContent\'))">Practice Again ↻</button> <button class="btn btn-blue" onclick="rfCurrentSkill=null;renderReinforce()">Try Another Skill →</button></div></div>';
+  }
+  html+='</div>';
+  container.innerHTML=html;
+  // Focus first unanswered fill input
+  for(var k=0;k<exs.length;k++){
+    if(!es.answered.includes(k)&&(exs[k].type==='fill'||exs[k].type==='error')){
+      var inp=document.getElementById('rfFill'+k);
+      if(inp)setTimeout(function(){inp.focus();},100);
+      break;
+    }
+  }
+}
+
+function submitRfAnswer(idx,choice){
+  var s=rfCurrentSkill;
+  var exs=RF_EXERCISES[s];
+  var ex=exs[idx];
+  var es=rfExState[s];
+  if(es.answered.includes(idx))return;
+  var correct;
+  if(ex.type==='mc'){
+    var btns=document.querySelectorAll('#rfOpts'+idx+' .eq-opt');
+    if(!btns.length)return;
+    btns.forEach(function(b){b.disabled=true;});
+    correct=(choice===ex.a);
+    btns[ex.a].classList.add('correct');
+    if(!correct)btns[choice].classList.add('wrong');
+  }else{
+    var inp=document.getElementById('rfFill'+idx);
+    if(!inp||inp.disabled)return;
+    inp.disabled=true;
+    correct=norm(inp.value)===norm(ex.a);
+    inp.style.borderColor=correct?'var(--ok)':'var(--bad)';
+  }
+  var fb=document.getElementById('rfFb'+idx);
+  fb.className='fb show '+(correct?'right':'wrong');
+  fb.innerHTML='<div class="fb-head">'+(correct?'✅ Correct!':'💡 Answer: '+ex.a)+'</div><div class="fb-rule">'+ex.fb+'</div>';
+  es.answered.push(idx);
+  if(correct){es.correct++;addXP(correct?8:0);recordAnswer(s,true);}
+  else{recordAnswer(s,false);}
+  // Scroll to next unanswered or completion
+  setTimeout(function(){
+    var next=null;
+    for(var k=idx+1;k<exs.length;k++){if(!es.answered.includes(k)){next=document.getElementById('rfEx'+k);break;}}
+    if(!next&&es.answered.length>=exs.length){renderRfDetail(document.getElementById('rfContent'));return;}
+    if(next)next.scrollIntoView({behavior:'smooth',block:'center'});
+  },600);
 }
 
 /* ===== init ===== */
@@ -929,6 +1368,22 @@ function init(){
   startPractice('all');startExam();
   document.querySelectorAll('.tl-box').forEach(b=>tlObserver.observe(b));
   go('dash');
+  // Auto-redirect returning students to weakest skill reinforcement
+  if(state.answered>=5){
+    var weak=getWeakestSkill();
+    if(weak&&masteryPct(weak)<70){
+      var th=RF_THEORY[weak];
+      var pct=masteryPct(weak);
+      setTimeout(function(){
+        var banner=document.createElement('div');
+        banner.id='rfBanner';
+        banner.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:200;background:linear-gradient(135deg,#16244A,#1E50A0);color:#fff;padding:16px 24px;border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.25);display:flex;align-items:center;gap:14px;max-width:540px;width:90%;animation:fade .5s';
+        banner.innerHTML='<div style="font-size:2rem;flex-shrink:0">'+th.icon+'</div><div style="flex:1"><div style="font-family:Bricolage Grotesque;font-weight:700;font-size:.95rem">Your weakest skill: '+th.title.split('—')[0].trim()+' ('+pct+'%)</div><div style="font-size:.8rem;opacity:.8;margin-top:2px">Review the theory and practice to build confidence!</div></div><button onclick="document.getElementById(\'rfBanner\').remove();go(\'reinforce\');renderReinforce(\''+weak+'\')" style="background:var(--gold);color:var(--ink);border:none;padding:8px 16px;border-radius:10px;font-weight:700;font-size:.82rem;cursor:pointer;white-space:nowrap">Reinforce Now →</button><button onclick="document.getElementById(\'rfBanner\').remove()" style="background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer;opacity:.6;padding:4px 8px">✕</button>';
+        document.body.appendChild(banner);
+        setTimeout(function(){var b=document.getElementById('rfBanner');if(b)b.remove();},15000);
+      },1500);
+    }
+  }
 }
 /* ============================================================
    SUPABASE LEADERBOARD
