@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FutureLab - Teacher Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700&family=Lexend:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 :root {
   --cream: #FBF6EA;
@@ -348,6 +349,7 @@ td { padding: 9px 12px; white-space: nowrap; }
   </button>
   <button class="icon-btn" onclick="exportCSV()">&#x2913; Export CSV</button>
   <span class="last-refresh" id="lastRefresh">Last refreshed: --:--:--</span>
+  <span class="last-refresh" id="realtimeStatus" style="color:var(--ok);margin-left:8px">&#x25cf; Live</span>
 </div>
 
 <!-- Main content -->
@@ -637,9 +639,34 @@ function exportCSV() {
   URL.revokeObjectURL(a.href);
 }
 
-// Initial load + auto-refresh
+// Initial load
 refreshData();
-autoRefreshTimer = setInterval(refreshData, 30000);
+
+// Supabase Realtime - instant updates when any student changes
+const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const channel = sbClient.channel('futurelab-realtime')
+  .on('postgres_changes',
+    { event: '*', schema: 'public', table: TABLE },
+    (payload) => {
+      console.log('Realtime update:', payload.eventType, payload.new?.student_name || '');
+      refreshData();
+    }
+  )
+  .subscribe((status) => {
+    const el = document.getElementById('realtimeStatus');
+    if (status === 'SUBSCRIBED') {
+      el.innerHTML = '&#x25cf; Live';
+      el.style.color = 'var(--ok)';
+    } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+      el.innerHTML = '&#x25cf; Disconnected';
+      el.style.color = 'var(--bad)';
+      // Fallback to polling if realtime fails
+      if (!autoRefreshTimer) autoRefreshTimer = setInterval(refreshData, 15000);
+    }
+  });
+
+// Fallback polling in case realtime doesn't connect (every 60s)
+autoRefreshTimer = setInterval(refreshData, 60000);
 </script>
 </body>
 </html>
