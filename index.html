@@ -157,7 +157,9 @@ button{font-family:'Lexend';cursor:pointer}
 .lesson .concept{font-size:1rem;margin:14px 0;opacity:.9}
 .tl-box{background:var(--blue-lt);border-radius:18px;padding:10px;margin:16px 0}
 .tl-box svg{width:100%;height:auto;display:block}
-.struct{background:var(--ink);color:var(--cream);border-radius:14px;padding:13px 17px;font-family:'Bricolage Grotesque';font-weight:600;font-size:1rem;margin:14px 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.struct{background:var(--ink);color:var(--cream);border-radius:14px;padding:13px 17px;font-family:'Bricolage Grotesque';font-weight:600;font-size:1rem;margin:14px 0;display:flex;flex-direction:column;gap:10px}
+.struct-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.struct-label{font-size:.72rem;opacity:.55;letter-spacing:.04em;text-transform:uppercase;margin-bottom:-4px}
 .struct b{color:var(--gold)}.struct .verb{color:#6fd3ff}
 .ex-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-top:1px dashed var(--line)}
 .ex-row .spk{flex-shrink:0;width:34px;height:34px;border-radius:50%;border:2px solid var(--blue);background:var(--paper);color:var(--blue);font-size:.9rem;display:grid;place-items:center;transition:.2s}
@@ -956,6 +958,13 @@ if(!state.mastery)state.mastery={};
 if(!state.review)state.review=[];
 if(!state.badges)state.badges=[];
 if(!state.cardBox)state.cardBox={};
+// totalXp: cumulative XP that never resets (for leaderboard ranking)
+if(state.totalXp===undefined){
+  // Retroactively estimate totalXp for existing users based on level + current xp
+  var retroXp=0;
+  for(var lv=1;lv<state.level;lv++){retroXp+=(lv<=3?100:lv<=6?150:lv<=9?200:lv<=12?300:lv<=15?400:500);}
+  state.totalXp=retroXp+state.xp;
+}
 Object.keys(SKILLS).forEach(s=>{
   if(!state.mastery[s])state.mastery[s]={seen:0,correct:0};
   if(!state.skillLvl[s])state.skillLvl[s]={xp:0,lv:1};
@@ -999,9 +1008,9 @@ ddWrap.appendChild(ddBtn);ddWrap.appendChild(ddMenu);tabsEl.appendChild(ddWrap);
 function go(id){document.querySelectorAll('.view').forEach(v=>{v.classList.add('hidden');v.setAttribute('aria-hidden','true');});var target=document.getElementById('v-'+id);target.classList.remove('hidden');target.setAttribute('aria-hidden','false');document.querySelectorAll('.tab').forEach(t=>{var isActive=t.dataset.v===id;t.classList.toggle('active',isActive);t.setAttribute('aria-selected',isActive?'true':'false');});document.querySelectorAll('.tab-dd-item').forEach(t=>{var isActive=t.dataset.v===id;t.classList.toggle('active',isActive);});window.scrollTo({top:0,behavior:'smooth'});if(id==='dash')renderDash();if(id==='learn')playTimelines();if(id==='reinforce')renderReinforce();if(id==='board')loadBoard('xp');}
 
 /* ===== HUD ===== */
-function renderHUD(){document.getElementById('sLevel').textContent=state.level;document.getElementById('sXp').textContent=state.xp;document.getElementById('sStreak').textContent=state.streak;var ns=document.getElementById('sNameStat');var sn=document.getElementById('sName');if(ns&&sn&&playerName){sn.textContent=firstName();ns.style.display='flex';}else if(ns){ns.style.display='none';}}
+function renderHUD(){document.getElementById('sLevel').textContent=state.level;document.getElementById('sXp').textContent=state.totalXp;document.getElementById('sStreak').textContent=state.streak;var ns=document.getElementById('sNameStat');var sn=document.getElementById('sName');if(ns&&sn&&playerName){sn.textContent=firstName();ns.style.display='flex';}else if(ns){ns.style.display='none';}}
 function xpNeeded(lv){return lv<=3?100:lv<=6?150:lv<=9?200:lv<=12?300:lv<=15?400:500;}
-function addXP(n){state.xp+=n;var need=xpNeeded(state.level);if(state.xp>=need){state.xp-=need;state.level++;showLevelUp();}persist();renderHUD();}
+function addXP(n){state.xp+=n;state.totalXp+=n;var need=xpNeeded(state.level);while(state.xp>=need){state.xp-=need;state.level++;showLevelUp();need=xpNeeded(state.level);}persist();renderHUD();}
 function showLevelUp(){var msg=['Keep it up, '+firstName()+'!','You are unstoppable, '+firstName()+'!',firstName()+', you are a Great Disciple!',firstName()+', we are proud of you!'][state.level%4];var tierMsg='';if(state.level===4)tierMsg='B1+ questions unlocked! The challenge increases!';else if(state.level===6)tierMsg='B2 questions unlocked! You are reaching advanced level!';else if(state.level===8)tierMsg='B2+ questions unlocked! You are at the highest level!';document.getElementById('lvlupTxt').textContent='Level '+state.level;document.getElementById('lvlupMsg').innerHTML=(tierMsg?'<b>'+tierMsg+'</b><br>':'')+msg;document.getElementById('lvlup').classList.add('show');confetti();}
 
 /* ===== toast + tts + confetti ===== */
@@ -1170,7 +1179,7 @@ const TENSES=[
  {id:'mixed',color:'#D946EF',name:'Mixed Conditional',tag:'Cross-time conditions',
   concept:'Mixes <b>two different time frames</b>. A past condition with a present result, or a present condition with a past result. The times do not match.',
   tl:'mixed',tlcap:'A condition in one time affects a result in another time',
-  struct:['If + <b>had</b> + PP, <b>would</b> + base (past→present)','If + <b>past simple</b>, <b>would have</b> + PP (present→past)'],
+  struct:['<div class="struct-label">Pattern 1: past → present</div>If + <b>had</b> + PP, <b>would</b> + base verb','<div class="struct-label">Pattern 2: present → past</div>If + <b>past simple</b>, <b>would have</b> + PP'],
   ex:[['If I had accepted that job, I would live in New York now.','Past condition → present result (I did not accept, so I do not live there now).'],['If she were not so stubborn, she would have accepted the offer yesterday.','Present trait → past result (she IS stubborn, so she did NOT accept).']],
   signals:['now','yesterday','at that time','today'],
   worked:['Fact: I did NOT accept the job (past). I do NOT live in New York (present).','Different time frames? Yes → Mixed Conditional.','Past condition: If + had + PP → "had accepted".','Present result: would + base → "would live".','✅ If I <b>had accepted</b> that job, I <b>would live</b> in New York now.'],
@@ -1249,7 +1258,7 @@ function renderLessons(){
       <div class="lhead"><div class="lnum" style="background:${t.color}">${i+1}</div><div><div class="tag">${t.tag}</div><h3>${t.name}</h3></div></div>
       <p class="concept">${t.concept}</p>
       <div class="tl-box">${timelineSVG(t.tl)}<div style="text-align:center;font-size:.8rem;opacity:.7;padding:2px 0 8px">${t.tlcap}</div></div>
-      <div class="struct">${t.struct.join('')}</div>
+      <div class="struct">${t.struct.map(s=>'<div class="struct-row">'+s+'</div>').join('')}</div>
       ${exHTML}
       <div class="signals"><b style="font-size:.78rem;opacity:.6">Signal words:</b> ${sig}</div>
       <div class="worked" id="worked-${t.id}"><h5>🧠 Worked example (follow the reasoning)</h5>${steps}<button class="wbtn check" style="margin-top:8px" onclick="document.getElementById('worked-${t.id}').classList.add('show');this.style.display='none'">Show step by step ▾</button></div>
@@ -2408,7 +2417,7 @@ function buildSyncBody(){
   return {
     student_name:playerName,
     section:playerSection||null,
-    xp:state.xp,
+    xp:state.totalXp,
     level:state.level,
     streak:state.streak,
     answered:state.answered,
