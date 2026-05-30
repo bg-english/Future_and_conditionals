@@ -1437,8 +1437,8 @@ function submitRfAnswer(idx,choice){
   fb.className='fb show '+(correct?'right':'wrong');
   fb.innerHTML='<div class="fb-head">'+(correct?'✅ Correct!':'💡 Answer: '+ex.a)+'</div><div class="fb-rule">'+ex.fb+'</div>';
   es.answered.push(idx);
-  if(correct){es.correct++;addXP(correct?8:0);recordAnswer(s,true);}
-  else{recordAnswer(s,false);}
+  if(correct){es.correct++;addXP(8);miniConfetti();recordAnswer(s,true);}
+  else{recordAnswer(s,false);trackWrong(s);}
   // Scroll to next unanswered or completion
   setTimeout(function(){
     var next=null;
