@@ -469,6 +469,18 @@ td { padding: 9px 12px; white-space: nowrap; }
   <button onclick="sendNotice()" style="font-family:'Lexend',sans-serif;font-size:13px;font-weight:600;padding:7px 20px;border-radius:20px;border:none;background:#E9A72C;color:#16244A;cursor:pointer">Send ▶</button>
   <button onclick="clearNotice()" style="font-family:'Lexend',sans-serif;font-size:13px;font-weight:600;padding:7px 16px;border-radius:20px;border:none;background:rgba(255,255,255,.2);color:#fff;cursor:pointer">Clear ✕</button>
   <span id="noticeStatus" style="font-size:12px;opacity:.8"></span>
+  <button onclick="toggleReadReceipts()" style="font-family:'Lexend',sans-serif;font-size:13px;font-weight:600;padding:7px 16px;border-radius:20px;border:none;background:rgba(255,255,255,.2);color:#fff;cursor:pointer" id="readReceiptToggle">👁 Read receipts</button>
+</div>
+
+<!-- Read receipts panel -->
+<div id="readReceiptsPanel" style="display:none;background:#f0f4ff;border-bottom:2px solid var(--line);padding:14px 24px;font-size:13px">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+    <h4 style="margin:0;font-size:14px;color:var(--ink)">📨 Message delivery status</h4>
+    <span id="readCount" style="font-size:12px;color:var(--blue);font-weight:600"></span>
+    <button onclick="loadReadReceipts()" style="font-family:'Lexend',sans-serif;font-size:11px;padding:4px 12px;border-radius:12px;border:1px solid var(--line);background:var(--paper);cursor:pointer">↻ Refresh</button>
+  </div>
+  <div id="readReceiptsList" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+  <div id="notReadList" style="margin-top:10px"></div>
 </div>
 
 <!-- Main content -->
@@ -1016,6 +1028,83 @@ async function clearNotice() {
     st.textContent = '✗ Error: ' + e.message;
   }
 }
+
+// === READ RECEIPTS ===
+const READS_URL = SUPABASE_URL + '/rest/v1/futurelab_notice_reads';
+let _readReceiptsVisible = false;
+
+function toggleReadReceipts() {
+  _readReceiptsVisible = !_readReceiptsVisible;
+  document.getElementById('readReceiptsPanel').style.display = _readReceiptsVisible ? '' : 'none';
+  if (_readReceiptsVisible) loadReadReceipts();
+}
+
+async function loadReadReceipts() {
+  const countEl = document.getElementById('readCount');
+  const readList = document.getElementById('readReceiptsList');
+  const notReadList = document.getElementById('notReadList');
+  countEl.textContent = 'Loading...';
+  readList.innerHTML = '';
+  notReadList.innerHTML = '';
+
+  try {
+    // Get active notice
+    const nRes = await fetch(
+      NOTICE_URL + '?active=eq.true&select=id,message,created_at&limit=1',
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    );
+    const notices = await nRes.json();
+    if (!notices.length) {
+      countEl.textContent = 'No active notice';
+      return;
+    }
+    const notice = notices[0];
+    const sentAt = new Date(notice.created_at);
+
+    // Get read receipts for this notice
+    const rRes = await fetch(
+      READS_URL + '?notice_id=eq.' + notice.id + '&select=student_name,section,read_at',
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    );
+    const reads = await rRes.json();
+    const readNames = new Set(reads.map(r => r.student_name));
+
+    // Build full student list from allStudents
+    const notRead = allStudents.filter(s => !readNames.has(s.name));
+
+    countEl.textContent = `${reads.length} / ${allStudents.length} students read it`;
+
+    // Show readers with delay
+    if (reads.length) {
+      readList.innerHTML = '<strong style="color:#4ade80">Read:</strong><br>' +
+        reads.map(r => {
+          const readAt = new Date(r.read_at);
+          const delaySec = Math.round((readAt - sentAt) / 1000);
+          let delayStr;
+          if (delaySec < 60) delayStr = delaySec + 's';
+          else if (delaySec < 3600) delayStr = Math.floor(delaySec/60) + 'm ' + (delaySec%60) + 's';
+          else delayStr = Math.floor(delaySec/3600) + 'h ' + Math.floor((delaySec%3600)/60) + 'm';
+          return `<span style="display:inline-block;background:#064e3b;color:#4ade80;padding:2px 8px;border-radius:10px;margin:2px;font-size:0.85em">${r.student_name} <small>(${delayStr})</small></span>`;
+        }).join('');
+    }
+
+    // Show non-readers
+    if (notRead.length) {
+      notReadList.innerHTML = '<strong style="color:#f87171;margin-top:8px;display:block">Not read:</strong><br>' +
+        notRead.map(s =>
+          `<span style="display:inline-block;background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:10px;margin:2px;font-size:0.85em">${s.name}</span>`
+        ).join('');
+    }
+  } catch(e) {
+    countEl.textContent = 'Error loading receipts';
+    console.error(e);
+  }
+}
+
+// Auto-refresh every 15 seconds when panel is open
+setInterval(function() {
+  if (_readReceiptsVisible) loadReadReceipts();
+}, 15000);
 
 // === INTERVENTION LOGS ===
 const INTERVENTION_TABLE = 'futurelab_interventions';

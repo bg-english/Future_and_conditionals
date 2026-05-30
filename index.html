@@ -2252,6 +2252,16 @@ function showWelcomeBack(){
 
 /* ===== teacher notice polling ===== */
 var _lastNoticeId=null;
+var _noticeAcked={};
+function ackNotice(noticeId){
+  if(!playerName||_noticeAcked[noticeId])return;
+  _noticeAcked[noticeId]=true;
+  fetch(SB_URL+'/rest/v1/futurelab_notice_reads',{
+    method:'POST',
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+    body:JSON.stringify({notice_id:noticeId,student_name:playerName,section:playerSection||null,read_at:new Date().toISOString()})
+  }).catch(function(){});
+}
 function checkNotice(){
   fetch(SB_URL+'/rest/v1/futurelab_notices?active=eq.true&order=created_at.desc&limit=1',
     {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}})
@@ -2266,6 +2276,7 @@ function checkNotice(){
         _lastNoticeId=row.id;
         msg.textContent='📢 '+row.message;
         bar.style.display='block';
+        ackNotice(row.id);
       }
     } else {
       bar.style.display='none';
