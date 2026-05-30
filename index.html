@@ -83,6 +83,8 @@ button{font-family:'Lexend';cursor:pointer}
 .ring svg{transform:rotate(-90deg)}
 .ring .pct{position:absolute;inset:0;display:grid;place-items:center;font-family:'Bricolage Grotesque';font-weight:800;font-size:1.1rem}
 .ring-card .nm{font-size:.78rem;font-weight:600;line-height:1.2}
+.ring-card .sk-lv{font-size:.68rem;margin-top:5px;font-weight:700;color:var(--ink);opacity:.8}
+.ring-card .sk-lv .cefr-chip{background:var(--blue);color:#fff;border-radius:20px;padding:1px 7px;font-size:.6rem;font-weight:700;vertical-align:middle;margin-left:3px}
 
 .badge-row{display:flex;gap:12px;flex-wrap:wrap}
 .badge{width:74px;text-align:center;opacity:.35;transition:.3s;filter:grayscale(1)}
@@ -620,14 +622,21 @@ const Store=(()=>{let ok=false,mem={};try{const k="__fl";localStorage.setItem(k,
 const SKILLS={'present-simple':'Present Simple','present-continuous':'Present Continuous','will':'will','going-to':'going to','future-perfect':'Future Perfect','fpc':'Fut. Perf. Continuous','zero':'Zero Cond.','first':'First Cond.','second':'Second Cond.','mixed':'Mixed Cond.','inversion':'Cond. Inversion'};
 let state=Store.get('flstate',null)||{xp:0,level:1,streak:0,lastDay:null,answered:0,correct:0,mastery:{},review:[],badges:[],cardBox:{},seenQ:{}};
 if(!state.seenQ)state.seenQ={};
-Object.keys(SKILLS).forEach(s=>{if(!state.mastery[s])state.mastery[s]={seen:0,correct:0};});
+if(!state.skillLvl)state.skillLvl={};
+Object.keys(SKILLS).forEach(s=>{if(!state.mastery[s])state.mastery[s]={seen:0,correct:0};if(!state.skillLvl[s])state.skillLvl[s]={xp:0,lv:1};});
 function save(){Store.set('flstate',state);} // namespaced
 function saveAll(){Store.set('flstate',state);}
 // migrate key
 state=Store.get('flstate',state);
-Object.keys(SKILLS).forEach(s=>{if(!state.mastery[s])state.mastery[s]={seen:0,correct:0};});
+if(!state.skillLvl)state.skillLvl={};
+Object.keys(SKILLS).forEach(s=>{if(!state.mastery[s])state.mastery[s]={seen:0,correct:0};if(!state.skillLvl[s])state.skillLvl[s]={xp:0,lv:1};});
 
 var persist=function(){Store.set('flstate',state);};
+
+/* ===== per-skill level helpers ===== */
+function cefrLabel(lv){return lv<=15?'A1':lv<=30?'A2':lv<=50?'B1':lv<=65?'B2':lv<=80?'C1':'C2';}
+function skillXpNeeded(lv){return 50+Math.floor(lv/5)*10;}
+function addSkillXP(sk,n){if(!state.skillLvl[sk])state.skillLvl[sk]={xp:0,lv:1};var sl=state.skillLvl[sk];sl.xp+=n;var need=skillXpNeeded(sl.lv);while(sl.xp>=need&&sl.lv<100){sl.xp-=need;sl.lv++;need=skillXpNeeded(sl.lv);}persist();}
 
 /* ===== streak ===== */
 (function(){const today=new Date().toDateString();if(state.lastDay!==today){const y=new Date(Date.now()-864e5).toDateString();state.streak=(state.lastDay===y)?state.streak+1:1;state.lastDay=today;persist();}})();
@@ -704,7 +713,7 @@ function checkBadges(){
 
 /* ===== mastery ===== */
 function masteryPct(s){const m=state.mastery[s];return m&&m.seen?Math.round(m.correct/m.seen*100):0;}
-function recordAnswer(skill,correct){state.answered++;if(correct)state.correct++;const m=state.mastery[skill];m.seen++;if(correct)m.correct++;persist();if(state.correct===1)award('first');checkBadges();}
+function recordAnswer(skill,correct){state.answered++;if(correct)state.correct++;const m=state.mastery[skill];m.seen++;if(correct){m.correct++;addSkillXP(skill,15);}else{addSkillXP(skill,3);}persist();if(state.correct===1)award('first');checkBadges();}
 
 /* ============================================================
    DATA: TENSES (with animated-timeline configs)
@@ -914,11 +923,49 @@ const ITEMS=[
  {sk:'will',type:'mc',q:'The government has announced it ___ new environmental policies next year. (formal register)',o:['will introduce','is introducing','introduces','would introduce'],a:0,fb:'Formal announcement about the future → <b>will introduce</b>.',tier:4,hint:'A formal, official announcement about the future. In formal contexts, which word signals a definite future action?'}
 ];
 let queue=[],qIdx=0,sessionMode='all',curItem=null,hintUsed=false;
-function buildQueue(mode){if(mode==='review'){const ids=state.review.slice();queue=ids.map(i=>ITEMS[i]).filter(Boolean);if(!queue.length){queue=[];}}else{var maxTier=1;if(state.level>=4)maxTier=2;if(state.level>=6)maxTier=3;if(state.level>=8)maxTier=4;var allEligible=ITEMS.map(function(_,i){return i;}).filter(function(i){return ITEMS[i].tier<=maxTier;});var eligible=allEligible.filter(function(i){return !state.seenQ[norm(ITEMS[i].q)];});if(eligible.length<5){state.seenQ={};persist();eligible=allEligible;}var currentTier=eligible.filter(function(i){return ITEMS[i].tier===maxTier;});var lowerTier=eligible.filter(function(i){return ITEMS[i].tier<maxTier;});var picked=[],usedIdx=[];for(var j=0;j<10;j++){var pool=(j<7&&currentTier.length)?currentTier:(lowerTier.length?lowerTier:currentTier);var avail=pool.filter(function(x){return !usedIdx.includes(x);});if(!avail.length)avail=pool;var chosen=avail[Math.floor(Math.random()*avail.length)];picked.push(chosen);usedIdx.push(chosen);}queue=picked.map(function(i){return ITEMS[i];});} }
+var _staticExhausted=false;
+function buildQueue(mode){
+  _staticExhausted=false;
+  if(mode==='review'){const ids=state.review.slice();queue=ids.map(i=>ITEMS[i]).filter(Boolean);if(!queue.length)queue=[];return;}
+  var maxTier=1;if(state.level>=4)maxTier=2;if(state.level>=6)maxTier=3;if(state.level>=8)maxTier=4;
+  var allEligible=ITEMS.map(function(_,i){return i;}).filter(function(i){return ITEMS[i].tier<=maxTier;});
+  var eligible=allEligible.filter(function(i){return !state.seenQ[norm(ITEMS[i].q)];});
+  if(eligible.length<5){_staticExhausted=true;eligible=allEligible;}// flag instead of reset
+  var currentTier=eligible.filter(function(i){return ITEMS[i].tier===maxTier;});
+  var lowerTier=eligible.filter(function(i){return ITEMS[i].tier<maxTier;});
+  var picked=[],usedIdx=[];
+  for(var j=0;j<10;j++){var pool=(j<7&&currentTier.length)?currentTier:(lowerTier.length?lowerTier:currentTier);var avail=pool.filter(function(x){return !usedIdx.includes(x);});if(!avail.length)avail=pool;var chosen=avail[Math.floor(Math.random()*avail.length)];picked.push(chosen);usedIdx.push(chosen);}
+  queue=picked.map(function(i){return ITEMS[i];});
+}
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);}
-function startPractice(mode){resetStruggleTracking();sessionMode=mode;if(mode==='review'){buildQueue(mode);qIdx=0;if(!queue.length){document.getElementById('engine').innerHTML='<div style="text-align:center;padding:20px"><img src="'+IMG.wave+'" style="width:120px"><h3 style="margin:10px 0">Review queue empty!</h3><p style="opacity:.7">You have no pending errors. Do a mixed practice to fill your review if you miss something.</p><button class="btn btn-blue" style="margin-top:14px" onclick="startPractice(\'all\')">Mixed Practice</button></div>';return;}renderItem();return;}var e=document.getElementById('engine');var _pm=['✨ Analyzing your level…','🧠 Generating fresh questions…','📝 Personalizing for you…','🎯 Almost ready!'];e.innerHTML=flLoaderHTML(_pm);startLoaderRotation(_pm,1300);fetchAIExercises(function(aiItems){stopLoader();if(aiItems&&aiItems.length>=5){queue=aiItems;}else{buildQueue(mode);}qIdx=0;renderItem();});}
-function fetchAIExercises(callback){fetch(SB_URL+'/functions/v1/futurelab-generate-exercises',{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},body:JSON.stringify({level:state.level,mastery:state.mastery||{},count:10,seenQuestions:Object.keys(state.seenQ).slice(-40)})}).then(function(r){return r.json();}).then(function(data){callback(data.exercises||[]);}).catch(function(){callback([]);});}
-function renderItem(){const e=document.getElementById('engine');if(qIdx>=queue.length){const acc=Math.round(state.correct/Math.max(1,state.answered)*100);e.innerHTML='<div style="text-align:center;padding:10px"><img src="'+IMG.wave+'" style="width:130px"><h3 style="margin:10px 0">Well done, '+firstName()+'! Session complete! 🎉</h3><p style="opacity:.75">Overall accuracy: '+acc+'%. What you missed has been saved for Smart Review.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><button class="btn btn-blue" onclick="startPractice(\'all\')">Another round</button><button class="btn btn-ghost" onclick="go(\'cards\')">Go to flashcards →</button></div></div>';confetti();return;}
+function startPractice(mode){
+  resetStruggleTracking();sessionMode=mode;
+  if(mode==='review'){buildQueue(mode);qIdx=0;if(!queue.length){document.getElementById('engine').innerHTML='<div style="text-align:center;padding:20px"><img src="'+IMG.wave+'" style="width:120px"><h3 style="margin:10px 0">Review queue empty!</h3><p style="opacity:.7">You have no pending errors. Do a mixed practice to fill your review if you miss something.</p><button class="btn btn-blue" style="margin-top:14px" onclick="startPractice(\'all\')">Mixed Practice</button></div>';return;}renderItem();return;}
+  var e=document.getElementById('engine');
+  var _pm=['✨ Analyzing your skill levels…','🧠 Generating personalized questions…','📝 Calibrating difficulty…','🎯 Almost ready!'];
+  e.innerHTML=flLoaderHTML(_pm);startLoaderRotation(_pm,1300);
+  fetchAIExercises(function(aiItems){
+    stopLoader();
+    if(aiItems&&aiItems.length>=5){queue=aiItems;_staticExhausted=false;}
+    else{buildQueue(mode);if(_staticExhausted&&(!aiItems||aiItems.length<5)){e.innerHTML='<div style="text-align:center;padding:30px"><h3 style="margin-bottom:10px">You\'re a master, '+firstName()+'! 🏆</h3><p style="opacity:.75;margin-bottom:16px">You\'ve seen all available static questions. AI will generate advanced exercises for your next session — try again in a moment.</p><button class="btn btn-blue" onclick="startPractice(\'all\')">Try AI again</button></div>';return;}}
+    qIdx=0;renderItem();
+  });
+}
+function fetchAIExercises(callback){
+  var skillLevels={};Object.keys(SKILLS).forEach(function(s){skillLevels[s]=(state.skillLvl[s]||{lv:1}).lv;});
+  fetch(SB_URL+'/functions/v1/futurelab-generate-exercises',{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},body:JSON.stringify({level:state.level,mastery:state.mastery||{},skillLevels:skillLevels,count:10,seenQuestions:Object.keys(state.seenQ).slice(-60)})}).then(function(r){return r.json();}).then(function(data){callback(data.exercises||[]);}).catch(function(){callback([]);});
+}
+function renderItem(){
+  const e=document.getElementById('engine');
+  if(qIdx>=queue.length){
+    // Build per-skill progress snapshot for end screen
+    var skillSnap='';var skList=Object.keys(SKILLS);
+    var sessionSkills=queue.map(function(it){return it.sk;}).filter(function(s,i,a){return a.indexOf(s)===i;});
+    if(sessionSkills.length){skillSnap='<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:14px 0">';sessionSkills.forEach(function(s){var sl=state.skillLvl[s]||{lv:1};skillSnap+='<div style="background:var(--blue-lt);border-radius:12px;padding:6px 12px;font-size:.78rem;font-weight:700">'+SKILLS[s]+' · Lv '+sl.lv+' <span style="background:var(--blue);color:#fff;border-radius:20px;padding:1px 6px;font-size:.65rem">'+cefrLabel(sl.lv)+'</span></div>';});skillSnap+='</div>';}
+    const acc=Math.round(state.correct/Math.max(1,state.answered)*100);
+    e.innerHTML='<div style="text-align:center;padding:10px"><img src="'+IMG.wave+'" style="width:130px"><h3 style="margin:10px 0">Well done, '+firstName()+'! Session complete! 🎉</h3>'+skillSnap+'<p style="opacity:.75">Overall accuracy: '+acc+'%. What you missed has been saved for Smart Review.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><button class="btn btn-blue" onclick="startPractice(\'all\')">Next level round ✨</button><button class="btn btn-ghost" onclick="go(\'cards\')">Go to flashcards →</button></div></div>';
+    confetti();return;
+  }
   curItem=queue[qIdx];hintUsed=false;const it=curItem;const idx=ITEMS.indexOf(it);
   if(it.q)state.seenQ[norm(it.q)]=true;
   let body;
@@ -1119,7 +1166,8 @@ function renderDash(){
   const mg=document.getElementById('masteryGrid');mg.innerHTML='';
   ['present-simple','present-continuous','will','going-to','future-perfect','fpc','zero','first','second','mixed','inversion'].forEach(s=>{const p=masteryPct(s);const col=p>=70?'#1FAA66':p>=40?'#E9A72C':'#C8202E';const circ=2*Math.PI*34;const off=circ*(1-p/100);
     const d=document.createElement('div');d.className='ring-card';d.onclick=()=>{go(['zero','first','second','mixed','inversion'].includes(s)?'cond':'learn');setTimeout(()=>{const t=document.getElementById('lesson-'+s);if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},250);};
-    d.innerHTML='<div class="ring"><svg width="84" height="84"><circle cx="42" cy="42" r="34" fill="none" stroke="#E7DCC6" stroke-width="8"/><circle cx="42" cy="42" r="34" fill="none" stroke="'+col+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'"/></svg><div class="pct">'+p+'%</div></div><div class="nm">'+SKILLS[s]+'</div>';mg.appendChild(d);});
+    var sl=state.skillLvl[s]||{lv:1};
+    d.innerHTML='<div class="ring"><svg width="84" height="84"><circle cx="42" cy="42" r="34" fill="none" stroke="#E7DCC6" stroke-width="8"/><circle cx="42" cy="42" r="34" fill="none" stroke="'+col+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'"/></svg><div class="pct">'+p+'%</div></div><div class="nm">'+SKILLS[s]+'</div><div class="sk-lv">Lv '+sl.lv+'<span class="cefr-chip">'+cefrLabel(sl.lv)+'</span></div>';mg.appendChild(d);});
   const br=document.getElementById('badgeRow');br.innerHTML='';
   var earnedCount=0;
   BADGES.forEach(b=>{
