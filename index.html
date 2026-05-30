@@ -354,6 +354,18 @@ button{font-family:'Lexend';cursor:pointer}
 footer{text-align:center;padding:30px 22px 60px;opacity:.7;font-size:.82rem}
 footer img{width:42px;margin-bottom:6px}
 
+/* ===== GLOBAL ANIMATED LOADER ===== */
+.fl-loader{display:flex;flex-direction:column;align-items:center;padding:40px 20px;gap:12px}
+.fl-ring{width:52px;height:52px;border-radius:50%;border:5px solid var(--line);border-top-color:var(--blue);border-right-color:var(--gold);animation:spin .85s linear infinite;flex-shrink:0}
+.fl-dots{display:flex;gap:8px;margin-top:2px}
+.fl-dots span{width:10px;height:10px;border-radius:50%;opacity:.2;animation:fl-blink 1.3s ease-in-out infinite}
+.fl-dots span:nth-child(1){background:var(--blue)}
+.fl-dots span:nth-child(2){animation-delay:.22s;background:var(--gold)}
+.fl-dots span:nth-child(3){animation-delay:.44s;background:var(--red)}
+.fl-msg{font-family:'Bricolage Grotesque';font-weight:700;font-size:.95rem;color:var(--blue);text-align:center;min-height:1.4em;transition:opacity .25s}
+.fl-msg.fade{opacity:0}
+@keyframes fl-blink{0%,80%,100%{opacity:.15;transform:scale(1)}40%{opacity:1;transform:scale(1.2)}}
+
 /* ===== INTERVENTION MODAL ===== */
 .interv-overlay{position:fixed;inset:0;z-index:300;background:rgba(22,36,74,.7);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
 .interv-card{background:var(--paper);border-radius:28px;padding:32px;max-width:580px;width:100%;box-shadow:0 20px 60px rgba(22,36,74,.3);animation:pop .35s;margin:auto;position:relative}
@@ -555,7 +567,7 @@ footer img{width:42px;margin-bottom:6px}
   <div class="panel">
     <table class="lb-table">
       <thead><tr><th>#</th><th>Student</th><th>Section</th><th>Level</th><th>XP</th><th>Accuracy</th><th>Exam</th><th>Progress</th></tr></thead>
-      <tbody id="lbBody"><tr><td colspan="8" style="text-align:center;opacity:.5;padding:30px">Loading...</td></tr></tbody>
+      <tbody id="lbBody"><tr><td colspan="8"><div class="fl-loader"><div class="fl-ring"></div><div class="fl-dots"><span></span><span></span><span></span></div><div class="fl-msg">🏆 Loading rankings…</div></div></td></tr></tbody>
     </table>
     <div class="lb-refresh" id="lbRefresh"></div>
   </div>
@@ -633,6 +645,29 @@ function showLevelUp(){var msg=['Keep it up!','You are unstoppable!','You are a 
 /* ===== toast + tts + confetti ===== */
 function toast(msg,type){const t=document.getElementById('toast');document.getElementById('toastMsg').textContent=msg;document.getElementById('toastFace').src=IMG.face;t.className='toast show '+(type||'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',2200);}
 function speak(text){if(!('speechSynthesis'in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=.92;speechSynthesis.speak(u);}catch(e){}}
+/* ===== GLOBAL LOADER UTILITY ===== */
+var _flTimer=null;
+function flLoaderHTML(msgs){
+  return '<div class="fl-loader"><div class="fl-ring"></div><div class="fl-dots"><span></span><span></span><span></span></div><div class="fl-msg" id="flLoaderMsg">'+(msgs[0]||'Please wait…')+'</div></div>';
+}
+function startLoaderRotation(msgs,ms){
+  if(_flTimer)clearInterval(_flTimer);
+  var i=0;
+  _flTimer=setInterval(function(){
+    var el=document.getElementById('flLoaderMsg');
+    if(!el){clearInterval(_flTimer);_flTimer=null;return;}
+    el.classList.add('fade');
+    setTimeout(function(){
+      var el2=document.getElementById('flLoaderMsg');
+      if(!el2)return;
+      i=(i+1)%msgs.length;
+      el2.textContent=msgs[i];
+      el2.classList.remove('fade');
+    },200);
+  },ms||1400);
+}
+function stopLoader(){if(_flTimer){clearInterval(_flTimer);_flTimer=null;}}
+
 function playCelebrationSound(big){try{var ctx=new(window.AudioContext||window.webkitAudioContext)();var comp=ctx.createDynamicsCompressor();comp.threshold.value=-10;comp.ratio.value=5;comp.connect(ctx.destination);var master=ctx.createGain();master.gain.value=0.85;master.connect(comp);var delay=ctx.createDelay(0.3);var dg=ctx.createGain();dg.gain.value=0.18;delay.delayTime.value=0.055;master.connect(delay);delay.connect(dg);dg.connect(comp);var t=ctx.currentTime;var notes=big?[261.63,329.63,392.00,523.25,659.25,783.99,1046.50]:[523.25,659.25,783.99];var step=big?0.075:0.09;notes.forEach(function(freq,i){var nt=t+i*step;var o=ctx.createOscillator();var g=ctx.createGain();o.type='sine';o.frequency.value=freq;o.frequency.setValueAtTime(freq*1.008,nt);g.gain.setValueAtTime(0,nt);g.gain.linearRampToValueAtTime(0.32,nt+0.012);g.gain.exponentialRampToValueAtTime(0.001,nt+0.55);o.connect(g);g.connect(master);o.start(nt);o.stop(nt+0.6);var o2=ctx.createOscillator();var g2=ctx.createGain();o2.type='triangle';o2.frequency.value=freq*2.001;g2.gain.setValueAtTime(0,nt);g2.gain.linearRampToValueAtTime(0.09,nt+0.01);g2.gain.exponentialRampToValueAtTime(0.001,nt+0.28);o2.connect(g2);g2.connect(master);o2.start(nt);o2.stop(nt+0.32);});if(big){var sp=t+notes.length*step+0.04;[1046.50,1318.51,1567.98,2093.00].forEach(function(freq,i){var st=sp+i*0.038;var o=ctx.createOscillator();var g=ctx.createGain();o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(0.13,st);g.gain.exponentialRampToValueAtTime(0.001,st+0.38);o.connect(g);g.connect(master);o.start(st);o.stop(st+0.42);});}setTimeout(function(){try{ctx.close();}catch(e){}},2800);}catch(e){}}
 function confetti(){playCelebrationSound(true);const cs=['#1E50A0','#C8202E','#E9A72C','#1FAA66'];for(let i=0;i<70;i++){const d=document.createElement('div');d.className='confetti';d.style.left=Math.random()*100+'vw';d.style.background=cs[i%4];d.style.transform='rotate('+Math.random()*360+'deg)';document.body.appendChild(d);const dur=2200+Math.random()*1500;d.animate([{transform:'translateY(0) rotate(0)',opacity:1},{transform:'translateY(105vh) rotate('+(360+Math.random()*360)+'deg)',opacity:.9}],{duration:dur,easing:'cubic-bezier(.3,.6,.4,1)'});setTimeout(()=>d.remove(),dur);}}
 function miniConfetti(){playCelebrationSound(false);const cs=['#1E50A0','#C8202E','#E9A72C','#1FAA66'];for(let i=0;i<28;i++){const d=document.createElement('div');d.className='confetti';d.style.left=(20+Math.random()*60)+'vw';d.style.background=cs[i%4];d.style.transform='rotate('+Math.random()*360+'deg)';document.body.appendChild(d);const dur=1400+Math.random()*800;d.animate([{transform:'translateY(0) rotate(0)',opacity:1},{transform:'translateY(60vh) rotate('+(180+Math.random()*360)+'deg)',opacity:.7}],{duration:dur,easing:'cubic-bezier(.25,.7,.4,1)'});setTimeout(()=>d.remove(),dur);}}
@@ -880,7 +915,7 @@ const ITEMS=[
 let queue=[],qIdx=0,sessionMode='all',curItem=null,hintUsed=false;
 function buildQueue(mode){if(mode==='review'){const ids=state.review.slice();queue=ids.map(i=>ITEMS[i]).filter(Boolean);if(!queue.length){queue=[];}}else{var maxTier=1;if(state.level>=4)maxTier=2;if(state.level>=6)maxTier=3;if(state.level>=8)maxTier=4;var allEligible=ITEMS.map(function(_,i){return i;}).filter(function(i){return ITEMS[i].tier<=maxTier;});var eligible=allEligible.filter(function(i){return !state.seenQ[norm(ITEMS[i].q)];});if(eligible.length<5){state.seenQ={};persist();eligible=allEligible;}var currentTier=eligible.filter(function(i){return ITEMS[i].tier===maxTier;});var lowerTier=eligible.filter(function(i){return ITEMS[i].tier<maxTier;});var picked=[],usedIdx=[];for(var j=0;j<10;j++){var pool=(j<7&&currentTier.length)?currentTier:(lowerTier.length?lowerTier:currentTier);var avail=pool.filter(function(x){return !usedIdx.includes(x);});if(!avail.length)avail=pool;var chosen=avail[Math.floor(Math.random()*avail.length)];picked.push(chosen);usedIdx.push(chosen);}queue=picked.map(function(i){return ITEMS[i];});} }
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);}
-function startPractice(mode){resetStruggleTracking();sessionMode=mode;if(mode==='review'){buildQueue(mode);qIdx=0;if(!queue.length){document.getElementById('engine').innerHTML='<div style="text-align:center;padding:20px"><img src="'+IMG.wave+'" style="width:120px"><h3 style="margin:10px 0">Review queue empty!</h3><p style="opacity:.7">You have no pending errors. Do a mixed practice to fill your review if you miss something.</p><button class="btn btn-blue" style="margin-top:14px" onclick="startPractice(\'all\')">Mixed Practice</button></div>';return;}renderItem();return;}var e=document.getElementById('engine');e.innerHTML='<div style="text-align:center;padding:44px 20px"><div style="width:40px;height:40px;border:3px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px"></div><div style="font-family:\'Bricolage Grotesque\';font-weight:800;font-size:1.1rem;color:var(--blue)">✨ AI generating personalized exercises…</div><div style="font-size:.82rem;opacity:.6;margin-top:6px">Analyzing your level and weak areas to create a custom session</div></div>';fetchAIExercises(function(aiItems){if(aiItems&&aiItems.length>=5){queue=aiItems;}else{buildQueue(mode);}qIdx=0;renderItem();});}
+function startPractice(mode){resetStruggleTracking();sessionMode=mode;if(mode==='review'){buildQueue(mode);qIdx=0;if(!queue.length){document.getElementById('engine').innerHTML='<div style="text-align:center;padding:20px"><img src="'+IMG.wave+'" style="width:120px"><h3 style="margin:10px 0">Review queue empty!</h3><p style="opacity:.7">You have no pending errors. Do a mixed practice to fill your review if you miss something.</p><button class="btn btn-blue" style="margin-top:14px" onclick="startPractice(\'all\')">Mixed Practice</button></div>';return;}renderItem();return;}var e=document.getElementById('engine');var _pm=['✨ Analyzing your level…','🧠 Generating fresh questions…','📝 Personalizing for you…','🎯 Almost ready!'];e.innerHTML=flLoaderHTML(_pm);startLoaderRotation(_pm,1300);fetchAIExercises(function(aiItems){stopLoader();if(aiItems&&aiItems.length>=5){queue=aiItems;}else{buildQueue(mode);}qIdx=0;renderItem();});}
 function fetchAIExercises(callback){fetch(SB_URL+'/functions/v1/futurelab-generate-exercises',{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},body:JSON.stringify({level:state.level,mastery:state.mastery||{},count:10,seenQuestions:Object.keys(state.seenQ).slice(-40)})}).then(function(r){return r.json();}).then(function(data){callback(data.exercises||[]);}).catch(function(){callback([]);});}
 function renderItem(){const e=document.getElementById('engine');if(qIdx>=queue.length){const acc=Math.round(state.correct/Math.max(1,state.answered)*100);e.innerHTML='<div style="text-align:center;padding:10px"><img src="'+IMG.wave+'" style="width:130px"><h3 style="margin:10px 0">Session complete! 🎉</h3><p style="opacity:.75">Overall accuracy: '+acc+'%. What you missed has been saved for Smart Review.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><button class="btn btn-blue" onclick="startPractice(\'all\')">Another round</button><button class="btn btn-ghost" onclick="go(\'cards\')">Go to flashcards →</button></div></div>';confetti();return;}
   curItem=queue[qIdx];hintUsed=false;const it=curItem;const idx=ITEMS.indexOf(it);
@@ -1589,6 +1624,9 @@ function filterSection(sec){
 function loadBoard(sort,btn){
   currentSort=sort||'xp';
   if(btn){document.querySelectorAll('.lb-tabs button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  var _lm=['🏆 Loading rankings…','⚡ Fetching scores…','🎯 Checking positions…'];
+  document.getElementById('lbBody').innerHTML='<tr><td colspan="8">'+flLoaderHTML(_lm)+'</td></tr>';
+  startLoaderRotation(_lm,1200);
   const order=sort==='exam'?'exam_score.desc.nullslast':sort==='accuracy'?'accuracy.desc':'xp.desc';
   let url=SB_URL+'/rest/v1/'+SB_TABLE+'?select=student_name,section,xp,level,streak,answered,correct,accuracy,exam_score,badges&order='+order+'&limit=50';
   if(currentFilter!=='all')url+='&section=eq.'+currentFilter;
@@ -1597,6 +1635,7 @@ function loadBoard(sort,btn){
   })
   .then(r=>r.json())
   .then(rows=>{
+    stopLoader();
     const tb=document.getElementById('lbBody');
     if(!rows.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;opacity:.5;padding:30px">No students yet. Be the first!</td></tr>';return;}
     const maxXp=Math.max(...rows.map(r=>r.xp||1));
@@ -1667,7 +1706,7 @@ function submitIntervention(skill){
   var confusion=document.getElementById('intervText').value.trim();
   var theory=document.getElementById('intervTheory');
   theory.className='interv-theory show';
-  theory.innerHTML='<div class="interv-spinner"><div class="sp"></div><div style="font-weight:600;color:var(--blue)">✨ AI is preparing your explanation…</div></div>';
+  var _em=['🔍 Reading your question…','💡 Building your explanation…','📚 Finding the best examples…','🎬 Almost done!'];theory.innerHTML=flLoaderHTML(_em);startLoaderRotation(_em,1300);
   document.querySelector('.interv-card textarea').disabled=true;
   document.querySelectorAll('.interv-actions .btn').forEach(function(b){b.disabled=true;});
   fetch(SB_URL+'/functions/v1/futurelab-explain-topic',{
@@ -1677,6 +1716,7 @@ function submitIntervention(skill){
   })
   .then(function(r){return r.json();})
   .then(function(data){
+    stopLoader();
     if(data.error){theory.innerHTML='<p style="color:var(--bad)">Could not load explanation. Try again later.</p>';return;}
     var videoHtml='';
     if(data.videoId){
@@ -1690,6 +1730,7 @@ function submitIntervention(skill){
       '<div style="margin-top:20px;text-align:center"><button class="btn btn-blue" onclick="closeIntervention()">✅ Got it! Continue →</button></div>';
   })
   .catch(function(){
+    stopLoader();
     theory.innerHTML='<p style="color:var(--bad)">Connection error. <button class="btn btn-ghost" style="margin-top:8px" onclick="closeIntervention()">Continue</button></p>';
   });
 }
