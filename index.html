@@ -2422,7 +2422,6 @@ function buildSyncBody(){
     streak:state.streak,
     answered:state.answered,
     correct:state.correct,
-    accuracy:state.answered>0?Math.round(state.correct/state.answered*100):0,
     exam_score:state.lastExamScore!=null?state.lastExamScore:null,
     best_exam_score:state.bestExamScore!=null?state.bestExamScore:null,
     badges:state.badges,
