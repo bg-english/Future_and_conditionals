@@ -355,8 +355,8 @@ footer{text-align:center;padding:30px 22px 60px;opacity:.7;font-size:.82rem}
 footer img{width:42px;margin-bottom:6px}
 
 /* ===== INTERVENTION MODAL ===== */
-.interv-overlay{position:fixed;inset:0;z-index:300;background:rgba(22,36,74,.7);backdrop-filter:blur(6px);display:grid;place-items:center;padding:16px}
-.interv-card{background:var(--paper);border-radius:28px;padding:32px;max-width:560px;width:100%;box-shadow:0 20px 60px rgba(22,36,74,.3);animation:pop .35s}
+.interv-overlay{position:fixed;inset:0;z-index:300;background:rgba(22,36,74,.7);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.interv-card{background:var(--paper);border-radius:28px;padding:32px;max-width:580px;width:100%;box-shadow:0 20px 60px rgba(22,36,74,.3);animation:pop .35s;margin:auto;position:relative}
 .interv-card .ic-head{font-size:2.4rem;margin-bottom:6px;text-align:center}
 .interv-card h2{font-family:'Bricolage Grotesque';font-size:1.45rem;font-weight:800;text-align:center;margin-bottom:6px}
 .interv-card .ic-sub{text-align:center;font-size:.88rem;opacity:.65;margin-bottom:20px}
@@ -1646,6 +1646,7 @@ function showIntervention(skill){
   var overlay=document.createElement('div');
   overlay.className='interv-overlay';
   overlay.id='intervOverlay';
+  overlay.onclick=function(e){e.stopPropagation();};
   overlay.innerHTML=
     '<div class="interv-card">'+
       '<div class="ic-head">🧠</div>'+
@@ -1677,11 +1678,16 @@ function submitIntervention(skill){
   .then(function(r){return r.json();})
   .then(function(data){
     if(data.error){theory.innerHTML='<p style="color:var(--bad)">Could not load explanation. Try again later.</p>';return;}
-    var ytSrc='https://www.youtube.com/embed?listType=search&list='+encodeURIComponent(data.youtubeQuery)+'&autoplay=0&rel=0';
+    var videoHtml='';
+    if(data.videoId){
+      var ytSrc='https://www.youtube-nocookie.com/embed/'+data.videoId+'?rel=0&modestbranding=1';
+      videoHtml='<div class="interv-video"><iframe src="'+ytSrc+'" allowfullscreen loading="lazy" title="'+data.skillName+' explanation" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>'
+        +'<p style="text-align:center;font-size:.78rem;opacity:.55;margin:-8px 0 12px">Can\'t see the video? <a href="https://www.youtube.com/watch?v='+data.videoId+'" target="_blank" style="color:var(--blue)">Open on YouTube ↗</a></p>';
+    }
     theory.innerHTML=
-      '<div class="interv-video"><iframe src="'+ytSrc+'" allowfullscreen loading="lazy" title="'+data.skillName+' explanation"></iframe></div>'+
+      videoHtml+
       '<div class="interv-explain">'+data.explanation+'</div>'+
-      '<div style="margin-top:16px;text-align:center"><button class="btn btn-blue" onclick="closeIntervention()">✅ Got it! Continue →</button></div>';
+      '<div style="margin-top:20px;text-align:center"><button class="btn btn-blue" onclick="closeIntervention()">✅ Got it! Continue →</button></div>';
   })
   .catch(function(){
     theory.innerHTML='<p style="color:var(--bad)">Connection error. <button class="btn btn-ghost" style="margin-top:8px" onclick="closeIntervention()">Continue</button></p>';
