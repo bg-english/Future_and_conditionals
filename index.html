@@ -223,10 +223,23 @@ button{font-family:'Lexend';cursor:pointer}
 .flash-back .ans{font-size:1.02rem;font-weight:600}
 .flash-back .eg{font-size:.86rem;font-style:italic;opacity:.7;margin-top:10px}
 .flash-hint{text-align:center;font-size:.8rem;opacity:.55;margin-bottom:10px}
-.rate-row{display:flex;gap:10px;justify-content:center}
-.rate-row button{flex:1;max-width:160px;border:2px solid var(--line);background:var(--paper);border-radius:14px;padding:12px;font-weight:700}
-.rate-row .again{color:var(--red);border-color:var(--red)}
-.rate-row .good{color:var(--ok);border-color:var(--ok)}
+.rate-row{display:flex;gap:10px;justify-content:center;margin-top:14px}
+.rate-row button{flex:1;max-width:180px;border:2px solid var(--line);background:var(--paper);border-radius:14px;padding:12px;font-weight:700;cursor:pointer;transition:.2s}
+.rate-row .again{color:var(--red);border-color:var(--red)}.rate-row .again:hover{background:#fef0f0}
+.rate-row .good{color:var(--ok);border-color:var(--ok)}.rate-row .good:hover{background:#f0faf4}
+.flash-input-area{display:flex;gap:10px;margin-top:16px;max-width:520px;margin-left:auto;margin-right:auto}
+.flash-input-area input{flex:1;font-family:'Lexend';font-size:1rem;font-weight:600;border:2px solid var(--line);border-radius:14px;padding:11px 15px;color:var(--ink);background:var(--cream);transition:.2s}
+.flash-input-area input:focus{outline:none;border-color:var(--blue)}
+.flash-input-area input:disabled{opacity:.6}
+.flash-result{max-width:520px;margin:12px auto 0;padding:14px 18px;border-radius:14px;font-size:.93rem;font-weight:600;line-height:1.4}
+.flash-result.correct{background:#d6f5e3;color:#157a48;border:2px solid var(--ok)}
+.flash-result.wrong{background:#fde8e8;color:var(--bad);border:2px solid var(--bad)}
+.flash-reinforce{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:20px;margin-top:28px}
+.flash-reinforce h3{font-family:'Bricolage Grotesque';font-size:1rem;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.flash-weak-list{display:flex;flex-direction:column;gap:8px}
+.flash-weak-item{background:#fef8f8;border:1.5px solid var(--bad);border-radius:10px;padding:10px 14px;font-size:.88rem}
+.flash-weak-item .fw-q{font-weight:700;color:var(--bad);margin-bottom:2px}
+.flash-weak-item .fw-a{color:var(--ink);opacity:.75}
 
 /* ===== CONDITIONALS ===== */
 .cond-block{background:var(--paper);border:2px solid var(--line);border-radius:22px;padding:28px;margin-bottom:22px;border-left:10px solid var(--blue)}
@@ -592,7 +605,8 @@ const Store=(()=>{let ok=false,mem={};try{const k="__fl";localStorage.setItem(k,
 
 /* ===== state ===== */
 const SKILLS={'present-simple':'Present Simple','present-continuous':'Present Continuous','will':'will','going-to':'going to','future-perfect':'Future Perfect','fpc':'Fut. Perf. Continuous','zero':'Zero Cond.','first':'First Cond.','second':'Second Cond.','mixed':'Mixed Cond.','inversion':'Cond. Inversion'};
-let state=Store.get('flstate',null)||{xp:0,level:1,streak:0,lastDay:null,answered:0,correct:0,mastery:{},review:[],badges:[],cardBox:{}};
+let state=Store.get('flstate',null)||{xp:0,level:1,streak:0,lastDay:null,answered:0,correct:0,mastery:{},review:[],badges:[],cardBox:{},seenQ:{}};
+if(!state.seenQ)state.seenQ={};
 Object.keys(SKILLS).forEach(s=>{if(!state.mastery[s])state.mastery[s]={seen:0,correct:0};});
 function save(){Store.set('flstate',state);} // namespaced
 function saveAll(){Store.set('flstate',state);}
@@ -864,12 +878,13 @@ const ITEMS=[
  {sk:'will',type:'mc',q:'The government has announced it ___ new environmental policies next year. (formal register)',o:['will introduce','is introducing','introduces','would introduce'],a:0,fb:'Formal announcement about the future → <b>will introduce</b>.',tier:4,hint:'A formal, official announcement about the future. In formal contexts, which word signals a definite future action?'}
 ];
 let queue=[],qIdx=0,sessionMode='all',curItem=null,hintUsed=false;
-function buildQueue(mode){if(mode==='review'){const ids=state.review.slice();queue=ids.map(i=>ITEMS[i]).filter(Boolean);if(!queue.length){queue=[];}}else{var maxTier=1;if(state.level>=4)maxTier=2;if(state.level>=6)maxTier=3;if(state.level>=8)maxTier=4;var eligible=ITEMS.map(function(_,i){return i;}).filter(function(i){return ITEMS[i].tier<=maxTier;});var currentTier=eligible.filter(function(i){return ITEMS[i].tier===maxTier;});var lowerTier=eligible.filter(function(i){return ITEMS[i].tier<maxTier;});var picked=[];for(var j=0;j<10;j++){if(j<7&&currentTier.length)picked.push(currentTier[Math.floor(Math.random()*currentTier.length)]);else if(lowerTier.length)picked.push(lowerTier[Math.floor(Math.random()*lowerTier.length)]);else if(currentTier.length)picked.push(currentTier[Math.floor(Math.random()*currentTier.length)]);}queue=picked.map(function(i){return ITEMS[i];});} }
+function buildQueue(mode){if(mode==='review'){const ids=state.review.slice();queue=ids.map(i=>ITEMS[i]).filter(Boolean);if(!queue.length){queue=[];}}else{var maxTier=1;if(state.level>=4)maxTier=2;if(state.level>=6)maxTier=3;if(state.level>=8)maxTier=4;var allEligible=ITEMS.map(function(_,i){return i;}).filter(function(i){return ITEMS[i].tier<=maxTier;});var eligible=allEligible.filter(function(i){return !state.seenQ[norm(ITEMS[i].q)];});if(eligible.length<5){state.seenQ={};persist();eligible=allEligible;}var currentTier=eligible.filter(function(i){return ITEMS[i].tier===maxTier;});var lowerTier=eligible.filter(function(i){return ITEMS[i].tier<maxTier;});var picked=[],usedIdx=[];for(var j=0;j<10;j++){var pool=(j<7&&currentTier.length)?currentTier:(lowerTier.length?lowerTier:currentTier);var avail=pool.filter(function(x){return !usedIdx.includes(x);});if(!avail.length)avail=pool;var chosen=avail[Math.floor(Math.random()*avail.length)];picked.push(chosen);usedIdx.push(chosen);}queue=picked.map(function(i){return ITEMS[i];});} }
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);}
 function startPractice(mode){resetStruggleTracking();sessionMode=mode;if(mode==='review'){buildQueue(mode);qIdx=0;if(!queue.length){document.getElementById('engine').innerHTML='<div style="text-align:center;padding:20px"><img src="'+IMG.wave+'" style="width:120px"><h3 style="margin:10px 0">Review queue empty!</h3><p style="opacity:.7">You have no pending errors. Do a mixed practice to fill your review if you miss something.</p><button class="btn btn-blue" style="margin-top:14px" onclick="startPractice(\'all\')">Mixed Practice</button></div>';return;}renderItem();return;}var e=document.getElementById('engine');e.innerHTML='<div style="text-align:center;padding:44px 20px"><div style="width:40px;height:40px;border:3px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px"></div><div style="font-family:\'Bricolage Grotesque\';font-weight:800;font-size:1.1rem;color:var(--blue)">✨ AI generating personalized exercises…</div><div style="font-size:.82rem;opacity:.6;margin-top:6px">Analyzing your level and weak areas to create a custom session</div></div>';fetchAIExercises(function(aiItems){if(aiItems&&aiItems.length>=5){queue=aiItems;}else{buildQueue(mode);}qIdx=0;renderItem();});}
-function fetchAIExercises(callback){fetch(SB_URL+'/functions/v1/futurelab-generate-exercises',{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},body:JSON.stringify({level:state.level,mastery:state.mastery||{},count:10})}).then(function(r){return r.json();}).then(function(data){callback(data.exercises||[]);}).catch(function(){callback([]);});}
+function fetchAIExercises(callback){fetch(SB_URL+'/functions/v1/futurelab-generate-exercises',{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},body:JSON.stringify({level:state.level,mastery:state.mastery||{},count:10,seenQuestions:Object.keys(state.seenQ).slice(-40)})}).then(function(r){return r.json();}).then(function(data){callback(data.exercises||[]);}).catch(function(){callback([]);});}
 function renderItem(){const e=document.getElementById('engine');if(qIdx>=queue.length){const acc=Math.round(state.correct/Math.max(1,state.answered)*100);e.innerHTML='<div style="text-align:center;padding:10px"><img src="'+IMG.wave+'" style="width:130px"><h3 style="margin:10px 0">Session complete! 🎉</h3><p style="opacity:.75">Overall accuracy: '+acc+'%. What you missed has been saved for Smart Review.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><button class="btn btn-blue" onclick="startPractice(\'all\')">Another round</button><button class="btn btn-ghost" onclick="go(\'cards\')">Go to flashcards →</button></div></div>';confetti();return;}
   curItem=queue[qIdx];hintUsed=false;const it=curItem;const idx=ITEMS.indexOf(it);
+  if(it.q)state.seenQ[norm(it.q)]=true;
   let body;
   if(it.type==='fill'||it.type==='error'){body='<div class="eq-fill"><input id="fillInput" placeholder="Type here…" autocomplete="off" onkeydown="if(event.key===\'Enter\')submitAnswer()"></div>';}
   else{body='<div class="eq-opts">'+it.o.map((o,j)=>'<button class="eq-opt" onclick="submitAnswer('+j+')">'+o+'</button>').join('')+'</div>';}
@@ -900,32 +915,80 @@ function updateReviewBadge(){const n=state.review.length;document.getElementById
    FLASHCARDS (Leitner)
    ============================================================ */
 const CARDS=[
- {id:'c1',f:'will + ?',b:'will + BASE verb',e:'I will go. / She will help.'},
- {id:'c2',f:'going to + ?',b:'am/is/are + going to + BASE verb',e:"It's going to rain."},
- {id:'c3',f:'Future Perfect',b:'will have + PAST PARTICIPLE',e:'By 9, she will have left.'},
- {id:'c4',f:'Future Perfect Continuous',b:'will have been + verb-ING',e:'…will have been waiting for an hour.'},
- {id:'c5',f:'Present Continuous (futuro)',b:'am/is/are + verb-ING (arranged plan)',e:"I'm flying tomorrow."},
- {id:'c6',f:'Present Simple (futuro)',b:'verb (+s) — fixed schedules',e:'The train leaves at 8.'},
- {id:'c7',f:'Zero Conditional',b:'If + present simple, present simple',e:'If you heat ice, it melts.'},
- {id:'c8',f:'First Conditional',b:'If + present simple, will + base',e:'If it rains, I will stay.'},
- {id:'c9',f:'Second Conditional',b:'If + past simple, would + base',e:'If I were rich, I would travel.'},
- {id:'c10',f:'"will" after "if"?',b:'NEVER in first conditional. After "if" → present.',e:'❌ if it will rain ✅ if it rains'},
- {id:'c11',f:'"to be" in Second Cond.',b:'Use WERE for all persons',e:'If I were you…'},
- {id:'c12',f:'unless',b:'= if not',e:'Unless you hurry, you\'ll be late.'}
+ {id:'c1',sk:'will',f:'will + ?',b:'will + BASE verb',e:'I will go. / She will help.'},
+ {id:'c2',sk:'going-to',f:'going to + ?',b:'am/is/are + going to + BASE verb',e:"It's going to rain."},
+ {id:'c3',sk:'future-perfect',f:'Future Perfect structure?',b:'will have + PAST PARTICIPLE',e:'By 9, she will have left.'},
+ {id:'c4',sk:'fpc',f:'Future Perfect Continuous structure?',b:'will have been + verb-ING',e:'…will have been waiting for an hour.'},
+ {id:'c5',sk:'present-continuous',f:'Present Continuous for future?',b:'am/is/are + verb-ING (arranged plan)',e:"I'm flying tomorrow."},
+ {id:'c6',sk:'present-simple',f:'Present Simple for future?',b:'verb (+s) — fixed schedules',e:'The train leaves at 8.'},
+ {id:'c7',sk:'zero',f:'Zero Conditional structure?',b:'If + present simple, present simple',e:'If you heat ice, it melts.'},
+ {id:'c8',sk:'first',f:'First Conditional structure?',b:'If + present simple, will + base verb',e:'If it rains, I will stay.'},
+ {id:'c9',sk:'second',f:'Second Conditional structure?',b:'If + past simple, would + base verb',e:'If I were rich, I would travel.'},
+ {id:'c10',sk:'first',f:'Can you use "will" after "if"?',b:'NEVER — after if use present simple',e:'❌ if it will rain ✅ if it rains'},
+ {id:'c11',sk:'second',f:'"to be" in Second Conditional?',b:'Use WERE for all persons (not was)',e:'If I were you… / If she were here…'},
+ {id:'c12',sk:'first',f:'unless = ?',b:'if not',e:'Unless you hurry = If you do not hurry'}
 ];
 let cardOrder=[],cardPos=0;
+if(!state.cardWrong)state.cardWrong=[];
 function buildDeck(){const box=state.cardBox;cardOrder=CARDS.map(c=>c.id).sort((a,b)=>(box[a]||1)-(box[b]||1));cardPos=0;renderCard();}
-function renderCard(){const d=document.getElementById('deck');if(cardPos>=cardOrder.length){d.innerHTML='<div style="text-align:center;padding:30px"><img src="'+IMG.wave+'" style="width:120px"><h3 style="margin:10px 0">You reviewed them all! 🃏</h3><p style="opacity:.7">Come back anytime; the hard ones will appear first.</p><button class="btn btn-blue" style="margin-top:12px" onclick="buildDeck()">Review again</button></div>';return;}
+function renderCard(){
+  const d=document.getElementById('deck');
+  if(cardPos>=cardOrder.length){
+    var weak=CARDS.filter(c=>(state.cardBox[c.id]||1)<=2);
+    var weakHtml='';
+    if(weak.length){weakHtml='<div class="flash-reinforce"><h3>🔁 Cards that need more practice</h3><div class="flash-weak-list">'+weak.map(c=>'<div class="flash-weak-item"><div class="fw-q">'+c.f+'</div><div class="fw-a">✅ '+c.b+'</div></div>').join('')+'</div></div>';}
+    d.innerHTML='<div style="text-align:center;padding:30px"><img src="'+IMG.wave+'" style="width:120px"><h3 style="margin:10px 0">You reviewed them all! 🃏</h3><p style="opacity:.7">Come back anytime; harder cards appear first.</p><button class="btn btn-blue" style="margin-top:12px" onclick="buildDeck()">Review again</button></div>'+weakHtml;
+    return;
+  }
   const c=CARDS.find(x=>x.id===cardOrder[cardPos]);
-  d.innerHTML='<div class="flash-hint">Card '+(cardPos+1)+' of '+cardOrder.length+' · tap to flip</div>'
-    +'<div class="flashcard" id="fc" onclick="this.classList.toggle(\'flipped\')"><div class="flash-inner">'
-    +'<div class="flash-face flash-front"><div class="lbl">What is the structure?</div><div class="term">'+c.f+'</div></div>'
-    +'<div class="flash-face flash-back"><div class="ans">'+c.b+'</div><div class="eg">🔊 '+c.e+'</div></div>'
+  d.innerHTML='<div class="flash-hint">Card '+(cardPos+1)+' of '+cardOrder.length+'</div>'
+    +'<div class="flashcard" id="fc"><div class="flash-inner">'
+    +'<div class="flash-face flash-front"><div class="lbl">'+c.f+'</div><div class="term" style="font-size:1.1rem;margin-top:8px;opacity:.8">Write the structure below ↓</div></div>'
+    +'<div class="flash-face flash-back"><div class="ans">'+c.b+'</div><div class="eg" style="cursor:pointer" onclick="speak(\''+c.e.replace(/'/g,"\\'")+'\')" title="Tap to hear">🔊 '+c.e+'</div></div>'
     +'</div></div>'
-    +'<div class="rate-row"><button class="again" onclick="rateCard(\''+c.id+'\',false)">😕 Again</button><button class="good" onclick="rateCard(\''+c.id+'\',true)">😎 Got it</button></div>';
-  const back=d.querySelector('.flash-back');if(back)back.onclick=(ev)=>{ev.stopPropagation();speak(c.e.replace(/^🔊\s*/,''));};
+    +'<div class="flash-input-area" id="flashInputArea">'
+    +'<input type="text" id="flashInput" placeholder="Type the grammar structure…" autocomplete="off" onkeydown="if(event.key===\'Enter\')checkCard(\''+c.id+'\')">'
+    +'<button class="btn btn-blue" id="flashCheckBtn" onclick="checkCard(\''+c.id+'\')">Check ✓</button>'
+    +'</div>'
+    +'<div id="flashResult" style="display:none"></div>'
+    +'<div class="rate-row" id="flashRate" style="display:none">'
+    +'<button class="again" onclick="rateCard(\''+c.id+'\',false)">😕 More practice</button>'
+    +'<button class="good" onclick="rateCard(\''+c.id+'\',true)">😎 Got it!</button>'
+    +'</div>';
+  setTimeout(function(){var i=document.getElementById('flashInput');if(i)i.focus();},120);
 }
-function rateCard(id,good){const box=state.cardBox;box[id]=good?Math.min(5,(box[id]||1)+1):1;persist();toast(good?'Great! You will see it less 👍':'No worries, it will come back soon 💪',good?'good':'');cardPos++;renderCard();}
+function checkCardAnswer(typed,correct){
+  var t=norm(typed);var c=norm(correct);
+  if(t===c)return true;
+  var keywords=c.split(/[\s+\-]+/).filter(function(w){return w.length>2;});
+  var hits=keywords.filter(function(w){return t.includes(w);});
+  return hits.length>=Math.ceil(keywords.length*0.65);
+}
+function checkCard(id){
+  var inp=document.getElementById('flashInput');
+  if(!inp||inp.disabled)return;
+  var typed=inp.value.trim();
+  if(!typed){inp.focus();return;}
+  inp.disabled=true;
+  document.getElementById('flashCheckBtn').disabled=true;
+  var c=CARDS.find(function(x){return x.id===id;});
+  var correct=checkCardAnswer(typed,c.b);
+  document.getElementById('fc').classList.add('flipped');
+  var result=document.getElementById('flashResult');
+  result.style.display='block';
+  result.className='flash-result '+(correct?'correct':'wrong');
+  result.innerHTML=correct
+    ?'✅ Correct! Great memory!'
+    :'❌ Not quite — the correct structure is shown on the card above. Study it carefully.';
+  document.getElementById('flashRate').style.display='flex';
+  if(correct){miniConfetti();toast('Correct! +8 XP 🎉','good');addXP(8);}
+  else{toast('Study the structure above 👆','bad');}
+  if(c.sk)recordAnswer(c.sk,correct);
+  if(!correct&&!state.cardWrong.includes(id))state.cardWrong.push(id);
+  else if(correct)state.cardWrong=state.cardWrong.filter(function(x){return x!==id;});
+  persist();
+}
+function rateCard(id,good){const box=state.cardBox;box[id]=good?Math.min(5,(box[id]||1)+1):1;persist();cardPos++;renderCard();}
 
 /* ============================================================
    CONDITIONALS
