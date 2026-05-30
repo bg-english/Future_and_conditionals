@@ -680,17 +680,22 @@ const Store=(()=>{let ok=false,mem={};try{const k="__fl";localStorage.setItem(k,
 
 /* ===== state ===== */
 const SKILLS={'present-simple':'Present Simple','present-continuous':'Present Continuous','will':'will','going-to':'going to','future-perfect':'Future Perfect','fpc':'Fut. Perf. Continuous','zero':'Zero Cond.','first':'First Cond.','second':'Second Cond.','mixed':'Mixed Cond.','inversion':'Cond. Inversion'};
-let state=Store.get('flstate',null)||{xp:0,level:1,streak:0,lastDay:null,answered:0,correct:0,mastery:{},review:[],badges:[],cardBox:{},seenQ:{}};
+let state=Store.get('flstate',null)||{xp:0,level:1,streak:0,lastDay:null,answered:0,correct:0,mastery:{},review:[],badges:[],cardBox:{},seenQ:{},skillLvl:{},skillBadges:{}};
+// migrate missing fields (safe for all old state versions)
 if(!state.seenQ)state.seenQ={};
 if(!state.skillLvl)state.skillLvl={};
 if(!state.skillBadges)state.skillBadges={};
-Object.keys(SKILLS).forEach(s=>{if(!state.mastery[s])state.mastery[s]={seen:0,correct:0};if(!state.skillLvl[s])state.skillLvl[s]={xp:0,lv:1};if(!state.skillBadges[s])state.skillBadges[s]=[];});
-function save(){Store.set('flstate',state);} // namespaced
+if(!state.mastery)state.mastery={};
+if(!state.review)state.review=[];
+if(!state.badges)state.badges=[];
+if(!state.cardBox)state.cardBox={};
+Object.keys(SKILLS).forEach(s=>{
+  if(!state.mastery[s])state.mastery[s]={seen:0,correct:0};
+  if(!state.skillLvl[s])state.skillLvl[s]={xp:0,lv:1};
+  if(!state.skillBadges[s])state.skillBadges[s]=[];
+});
+function save(){Store.set('flstate',state);}
 function saveAll(){Store.set('flstate',state);}
-// migrate key
-state=Store.get('flstate',state);
-if(!state.skillLvl)state.skillLvl={};
-Object.keys(SKILLS).forEach(s=>{if(!state.mastery[s])state.mastery[s]={seen:0,correct:0};if(!state.skillLvl[s])state.skillLvl[s]={xp:0,lv:1};});
 
 var persist=function(){Store.set('flstate',state);};
 
