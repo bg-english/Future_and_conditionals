@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FutureLab · Boston Flex · Plataforma de Inglés 8°</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FBF6EA;--paper:#FFFDF7;--ink:#16244A;
+  --blue:#1E50A0;--blue-dk:#143A77;--blue-lt:#E4ECF8;
+  --red:#C8202E;--red-dk:#9E1623;
+  --gold:#E9A72C;--gold-dk:#BE8418;
+  --soft:#FCE6C4;--line:#E7DCC6;
+  --ok:#1FAA66;--bad:#E64545;
+  --shadow:0 14px 38px rgba(22,36,74,.16);--shadow-sm:0 4px 14px rgba(22,36,74,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Lexend',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;overflow-x:hidden;
+  background-image:radial-gradient(circle at 8% 10%,rgba(233,167,44,.12),transparent 38%),radial-gradient(circle at 92% 4%,rgba(30,80,160,.11),transparent 40%);}
+h1,h2,h3,h4,.display{font-family:'Bricolage Grotesque',sans-serif;line-height:1.06}
+button{font-family:'Lexend';cursor:pointer}
+.hidden{display:none!important}
+
+/* ===== TOPBAR ===== */
+.top{position:sticky;top:0;z-index:60;background:rgba(255,253,247,.94);backdrop-filter:blur(10px);border-bottom:3px solid var(--gold)}
+.top .row{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:8px 18px}
+.brand{display:flex;align-items:center;gap:9px;cursor:pointer}
+.brand img{width:38px;height:38px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))}
+.brand .bt{font-family:'Bricolage Grotesque';font-weight:800;font-size:1.1rem;line-height:1}
+.brand .bt small{display:block;font-family:'Lexend';font-weight:600;font-size:.56rem;letter-spacing:.18em;color:var(--red);text-transform:uppercase}
+.tabs{display:flex;gap:3px;flex:1;justify-content:center;flex-wrap:wrap}
+.tab{font-size:.8rem;font-weight:600;color:var(--ink);background:none;border:none;padding:8px 13px;border-radius:30px;opacity:.7;transition:.2s}
+.tab:hover{background:var(--blue-lt);opacity:1}
+.tab.active{background:var(--ink);color:#fff;opacity:1}
+.stats{display:flex;align-items:center;gap:10px}
+.stat{display:flex;align-items:center;gap:5px;font-weight:700;font-size:.82rem;background:var(--paper);border:2px solid var(--line);padding:5px 11px;border-radius:30px;white-space:nowrap}
+.stat .lv{color:var(--blue)}.stat .xp{color:var(--gold-dk)}.stat .st{color:var(--red)}
+@media(max-width:920px){.tabs{order:3;width:100%;justify-content:flex-start;overflow-x:auto;padding-bottom:4px}.tab{flex-shrink:0}}
+@media(max-width:520px){.stat{font-size:.72rem;padding:4px 8px}.brand .bt small{display:none}}
+
+.view{max-width:1100px;margin:0 auto;padding:40px 22px 90px;animation:fade .4s}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.eyebrow{display:inline-block;font-weight:700;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--red-dk);background:var(--soft);padding:6px 14px;border-radius:30px;margin-bottom:14px}
+.h-title{font-size:clamp(1.9rem,4.5vw,2.8rem);font-weight:800;margin-bottom:8px}
+.h-sub{font-size:1.02rem;max-width:680px;opacity:.82;margin-bottom:32px}
+
+.btn{font-weight:700;font-size:.98rem;border:none;padding:14px 26px;border-radius:40px;transition:transform .15s,box-shadow .2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn-primary{background:var(--red);color:#fff;box-shadow:0 8px 20px rgba(200,32,46,.32)}
+.btn-primary:hover{transform:translateY(-3px)}
+.btn-blue{background:var(--blue);color:#fff;box-shadow:0 8px 20px rgba(30,80,160,.3)}
+.btn-blue:hover{transform:translateY(-3px)}
+.btn-ghost{background:var(--paper);color:var(--ink);border:2px solid var(--ink)}
+.btn-ghost:hover{background:var(--ink);color:#fff}
+.btn-gold{background:var(--gold);color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:default;transform:none!important}
+
+/* ===== DASHBOARD ===== */
+.dash-hero{display:flex;align-items:center;gap:26px;background:linear-gradient(140deg,var(--ink),#22356b);color:#fff;border-radius:28px;padding:34px;position:relative;overflow:hidden}
+.dash-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 120%,rgba(233,167,44,.25),transparent 50%)}
+.dash-hero .txt{flex:1;position:relative;z-index:1}
+.dash-hero h1{font-size:clamp(1.7rem,4vw,2.6rem);font-weight:800;margin-bottom:8px}
+.dash-hero h1 .hl{color:var(--gold)}
+.dash-hero p{opacity:.88;max-width:50ch;margin-bottom:18px}
+.dash-hero .mascot{width:min(28vw,200px);flex:0 0 auto;position:relative;z-index:1}
+.dash-hero .mascot img{width:100%;filter:drop-shadow(0 14px 22px rgba(0,0,0,.4));animation:bob 5s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@media(max-width:720px){.dash-hero{flex-direction:column;text-align:center}.dash-hero .mascot{width:150px}}
+
+.grid{display:grid;gap:18px}
+.cards-3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.cards-2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.panel{background:var(--paper);border:2px solid var(--line);border-radius:22px;padding:24px}
+.panel h3{font-size:1.15rem;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+.mastery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px}
+.ring-card{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:16px;text-align:center;transition:.2s;cursor:pointer}
+.ring-card:hover{border-color:var(--blue);transform:translateY(-3px)}
+.ring{width:84px;height:84px;margin:0 auto 8px;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring .pct{position:absolute;inset:0;display:grid;place-items:center;font-family:'Bricolage Grotesque';font-weight:800;font-size:1.1rem}
+.ring-card .nm{font-size:.78rem;font-weight:600;line-height:1.2}
+
+.badge-row{display:flex;gap:12px;flex-wrap:wrap}
+.badge{width:74px;text-align:center;opacity:.35;transition:.3s;filter:grayscale(1)}
+.badge.earned{opacity:1;filter:none;animation:pop .5s}
+@keyframes pop{0%{transform:scale(.5)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+.badge .ic{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:1.5rem;margin:0 auto 4px;background:var(--soft);border:3px solid var(--gold)}
+.badge .nm{font-size:.62rem;font-weight:700;line-height:1.1}
+
+/* ===== LEARN ===== */
+.lesson{background:var(--paper);border:2px solid var(--line);border-radius:24px;padding:28px;margin-bottom:24px;scroll-margin-top:90px}
+.lesson .lhead{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.lesson .lnum{font-family:'Bricolage Grotesque';font-weight:800;font-size:1.6rem;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;color:#fff;flex-shrink:0}
+.lesson h3{font-size:1.45rem;font-weight:800}
+.lesson .tag{font-size:.74rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em}
+.lesson .concept{font-size:1rem;margin:14px 0;opacity:.9}
+.tl-box{background:var(--blue-lt);border-radius:18px;padding:10px;margin:16px 0}
+.tl-box svg{width:100%;height:auto;display:block}
+.struct{background:var(--ink);color:var(--cream);border-radius:14px;padding:13px 17px;font-family:'Bricolage Grotesque';font-weight:600;font-size:1rem;margin:14px 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.struct b{color:var(--gold)}.struct .verb{color:#6fd3ff}
+.ex-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-top:1px dashed var(--line)}
+.ex-row .spk{flex-shrink:0;width:34px;height:34px;border-radius:50%;border:2px solid var(--blue);background:var(--paper);color:var(--blue);font-size:.9rem;display:grid;place-items:center;transition:.2s}
+.ex-row .spk:hover{background:var(--blue);color:#fff}
+.ex-row .en{font-weight:600}.ex-row .es{display:block;font-size:.82rem;opacity:.62}
+.signals{margin-top:12px}
+.chip{display:inline-block;background:var(--soft);color:var(--red-dk);font-weight:600;font-size:.72rem;padding:4px 10px;border-radius:20px;margin:3px 3px 0 0}
+.worked{background:var(--blue-lt);border-radius:16px;padding:18px;margin-top:16px}
+.worked h5{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--blue-dk);margin-bottom:10px}
+.worked .step{font-size:.9rem;padding:6px 0 6px 26px;position:relative;opacity:0;transform:translateX(-8px);transition:.4s}
+.worked.show .step{opacity:1;transform:none}
+.worked .step::before{content:counter(s);counter-increment:s;position:absolute;left:0;top:5px;width:18px;height:18px;background:var(--blue);color:#fff;border-radius:50%;font-size:.66rem;font-weight:700;display:grid;place-items:center}
+.worked{counter-reset:s}
+.mini-check{margin-top:16px;background:var(--paper);border:2px dashed var(--blue);border-radius:14px;padding:16px}
+.mini-check .q{font-weight:700;margin-bottom:10px;font-size:.95rem}
+.mini-opts{display:flex;flex-wrap:wrap;gap:8px}
+.mini-opts button{background:var(--cream);border:2px solid var(--line);border-radius:10px;padding:9px 14px;font-weight:600;font-size:.86rem;transition:.18s}
+.mini-opts button:hover{border-color:var(--blue)}
+.mini-opts button.ok{background:#E5F7F0;border-color:var(--ok);color:var(--ok)}
+.mini-opts button.no{background:#FCE8E8;border-color:var(--bad);color:var(--bad)}
+.mini-fb{font-size:.84rem;margin-top:10px;display:none;padding:10px 12px;border-radius:10px;background:var(--blue-lt)}
+.mini-fb.show{display:block;animation:fade .3s}
+
+/* compare widget */
+.compare{background:var(--ink);color:var(--cream);border-radius:24px;padding:30px;margin-bottom:24px}
+.compare h3{color:#fff;font-size:1.4rem;margin-bottom:14px}
+.toggle-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.tg{flex:1;min-width:180px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);border-radius:14px;padding:14px;transition:.2s}
+.tg.active{border-color:var(--gold);background:rgba(233,167,44,.15)}
+.tg b{font-family:'Bricolage Grotesque';color:var(--gold)}.tg p{font-size:.82rem;opacity:.8;margin-top:4px}
+.cmp-ex{background:rgba(255,255,255,.06);border-radius:12px;padding:16px;min-height:64px;border-left:4px solid var(--gold)}
+
+/* ===== PRACTICE ENGINE ===== */
+.engine{background:var(--paper);border:3px solid var(--ink);border-radius:24px;padding:30px;box-shadow:var(--shadow);max-width:720px;margin:0 auto}
+.engine-top{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.engine-top .skilltag{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--blue-lt);color:var(--blue-dk);padding:5px 11px;border-radius:20px}
+.engine-top .barwrap{flex:1;height:10px;background:var(--line);border-radius:20px;overflow:hidden}
+.engine-top .barwrap i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--gold));transition:width .4s;width:0}
+.engine-top .cnt{font-size:.78rem;font-weight:700;opacity:.6}
+.eq-q{font-size:1.3rem;font-weight:700;font-family:'Bricolage Grotesque';margin-bottom:6px;line-height:1.3}
+.eq-instr{font-size:.82rem;opacity:.6;margin-bottom:18px}
+.eq-opts{display:grid;gap:11px}
+.eq-opt{background:var(--cream);border:2px solid var(--line);border-radius:14px;padding:14px 18px;font-weight:600;font-size:.98rem;transition:.18s;text-align:left}
+.eq-opt:hover:not(:disabled){border-color:var(--blue);transform:translateX(4px)}
+.eq-opt.correct{background:#E5F7F0;border-color:var(--ok);color:var(--ok)}
+.eq-opt.wrong{background:#FCE8E8;border-color:var(--bad);color:var(--bad)}
+.eq-fill input{font-family:'Lexend';font-weight:600;border:none;border-bottom:3px solid var(--red);background:var(--cream);font-size:1.05rem;padding:8px 12px;border-radius:8px 8px 0 0;width:100%;color:var(--ink)}
+.eq-fill input:focus{outline:none;border-color:var(--blue)}
+.fb{margin-top:18px;border-radius:14px;padding:16px;display:none}
+.fb.show{display:block;animation:fade .3s}
+.fb.right{background:#E5F7F0;border:2px solid var(--ok)}
+.fb.wrong{background:#FFF3D6;border:2px solid var(--gold)}
+.fb .fb-head{font-weight:800;font-family:'Bricolage Grotesque';display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.fb .fb-rule{font-size:.9rem}
+.fb .fb-rule b{color:var(--blue-dk)}
+.engine-foot{display:flex;justify-content:flex-end;margin-top:18px;gap:10px}
+.mode-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;justify-content:center}
+
+/* ===== FLASHCARDS ===== */
+.deck{max-width:520px;margin:0 auto}
+.flashcard{perspective:1200px;height:260px;margin-bottom:20px;cursor:pointer}
+.flash-inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.flashcard.flipped .flash-inner{transform:rotateY(180deg)}
+.flash-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center;box-shadow:var(--shadow)}
+.flash-front{background:linear-gradient(140deg,var(--blue),var(--blue-dk));color:#fff}
+.flash-front .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;opacity:.7;margin-bottom:10px}
+.flash-front .term{font-family:'Bricolage Grotesque';font-weight:800;font-size:1.7rem}
+.flash-back{background:var(--paper);border:3px solid var(--gold);transform:rotateY(180deg);color:var(--ink)}
+.flash-back .ans{font-size:1.02rem;font-weight:600}
+.flash-back .eg{font-size:.86rem;font-style:italic;opacity:.7;margin-top:10px}
+.flash-hint{text-align:center;font-size:.8rem;opacity:.55;margin-bottom:10px}
+.rate-row{display:flex;gap:10px;justify-content:center}
+.rate-row button{flex:1;max-width:160px;border:2px solid var(--line);background:var(--paper);border-radius:14px;padding:12px;font-weight:700}
+.rate-row .again{color:var(--red);border-color:var(--red)}
+.rate-row .good{color:var(--ok);border-color:var(--ok)}
+
+/* ===== CONDITIONALS ===== */
+.cond-block{background:var(--paper);border:2px solid var(--line);border-radius:22px;padding:28px;margin-bottom:22px;border-left:10px solid var(--blue)}
+.cond-block.c0{border-left-color:var(--blue)}.cond-block.c1{border-left-color:var(--gold)}.cond-block.c2{border-left-color:var(--red)}
+.cond-block h3{font-size:1.5rem;font-weight:800}
+.cond-block .when{font-size:.8rem;font-weight:700;color:var(--red-dk);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
+.formula{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--ink);color:#fff;border-radius:14px;padding:15px 18px;font-family:'Bricolage Grotesque';font-weight:600;margin:14px 0}
+.formula .ifc{color:var(--gold)}.formula .mainc{color:#6fd3ff}.formula .plus{opacity:.5}
+.real-uses{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:14px}
+.use{background:var(--cream);border-radius:12px;padding:14px;border:1px solid var(--line)}
+.use h5{font-size:.9rem;margin-bottom:4px;color:var(--red-dk)}.use .ex{font-style:italic;font-size:.82rem;opacity:.8;margin-top:4px}
+.warn{background:#FFF3D6;border:1px dashed var(--gold);border-radius:12px;padding:12px 16px;font-size:.85rem;margin-top:14px}
+.machine{background:linear-gradient(140deg,var(--ink),#22356b);color:#fff;border-radius:22px;padding:28px;margin-bottom:22px}
+.machine h3{color:#fff;font-size:1.4rem}
+.machine .slots{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.machine .slot{flex:1;min-width:160px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.16);border-radius:14px;padding:14px;transition:.2s}
+.machine .slot.active{border-color:var(--gold);background:rgba(233,167,44,.16)}
+.machine .slot b{font-family:'Bricolage Grotesque';color:var(--gold);font-size:.95rem}
+.machine .slot p{font-size:.78rem;opacity:.8;margin-top:4px}
+.machine-out{background:rgba(255,255,255,.08);border-radius:14px;padding:18px;border-left:4px solid var(--gold);min-height:80px}
+.machine-out .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);font-weight:700}
+.machine-out .sent{font-size:1.1rem;font-weight:700;font-family:'Bricolage Grotesque';margin:6px 0}
+.machine-out .ex2{font-size:.85rem;opacity:.85}
+.builder{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0;min-height:52px;background:var(--cream);border:2px dashed var(--line);border-radius:14px;padding:12px;align-items:center}
+.word-bank{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.word{background:var(--paper);border:2px solid var(--ink);border-radius:30px;padding:7px 15px;font-weight:600;font-size:.88rem;transition:.15s;user-select:none}
+.word:hover{background:var(--gold)}.word.placed{background:var(--blue);color:#fff;border-color:var(--blue)}
+.drop-slot{font-style:italic;opacity:.4;font-size:.88rem}
+
+/* ===== WRITING STUDIO ===== */
+.write-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:840px){.write-grid{grid-template-columns:1fr}}
+.write-card{background:var(--paper);border:2px solid var(--line);border-radius:22px;padding:26px}
+.write-card.notebook{background:repeating-linear-gradient(var(--paper),var(--paper) 31px,var(--line) 32px);border-left:8px solid var(--red)}
+.write-card h3{font-size:1.2rem;margin-bottom:12px}
+.task{margin-bottom:18px;font-size:.92rem}.task b{display:block;color:var(--red-dk);margin-bottom:3px}
+.write-card textarea{width:100%;border:2px solid var(--line);border-radius:12px;padding:11px;font-family:'Lexend';font-size:.92rem;resize:vertical;min-height:70px;background:var(--cream)}
+.write-card textarea:focus{outline:none;border-color:var(--blue)}
+.wbtns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.wbtn{font-size:.76rem;font-weight:700;border:2px solid var(--line);background:var(--paper);border-radius:20px;padding:6px 12px}
+.wbtn.check{border-color:var(--blue);color:var(--blue)}
+.wfb{font-size:.84rem;margin-top:8px;padding:10px 12px;border-radius:10px;display:none}
+.wfb.show{display:block;animation:fade .3s}.wfb.good{background:#E5F7F0}.wfb.bad{background:#FFF3D6}
+.model{display:none;background:var(--blue-lt);border-radius:10px;padding:11px;font-size:.84rem;margin-top:8px;font-style:italic}
+.model.show{display:block}
+
+/* ===== EXAM ===== */
+.exam{background:linear-gradient(160deg,var(--ink),#22356b);color:#fff;border-radius:26px;padding:36px;position:relative;overflow:hidden;max-width:760px;margin:0 auto}
+.exam-judah{position:absolute;right:16px;top:16px;width:84px;transition:.3s}.exam-judah img{width:100%;filter:drop-shadow(0 8px 14px rgba(0,0,0,.4))}
+@media(max-width:560px){.exam-judah{width:56px}}
+.exam h3{color:#fff;font-size:1.5rem;max-width:78%}
+.exam .lead{opacity:.82;margin-bottom:22px;max-width:78%}
+.ex-prog{height:8px;background:rgba(255,255,255,.15);border-radius:20px;overflow:hidden;margin-bottom:20px}
+.ex-prog i{display:block;height:100%;background:var(--gold);width:0;transition:width .4s}
+.eq{display:none}.eq.show{display:block;animation:fade .4s}
+.exq-num{font-size:.72rem;font-weight:700;letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
+.exq-q{font-size:1.15rem;font-weight:700;font-family:'Bricolage Grotesque';margin:8px 0 16px}
+.eopt{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.12);border-radius:12px;padding:13px 16px;margin-bottom:10px;transition:.18s;font-size:.94rem;width:100%;text-align:left;color:#fff}
+.eopt:hover:not(:disabled){border-color:var(--gold)}
+.eopt.correct{background:rgba(31,170,102,.28);border-color:var(--ok)}.eopt.wrong{background:rgba(230,69,69,.28);border-color:var(--bad)}
+.exam-result{display:none;text-align:center}.exam-result.show{display:block;animation:fade .5s}
+.exam-result .resj{width:140px;margin:0 auto}.exam-result .resj img{width:100%;filter:drop-shadow(0 10px 16px rgba(0,0,0,.4))}
+.exam-result .grade{font-family:'Bricolage Grotesque';font-weight:800;font-size:4.4rem;color:var(--gold);line-height:1}
+.breakdown{text-align:left;background:rgba(255,255,255,.06);border-radius:14px;padding:18px;margin:18px 0}
+.breakdown h4{color:#fff;margin-bottom:10px;font-size:1rem}
+.bd-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:.85rem}
+.bd-row .nm{flex:0 0 42%}.bd-row .bar{flex:1;height:8px;background:rgba(255,255,255,.12);border-radius:20px;overflow:hidden}
+.bd-row .bar i{display:block;height:100%;border-radius:20px}.bd-row .v{font-weight:700;width:42px;text-align:right}
+
+/* toast + coach */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(140px);background:var(--ink);color:#fff;padding:9px 22px 9px 10px;border-radius:50px;font-weight:600;z-index:99;transition:transform .4s;box-shadow:var(--shadow);display:flex;align-items:center;gap:11px;max-width:92vw}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.good{background:var(--ok)}.toast.bad{background:var(--red)}
+.toast img{width:42px;height:42px;object-fit:contain;background:#fff;border-radius:50%;padding:2px;flex-shrink:0}
+.toast.good img{animation:jbounce .6s}.toast.bad img{animation:jshake .5s}
+@keyframes jbounce{0%{transform:scale(1)}30%{transform:scale(1.18) translateY(-8px) rotate(-5deg)}60%{transform:scale(.95)}100%{transform:scale(1)}}
+@keyframes jshake{0%,100%{transform:rotate(0)}25%{transform:rotate(-9deg)}75%{transform:rotate(9deg)}}
+.confetti{position:fixed;width:10px;height:14px;z-index:120;top:-20px;pointer-events:none;border-radius:2px}
+.lvlup{position:fixed;inset:0;display:none;place-items:center;z-index:130;background:rgba(22,36,74,.55);backdrop-filter:blur(3px)}
+.lvlup.show{display:grid;animation:fade .3s}
+.lvlup .card{background:var(--paper);border-radius:24px;padding:36px;text-align:center;max-width:340px;box-shadow:var(--shadow);animation:pop .5s}
+.lvlup .card img{width:120px;filter:drop-shadow(0 10px 16px rgba(0,0,0,.25))}
+.lvlup .card .big{font-family:'Bricolage Grotesque';font-weight:800;font-size:2rem;color:var(--blue);margin:6px 0}
+
+footer{text-align:center;padding:30px 22px 60px;opacity:.7;font-size:.82rem}
+footer img{width:42px;margin-bottom:6px}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="row">
+    <div class="brand" onclick="go('dash')"><img src="__SHIELD__" alt="Boston Flex"><div class="bt">FutureLab<small>Boston Flex</small></div></div>
+    <div class="tabs" id="tabs"></div>
+    <div class="stats">
+      <div class="stat"><span class="lv">★</span> Nv <span id="sLevel">1</span></div>
+      <div class="stat"><span class="xp">⚡</span> <span id="sXp">0</span> XP</div>
+      <div class="stat"><span class="st">🔥</span> <span id="sStreak">0</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="view" id="v-dash">
+  <div class="dash-hero">
+    <div class="txt">
+      <h1>Bienvenido a <span class="hl">FutureLab</span> 🦁</h1>
+      <p id="dashGreeting">Tu plataforma para dominar los tiempos futuros y los condicionales. Aprende con animaciones, practica con feedback inteligente y demuéstralo en el examen final.</p>
+      <button class="btn btn-gold" id="continueBtn" onclick="go('learn')">Continuar aprendiendo →</button>
+    </div>
+    <div class="mascot"><img src="__JUDAH_WAVE__" alt="Judah"></div>
+  </div>
+
+  <div class="grid cards-2" style="margin-top:24px">
+    <div class="panel">
+      <h3>🎯 Tu dominio por habilidad</h3>
+      <div class="mastery-grid" id="masteryGrid"></div>
+    </div>
+    <div class="panel">
+      <h3>🏅 Insignias</h3>
+      <div class="badge-row" id="badgeRow"></div>
+      <h3 style="margin-top:22px">📊 Tu sesión</h3>
+      <div class="grid cards-3" style="gap:10px">
+        <div style="text-align:center"><div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:1.8rem;color:var(--blue)" id="statAnswered">0</div><div style="font-size:.76rem;opacity:.6">respondidas</div></div>
+        <div style="text-align:center"><div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:1.8rem;color:var(--ok)" id="statAcc">—</div><div style="font-size:.76rem;opacity:.6">aciertos</div></div>
+        <div style="text-align:center"><div style="font-family:'Bricolage Grotesque';font-weight:800;font-size:1.8rem;color:var(--gold-dk)" id="statReview">0</div><div style="font-size:.76rem;opacity:.6">por repasar</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:18px">
+    <h3>🗺️ Tu ruta de aprendizaje</h3>
+    <div class="grid cards-3">
+      <div class="ring-card" onclick="go('learn')"><div style="font-size:2rem">📖</div><div class="nm" style="margin-top:8px;font-weight:800">1. Aprende</div><div style="font-size:.78rem;opacity:.6">6 tiempos con animaciones</div></div>
+      <div class="ring-card" onclick="go('practice')"><div style="font-size:2rem">🎮</div><div class="nm" style="margin-top:8px;font-weight:800">2. Practica</div><div style="font-size:.78rem;opacity:.6">motor adaptativo + repaso</div></div>
+      <div class="ring-card" onclick="go('cards')"><div style="font-size:2rem">🃏</div><div class="nm" style="margin-top:8px;font-weight:800">3. Tarjetas</div><div style="font-size:.78rem;opacity:.6">memoriza con repetición</div></div>
+      <div class="ring-card" onclick="go('cond')"><div style="font-size:2rem">🔀</div><div class="nm" style="margin-top:8px;font-weight:800">4. Condicionales</div><div style="font-size:.78rem;opacity:.6">la gran sección</div></div>
+      <div class="ring-card" onclick="go('write')"><div style="font-size:2rem">✍️</div><div class="nm" style="margin-top:8px;font-weight:800">5. Escribe</div><div style="font-size:.78rem;opacity:.6">con auto-revisión</div></div>
+      <div class="ring-card" onclick="go('exam')"><div style="font-size:2rem">🏆</div><div class="nm" style="margin-top:8px;font-weight:800">6. Examen</div><div style="font-size:.78rem;opacity:.6">diagnóstico final</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- LEARN -->
+<div class="view hidden" id="v-learn">
+  <span class="eyebrow">Módulo 1 · Aprende</span>
+  <h1 class="h-title">Los seis tiempos del futuro</h1>
+  <p class="h-sub">Cada tiempo tiene una <b>línea de tiempo animada</b> que te muestra su significado, ejemplos con audio 🔊, un ejemplo resuelto paso a paso y una mini-comprobación. No memorices: <b>entiende</b>.</p>
+  <div id="lessons"></div>
+
+  <div class="compare">
+    <span class="eyebrow" style="background:rgba(233,167,44,.2);color:var(--gold)">El dilema clásico</span>
+    <h3>"will" vs "going to"</h3>
+    <div class="toggle-row" id="cmpToggle"></div>
+    <div class="cmp-ex" id="cmpEx"></div>
+  </div>
+  <div style="text-align:center;margin-top:24px"><button class="btn btn-blue" onclick="go('practice')">¡A practicar! →</button></div>
+</div>
+
+<!-- PRACTICE -->
+<div class="view hidden" id="v-practice">
+  <span class="eyebrow">Módulo 2 · Practica</span>
+  <h1 class="h-title">Práctica inteligente</h1>
+  <p class="h-sub">El motor mezcla todos los tiempos (interleaving), te da feedback que <b>explica la regla</b> y guarda lo que fallas para traerlo de vuelta en el Repaso.</p>
+  <div class="mode-row">
+    <button class="btn btn-blue" onclick="startPractice('all')">🎲 Práctica mixta</button>
+    <button class="btn btn-ghost" onclick="startPractice('review')" id="reviewBtn">🔁 Repaso inteligente</button>
+  </div>
+  <div class="engine" id="engine"></div>
+</div>
+
+<!-- FLASHCARDS -->
+<div class="view hidden" id="v-cards">
+  <span class="eyebrow">Módulo 3 · Memoriza</span>
+  <h1 class="h-title">Tarjetas de memoria</h1>
+  <p class="h-sub">Repetición espaciada estilo Leitner: si la sabes, la verás menos; si te cuesta, volverá pronto. Toca la tarjeta para girarla.</p>
+  <div class="deck" id="deck"></div>
+</div>
+
+<!-- CONDITIONALS -->
+<div class="view hidden" id="v-cond">
+  <span class="eyebrow">Módulo 4 · La gran sección</span>
+  <h1 class="h-title">Los tres condicionales</h1>
+  <p class="h-sub">Un condicional tiene la cláusula <b>if</b> (condición) y la principal (resultado). Si <b>if</b> va primero, lleva coma. Usa la <b>Máquina de Condicionales</b> para verlos en acción.</p>
+
+  <div class="machine">
+    <h3>🔧 Máquina de Condicionales</h3>
+    <p style="opacity:.82;font-size:.9rem;margin-top:6px">Elige qué tan real es la situación y mira qué condicional se forma.</p>
+    <div class="slots" id="machineSlots"></div>
+    <div class="machine-out" id="machineOut"></div>
+  </div>
+
+  <div id="condBlocks"></div>
+
+  <div class="panel" style="border:3px solid var(--ink)">
+    <h3>🛠️ Arma la oración (First Conditional)</h3>
+    <p style="font-size:.88rem;opacity:.7;margin-bottom:10px">Toca las palabras en el orden correcto.</p>
+    <div class="word-bank" id="wordBank"></div>
+    <div class="builder" id="builder"><span class="drop-slot">Toca las palabras de arriba…</span></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-primary" onclick="checkBuilder()">Comprobar</button><button class="btn btn-ghost" onclick="resetBuilder()">Reiniciar</button></div>
+  </div>
+</div>
+
+<!-- WRITING -->
+<div class="view hidden" id="v-write">
+  <span class="eyebrow">Módulo 5 · Produce</span>
+  <h1 class="h-title">Estudio de escritura</h1>
+  <p class="h-sub">Aquí escribes tú. El revisor detecta si usaste la estructura correcta y te da pistas. También hay tareas para tu cuaderno.</p>
+  <div class="write-grid">
+    <div class="write-card notebook">
+      <h3>📓 Para tu cuaderno</h3>
+      <div class="task"><b>Tarea 1 — Mi futuro</b>6 oraciones: 2 con "will", 2 con "going to", 2 con Future Perfect ("By 2035, I will have…").</div>
+      <div class="task"><b>Tarea 2 — Predicciones</b>Párrafo de 60–80 palabras sobre la tecnología en 20 años. Usa 3 futuros distintos.</div>
+      <div class="task"><b>Tarea 3 — Cadena condicional</b>3 oraciones zero, 3 first y 3 second sobre tu colegio. Subraya la cláusula "if".</div>
+      <div class="task"><b>Tarea 4 — Historia hipotética</b>Mini-historia (8 líneas) que empiece con "If I could travel anywhere…" (Second Conditional).</div>
+    </div>
+    <div class="write-card" id="writeStudio"></div>
+  </div>
+</div>
+
+<!-- EXAM -->
+<div class="view hidden" id="v-exam">
+  <span class="eyebrow">Módulo 6 · ¡El gran reto!</span>
+  <h1 class="h-title">Simulacro de examen final</h1>
+  <p class="h-sub">Preguntas que combinan todo. Al terminar tendrás tu nota y un <b>diagnóstico por habilidad</b> que te dice exactamente qué repasar.</p>
+  <div class="exam">
+    <div class="exam-judah" id="examJudah"><img src="__JUDAH_PRAY__" alt="Judah"></div>
+    <h3 id="examTitle">Examen · Futuros + Condicionales</h3>
+    <p class="lead">Lee con cuidado. Solo una respuesta es correcta. ¡Judah cruza los dedos por ti!</p>
+    <div class="ex-prog"><i id="exProg"></i></div>
+    <div id="examBody"></div>
+    <div class="exam-result" id="examResult">
+      <div class="resj" id="resJudah"><img src="__JUDAH_WAVE__" alt="Judah"></div>
+      <div class="grade" id="examGrade">—</div>
+      <p style="font-size:1.15rem;margin:8px 0" id="examMsg"></p>
+      <div class="breakdown" id="examBreakdown"></div>
+      <button class="btn btn-gold" onclick="startExam()">Intentar de nuevo ↺</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <img src="__SHIELD__" alt="Boston Flex"><br>
+  <b>Boston Flex · Great Disciples</b> · FutureLab — Plataforma de Inglés 8° grado<br>
+  Diseñada con ciencia del aprendizaje. 🦁
+</footer>
+
+<div class="toast" id="toast"><img id="toastFace" src="__JUDAH_FACE__" alt=""><span id="toastMsg"></span></div>
+<div class="lvlup" id="lvlup" onclick="this.classList.remove('show')"><div class="card"><img src="__JUDAH_WAVE__" alt="Judah"><div style="font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gold-dk);font-weight:700;margin-top:8px">¡Subiste de nivel!</div><div class="big" id="lvlupTxt">Nivel 2</div><div style="font-size:.85rem;opacity:.7" id="lvlupMsg"></div></div></div>
+
+<script>
+const IMG={wave:"__JUDAH_WAVE__",pray:"__JUDAH_PRAY__",face:"__JUDAH_FACE__"};
+
+/* ===== guarded storage (works deployed, falls back in sandbox) ===== */
+const Store=(()=>{let ok=false,mem={};try{const k="__fl";localStorage.setItem(k,"1");localStorage.removeItem(k);ok=true;}catch(e){ok=false;}
+  return{get(k,d){try{if(ok){const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}}catch(e){}return k in mem?mem[k]:d;},
+         set(k,v){try{if(ok){localStorage.setItem(k,JSON.stringify(v));return;}}catch(e){}mem[k]=v;}};})();
+
+/* ===== state ===== */
+const SKILLS={'present-simple':'Present Simple','present-continuous':'Present Continuous','will':'will','going-to':'going to','future-perfect':'Future Perfect','fpc':'Fut. Perf. Continuous','zero':'Zero Cond.','first':'First Cond.','second':'Second Cond.'};
+let state=Store.get('flstate',null)||{xp:0,level:1,streak:0,lastDay:null,answered:0,correct:0,mastery:{},review:[],badges:[],cardBox:{}};
+Object.keys(SKILLS).forEach(s=>{if(!state.mastery[s])state.mastery[s]={seen:0,correct:0};});
+function save(){Store.set('flstate',state);} // namespaced
+function saveAll(){Store.set('flstate',state);}
+// migrate key
+state=Store.get('flstate',state);
+Object.keys(SKILLS).forEach(s=>{if(!state.mastery[s])state.mastery[s]={seen:0,correct:0};});
+
+function persist(){Store.set('flstate',state);}
+
+/* ===== streak ===== */
+(function(){const today=new Date().toDateString();if(state.lastDay!==today){const y=new Date(Date.now()-864e5).toDateString();state.streak=(state.lastDay===y)?state.streak+1:1;state.lastDay=today;persist();}})();
+
+/* ===== nav ===== */
+const VIEWS=[['dash','🏠 Inicio'],['learn','📖 Aprende'],['practice','🎮 Practica'],['cards','🃏 Tarjetas'],['cond','🔀 Condicionales'],['write','✍️ Escribe'],['exam','🏆 Examen']];
+const tabsEl=document.getElementById('tabs');
+VIEWS.forEach(([id,label])=>{const b=document.createElement('button');b.className='tab';b.textContent=label;b.dataset.v=id;b.onclick=()=>go(id);tabsEl.appendChild(b);});
+function go(id){document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));document.getElementById('v-'+id).classList.remove('hidden');document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.v===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='dash')renderDash();if(id==='learn')playTimelines();}
+
+/* ===== HUD ===== */
+function renderHUD(){document.getElementById('sLevel').textContent=state.level;document.getElementById('sXp').textContent=state.xp;document.getElementById('sStreak').textContent=state.streak;}
+function addXP(n){state.xp+=n;const need=state.level*100;if(state.xp>=need){state.level++;showLevelUp();}persist();renderHUD();}
+function showLevelUp(){document.getElementById('lvlupTxt').textContent='Nivel '+state.level;document.getElementById('lvlupMsg').textContent=['¡Sigue así!','¡Vas imparable!','¡Eres un Great Disciple!','¡Judah está orgulloso!'][state.level%4];document.getElementById('lvlup').classList.add('show');confetti();}
+
+/* ===== toast + tts + confetti ===== */
+function toast(msg,type){const t=document.getElementById('toast');document.getElementById('toastMsg').textContent=msg;document.getElementById('toastFace').src=IMG.face;t.className='toast show '+(type||'');clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',2200);}
+function speak(text){if(!('speechSynthesis'in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=.92;speechSynthesis.speak(u);}catch(e){}}
+function confetti(){const cs=['#1E50A0','#C8202E','#E9A72C','#1FAA66'];for(let i=0;i<70;i++){const d=document.createElement('div');d.className='confetti';d.style.left=Math.random()*100+'vw';d.style.background=cs[i%4];d.style.transform='rotate('+Math.random()*360+'deg)';document.body.appendChild(d);const dur=2200+Math.random()*1500;d.animate([{transform:'translateY(0) rotate(0)',opacity:1},{transform:'translateY(105vh) rotate('+(360+Math.random()*360)+'deg)',opacity:.9}],{duration:dur,easing:'cubic-bezier(.3,.6,.4,1)'});setTimeout(()=>d.remove(),dur);}}
+
+/* ===== badges ===== */
+const BADGES=[{id:'first',ic:'🎯',nm:'Primer acierto'},{id:'streak3',ic:'🔥',nm:'Racha de 3'},{id:'tense',ic:'⏳',nm:'Maestro del futuro'},{id:'cond',ic:'🔀',nm:'Rey condicional'},{id:'exam',ic:'🏆',nm:'Examen aprobado'},{id:'perfect',ic:'💯',nm:'Examen perfecto'}];
+function award(id){if(!state.badges.includes(id)){state.badges.push(id);persist();const b=BADGES.find(x=>x.id===id);toast('¡Insignia: '+b.nm+'! '+b.ic,'good');confetti();}}
+function checkBadges(){const tn=['present-simple','present-continuous','will','going-to','future-perfect','fpc'];if(tn.every(s=>masteryPct(s)>=80))award('tense');if(['zero','first','second'].every(s=>masteryPct(s)>=80))award('cond');if(state.streak>=3)award('streak3');}
+
+/* ===== mastery ===== */
+function masteryPct(s){const m=state.mastery[s];return m&&m.seen?Math.round(m.correct/m.seen*100):0;}
+function recordAnswer(skill,correct){state.answered++;if(correct)state.correct++;const m=state.mastery[skill];m.seen++;if(correct)m.correct++;persist();if(state.correct===1)award('first');checkBadges();}
+
+/* ============================================================
+   DATA: TENSES (with animated-timeline configs)
+   ============================================================ */
+const TENSES=[
+ {id:'present-simple',color:'#1E50A0',name:'Present Simple',tag:'Horarios fijos',
+  concept:'Lo usamos para el futuro cuando el momento lo decide un <b>horario o agenda</b> (trenes, clases, cines). No depende de nosotros: ya está programado.',
+  tl:'repeat',tlcap:'Eventos que se repiten en momentos fijos',
+  struct:['<span class="verb">verb (+s)</span> + complemento'],
+  ex:[['The bus leaves at 7:00 AM.','El bus sale a las 7:00 (horario fijo).'],['The movie starts at 8 tonight.','La película empieza a las 8 esta noche.']],
+  signals:['at 7','tonight','on Monday','tomorrow'],
+  worked:['Pregunta: ¿a qué hora <i>empieza</i> la clase mañana?','¿Lo decide un horario? Sí → Present Simple.','Verbo "start" en 3ª persona → "starts".','✅ The class <b>starts</b> at 9 tomorrow.'],
+  check:{q:'The train ___ at 6 PM (horario fijo).',opts:['will leave','leaves','is leaving'],a:1,fb:'Un horario fijo usa Present Simple: <b>leaves</b>.'}},
+
+ {id:'present-continuous',color:'#0F76C2',name:'Present Continuous',tag:'Planes acordados',
+  concept:'Para <b>planes ya organizados</b> con otra persona, casi siempre con fecha u hora. Es un acuerdo, no una idea suelta.',
+  tl:'arrange',tlcap:'Un plan fijado desde AHORA hacia un punto futuro',
+  struct:['am/is/are + <span class="verb">verb-ing</span>'],
+  ex:[["I'm meeting Ana tomorrow.",'Veré a Ana mañana (ya quedamos).'],["They're flying to Lima next week.",'Vuelan a Lima la próxima semana.']],
+  signals:['tomorrow','next week','at 5 PM','this Friday'],
+  worked:['Idea: ya quedé con Ana para mañana.','¿Es un acuerdo con fecha? Sí → Present Continuous.','am/is/are + verbo-ing → "am meeting".','✅ I <b>am meeting</b> Ana tomorrow.'],
+  check:{q:'We ___ Ana at the cinema tonight (ya quedamos).',opts:['meet','are meeting','will meet'],a:1,fb:'Plan acordado con hora → Present Continuous: <b>are meeting</b>.'}},
+
+ {id:'will',color:'#C8202E',name:'Future "will"',tag:'Decisión / predicción',
+  concept:'Para <b>decisiones en el momento</b>, predicciones sin pruebas, promesas y ofrecimientos. Aparece "en el aire" mientras hablas.',
+  tl:'will',tlcap:'Una idea que surge en el momento y apunta al futuro',
+  struct:['<b>will</b> + <span class="verb">base verb</span>'],
+  ex:[['I think it will rain.','Creo que lloverá (predicción).'],["I'll help you! / I won't tell anyone.",'¡Te ayudaré! / No se lo diré (decisión/promesa).']],
+  signals:['probably','I think','maybe','I promise'],
+  worked:['Suena el teléfono — decido contestar AHORA.','¿Decisión espontánea? Sí → will.','will + verbo base → "will get".','✅ I <b>will get</b> it!'],
+  check:{q:'The phone is ringing — I ___ get it! (decido ahora)',opts:['am going to','will','get'],a:1,fb:'Decisión espontánea → <b>will</b>.'}},
+
+ {id:'going-to',color:'#E9A72C',name:'Future "going to"',tag:'Intención / evidencia',
+  concept:'Para <b>planes ya decididos antes</b> de hablar, o predicciones con <b>evidencia visible ahora</b>.',
+  tl:'goingto',tlcap:'Una intención ya decidida (o evidencia) que lleva al futuro',
+  struct:['am/is/are + <b>going to</b> + <span class="verb">base verb</span>'],
+  ex:[["I'm going to study tonight.",'Voy a estudiar esta noche (ya lo decidí).'],["Look at those clouds — it's going to rain!",'Mira esas nubes: ¡va a llover! (evidencia).']],
+  signals:['tonight','this weekend','look!','I plan to'],
+  worked:['Veo nubes negras AHORA mismo.','¿Hay evidencia visible? Sí → going to.','is + going to + verbo → "is going to rain".','✅ It <b>is going to</b> rain.'],
+  check:{q:'Look at those clouds! It ___ rain. (evidencia)',opts:['will','is going to','rains'],a:1,fb:'Predicción con evidencia visible → <b>going to</b>.'}},
+
+ {id:'future-perfect',color:'#7A4FB5',name:'Future Perfect',tag:'Ya terminado antes del futuro',
+  concept:'Para algo que <b>YA estará completado</b> antes de cierto momento futuro. Imagina mirar hacia atrás desde el futuro.',
+  tl:'fperfect',tlcap:'La acción TERMINA antes del punto futuro (✓)',
+  struct:['<b>will have</b> + <span class="verb">past participle</span>'],
+  ex:[['By 2030, I will have graduated.','Para 2030 ya me habré graduado.'],['By 9 PM, she will have finished.','Para las 9 ya habrá terminado.']],
+  signals:['by 2030','by then','before','by the time'],
+  worked:['Punto futuro: el año 2030.','¿La acción termina ANTES de ese punto? Sí → Future Perfect.','will have + participio (graduate→graduated).','✅ By 2030, I <b>will have graduated</b>.'],
+  check:{q:'By Friday, I ___ the project (terminado antes).',opts:['will finish','will have finished','finish'],a:1,fb:'Terminado antes de un punto futuro → <b>will have finished</b>.'}},
+
+ {id:'fpc',color:'#138A72',name:'Future Perfect Continuous',tag:'Duración hasta el futuro',
+  concept:'Enfatiza <b>cuánto tiempo</b> llevará una acción <b>hasta</b> cierto punto futuro. Resalta la duración, no el final.',
+  tl:'fpc',tlcap:'La acción CONTINÚA hasta el punto futuro (duración)',
+  struct:['<b>will have been</b> + <span class="verb">verb-ing</span>'],
+  ex:[['By June, I will have been studying English for 3 years.','Para junio llevaré 3 años estudiando inglés.'],['By 5 PM, they will have been working for 8 hours.','Para las 5 llevarán 8 horas trabajando.']],
+  signals:['by … for','how long','since'],
+  worked:['Punto futuro: junio. Importa la DURACIÓN.','will have been + verbo-ing.','study → studying, con "for 3 years".','✅ By June, I <b>will have been studying</b> for 3 years.'],
+  check:{q:'By 2030, they ___ here for 10 years (duración).',opts:['will live','will have been living','are living'],a:1,fb:'Duración hasta un punto futuro → <b>will have been living</b>.'}}
+];
+
+/* ----- animated timeline SVG ----- */
+function timelineSVG(type){
+  const W=640,H=200,base=128,past=120,now=300,fut=500;
+  const axis=`<line x1="50" y1="${base}" x2="590" y2="${base}" stroke="#9fb4d8" stroke-width="3"/>
+    <polygon points="590,${base} 578,${base-7} 578,${base+7}" fill="#9fb4d8"/>`;
+  const mark=(x,label,sub,color)=>`<line x1="${x}" y1="${base-22}" x2="${x}" y2="${base+22}" stroke="${color}" stroke-width="3"/>
+    <circle cx="${x}" cy="${base}" r="6" fill="${color}"/>
+    <text x="${x}" y="${base+44}" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="15" fill="${color}">${label}</text>
+    <text x="${x}" y="${base+62}" text-anchor="middle" font-family="Lexend,sans-serif" font-size="11" fill="#5a6b8a">${sub}</text>`;
+  let extra='';
+  const NOW=mark(now,'NOW','ahora','#16244A');
+  const FUT=(lbl,sub)=>mark(fut,lbl||'FUTURE',sub||'futuro','#1E50A0');
+  if(type==='repeat'){
+    [180,300,420].forEach((x,i)=>extra+=`<g class="tl-pop" style="--d:${.3+i*.25}s"><circle cx="${x}" cy="${base-40}" r="15" fill="none" stroke="#1E50A0" stroke-width="3"/><text x="${x}" y="${base-35}" text-anchor="middle" font-size="14">🕘</text></g>`);
+    extra+=NOW;extra+=`<text x="500" y="${base-60}" text-anchor="middle" font-size="13" fill="#1E50A0" font-weight="700" class="tl-fade" style="--d:1.1s">horario fijo · se repite</text>`;
+  } else if(type==='arrange'){
+    extra+=NOW+FUT('PLAN','fecha fija');
+    extra+=`<path class="tl-draw" d="M${now} ${base-30} L${fut} ${base-30}" stroke="#0F76C2" stroke-width="4" fill="none" marker-end="url(#ar)"/>
+      <text x="${(now+fut)/2}" y="${base-40}" text-anchor="middle" font-size="13" fill="#0F76C2" font-weight="700" class="tl-fade" style="--d:.9s">ya acordado 📅</text>`;
+  } else if(type==='will'){
+    extra+=NOW+FUT();
+    extra+=`<g class="tl-pop" style="--d:.3s"><ellipse cx="${now}" cy="${base-58}" rx="46" ry="26" fill="#fff" stroke="#C8202E" stroke-width="3"/><text x="${now}" y="${base-52}" text-anchor="middle" font-size="13" font-weight="700" fill="#C8202E">¡idea!</text><circle cx="${now-22}" cy="${base-30}" r="5" fill="#C8202E"/><circle cx="${now-30}" cy="${base-18}" r="3" fill="#C8202E"/></g>
+      <path class="tl-draw" d="M${now+30} ${base-30} L${fut} ${base-30}" stroke="#C8202E" stroke-width="4" stroke-dasharray="9 7" fill="none" marker-end="url(#arr)"/>`;
+  } else if(type==='goingto'){
+    extra+=mark(240,'antes','decidido','#BE8418')+NOW+FUT();
+    extra+=`<path class="tl-draw" d="M240 ${base-34} L${fut} ${base-34}" stroke="#E9A72C" stroke-width="5" fill="none" marker-end="url(#arg)"/>
+      <text x="370" y="${base-44}" text-anchor="middle" font-size="13" fill="#BE8418" font-weight="700" class="tl-fade" style="--d:.9s">intención / evidencia →</text>`;
+  } else if(type==='fperfect'){
+    extra+=NOW+FUT('punto','futuro');
+    extra+=`<rect class="tl-bar" x="320" y="${base-40}" width="110" height="16" rx="8" fill="#7A4FB5"/>
+      <g class="tl-pop" style="--d:1s"><circle cx="448" cy="${base-32}" r="15" fill="#1FAA66"/><text x="448" y="${base-27}" text-anchor="middle" font-size="15" fill="#fff">✓</text></g>
+      <text x="375" y="${base-50}" text-anchor="middle" font-size="13" fill="#7A4FB5" font-weight="700" class="tl-fade" style="--d:1.2s">termina ANTES del punto</text>`;
+  } else if(type==='fpc'){
+    extra+=NOW+FUT('punto','futuro');
+    extra+=`<rect class="tl-bar" x="200" y="${base-40}" width="300" height="16" rx="8" fill="#138A72"/>
+      <path d="M200 ${base-52} L500 ${base-52}" stroke="#138A72" stroke-width="2" class="tl-fade" style="--d:1s"/>
+      <text x="350" y="${base-60}" text-anchor="middle" font-size="13" fill="#138A72" font-weight="700" class="tl-fade" style="--d:1.1s">DURACIÓN (for…) hasta el punto</text>`;
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" role="img">
+    <defs>
+      <marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="#0F76C2"/></marker>
+      <marker id="arr" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="#C8202E"/></marker>
+      <marker id="arg" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="#E9A72C"/></marker>
+    </defs>${axis}${extra}</svg>`;
+}
+
+/* ----- render lessons ----- */
+function renderLessons(){
+  const wrap=document.getElementById('lessons');wrap.innerHTML='';
+  TENSES.forEach((t,i)=>{
+    const exHTML=t.ex.map(e=>`<div class="ex-row"><button class="spk" title="Escuchar" onclick="speak('${e[0].replace(/'/g,"\\'")}')">🔊</button><div><span class="en">${e[0]}</span><span class="es">${e[1]}</span></div></div>`).join('');
+    const sig=t.signals.map(s=>`<span class="chip">${s}</span>`).join('');
+    const steps=t.worked.map(s=>`<div class="step">${s}</div>`).join('');
+    const opts=t.check.opts.map((o,j)=>`<button onclick="miniCheck(this,${i},${j})">${o}</button>`).join('');
+    const el=document.createElement('div');el.className='lesson';el.id='lesson-'+t.id;
+    el.innerHTML=`
+      <div class="lhead"><div class="lnum" style="background:${t.color}">${i+1}</div><div><div class="tag">${t.tag}</div><h3>${t.name}</h3></div></div>
+      <p class="concept">${t.concept}</p>
+      <div class="tl-box">${timelineSVG(t.tl)}<div style="text-align:center;font-size:.8rem;opacity:.7;padding:2px 0 8px">${t.tlcap}</div></div>
+      <div class="struct">${t.struct.join('')}</div>
+      ${exHTML}
+      <div class="signals"><b style="font-size:.78rem;opacity:.6">Señales:</b> ${sig}</div>
+      <div class="worked" id="worked-${t.id}"><h5>🧠 Ejemplo resuelto (sigue el razonamiento)</h5>${steps}<button class="wbtn check" style="margin-top:8px" onclick="document.getElementById('worked-${t.id}').classList.add('show');this.style.display='none'">Ver paso a paso ▾</button></div>
+      <div class="mini-check"><div class="q">✋ Compruébalo: ${t.check.q}</div><div class="mini-opts">${opts}</div><div class="mini-fb" id="minifb-${i}"></div></div>`;
+    wrap.appendChild(el);
+  });
+}
+function miniCheck(btn,ti,ji){const t=TENSES[ti];const fb=document.getElementById('minifb-'+ti);btn.parentElement.querySelectorAll('button').forEach(b=>b.disabled=true);if(ji===t.check.a){btn.classList.add('ok');fb.innerHTML='✅ ¡Correcto! '+t.check.fb;toast('¡Bien hecho! 🎉','good');addXP(5);recordAnswer(t.id,true);}else{btn.classList.add('no');btn.parentElement.querySelectorAll('button')[t.check.a].classList.add('ok');fb.innerHTML='💡 '+t.check.fb;toast('Mira la explicación 👇','bad');recordAnswer(t.id,false);}fb.classList.add('show');}
+let timelinesPlayed=false;
+function playTimelines(){if(timelinesPlayed)return;timelinesPlayed=true;}
+const tlObserver=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.querySelector('svg')&&e.target.querySelector('svg').classList.add('play');}}),{threshold:.3});
+
+/* compare */
+const cmpData=[["Decisión espontánea","Lo decido justo ahora.","“The phone is ringing — I <b>’ll get</b> it!” → <b>will</b>"],["Plan / intención","Ya lo había decidido.","“I <b>’m going to</b> start a diet next month.” → <b>going to</b>"],["Evidencia visible","Veo señales ahora.","“Look at the sky! It <b>’s going to</b> snow.” → <b>going to</b>"],["Predicción / opinión","Creo que pasará.","“I think our team <b>will</b> win.” → <b>will</b>"]];
+function renderCompare(){const tog=document.getElementById('cmpToggle');tog.innerHTML='';cmpData.forEach((c,i)=>{const d=document.createElement('div');d.className='tg'+(i===0?' active':'');d.innerHTML='<b>'+c[0]+'</b><p>'+c[1]+'</p>';d.onclick=()=>{tog.querySelectorAll('.tg').forEach(x=>x.classList.remove('active'));d.classList.add('active');document.getElementById('cmpEx').innerHTML=c[2];};tog.appendChild(d);});document.getElementById('cmpEx').innerHTML=cmpData[0][2];}
+
+/* ============================================================
+   PRACTICE ENGINE
+   ============================================================ */
+const ITEMS=[
+ {sk:'present-simple',type:'mc',q:'The plane ___ at 6 PM every day.',o:['will leave','leaves','is leaving','would leave'],a:1,fb:'Horario fijo y repetido → <b>Present Simple</b>: leaves.'},
+ {sk:'present-continuous',type:'mc',q:'I ___ the dentist at 4 tomorrow (cita ya hecha).',o:['see','am seeing','will see','saw'],a:1,fb:'Cita acordada con hora → <b>Present Continuous</b>: am seeing.'},
+ {sk:'will',type:'mc',q:"That bag looks heavy. ___ I help you?",o:['Do','Will','Am','Going'],a:1,fb:'Ofrecimiento espontáneo → <b>will</b>.'},
+ {sk:'going-to',type:'mc',q:"She has bought paint. She ___ paint her room.",o:['will','is going to','paints','would'],a:1,fb:'Plan ya decidido (compró pintura) → <b>going to</b>.'},
+ {sk:'future-perfect',type:'mc',q:'By the time you arrive, the show ___ .',o:['will start','will have started','starts','is starting'],a:1,fb:'Terminará/empezará ANTES de tu llegada → <b>Future Perfect</b>.'},
+ {sk:'fpc',type:'mc',q:'By midnight, we ___ for six hours.',o:['will drive','will have driven','will have been driving','drive'],a:2,fb:'Resalta la duración hasta un punto → <b>Future Perfect Continuous</b>.'},
+ {sk:'zero',type:'mc',q:'If you mix blue and yellow, you ___ green.',o:['will get','get','would get','are getting'],a:1,fb:'Verdad general → <b>Zero</b>: present + present (get).'},
+ {sk:'first',type:'mc',q:'If it ___ tomorrow, we will cancel the picnic.',o:['will rain','rains','rained','would rain'],a:1,fb:'First conditional: tras "if" va presente (rains); nunca "will".'},
+ {sk:'second',type:'mc',q:'If I ___ a millionaire, I would help my school.',o:['am','was','were','will be'],a:2,fb:'Hipótesis irreal → <b>Second</b>; con "to be" usamos <b>were</b>.'},
+ {sk:'will',type:'fill',q:'Predicción: I think our team ___ (win) the match.',a:'will win',fb:'Predicción/opinión → <b>will</b> + base: will win.'},
+ {sk:'going-to',type:'fill',q:'Plan: This weekend I ___ (visit) my grandparents.',a:'am going to visit',fb:'Plan decidido → <b>am going to</b> + base: am going to visit.'},
+ {sk:'future-perfect',type:'fill',q:'By 2040, scientists ___ (find) new cures.',a:'will have found',fb:'Completado antes de 2040 → <b>will have</b> + participio: will have found.'},
+ {sk:'first',type:'fill',q:'If you ___ (study), you will pass.',a:'study',fb:'Tras "if" → presente simple: study.'},
+ {sk:'second',type:'fill',q:'If we ___ (have) more time, we would travel.',a:'had',fb:'Second conditional: tras "if" → pasado simple: had.'},
+ {sk:'present-simple',type:'error',q:'Corrige: "The class will start at 9 every day." (escribe solo la forma correcta del verbo)',a:'starts',fb:'Horario fijo → present simple: starts (sin "will").'},
+ {sk:'first',type:'error',q:'Corrige: "If it will rain, we stay home." (escribe la forma correcta tras "if")',a:'rains',fb:'Nunca "will" tras "if" en first conditional → rains.'},
+ {sk:'fpc',type:'mc',q:'How long emphasis: By June she ___ here for a year.',o:['will work','will have worked','will have been working','works'],a:2,fb:'Énfasis en duración → <b>FPC</b>: will have been working.'},
+ {sk:'zero',type:'fill',q:'If you heat ice, it ___ (melt).',a:'melts',fb:'Zero conditional → present simple en ambas partes: melts.'}
+];
+let queue=[],qIdx=0,sessionMode='all',curItem=null;
+function buildQueue(mode){if(mode==='review'){const ids=state.review.slice();queue=ids.map(i=>ITEMS[i]).filter(Boolean);if(!queue.length){queue=[];}}else{queue=shuffle(ITEMS.map((_,i)=>i)).slice(0,10).map(i=>ITEMS[i]);} }
+function shuffle(a){return a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);}
+function startPractice(mode){sessionMode=mode;buildQueue(mode);qIdx=0;if(mode==='review'&&!queue.length){document.getElementById('engine').innerHTML='<div style="text-align:center;padding:20px"><img src="'+IMG.wave+'" style="width:120px"><h3 style="margin:10px 0">¡Cola de repaso vacía!</h3><p style="opacity:.7">No tienes errores pendientes. Haz una práctica mixta para llenar tu repaso si fallas algo.</p><button class="btn btn-blue" style="margin-top:14px" onclick="startPractice(\'all\')">Práctica mixta</button></div>';return;}renderItem();}
+function renderItem(){const e=document.getElementById('engine');if(qIdx>=queue.length){const acc=Math.round(state.correct/Math.max(1,state.answered)*100);e.innerHTML='<div style="text-align:center;padding:10px"><img src="'+IMG.wave+'" style="width:130px"><h3 style="margin:10px 0">¡Sesión completada! 🎉</h3><p style="opacity:.75">Precisión global: '+acc+'%. Lo que fallaste quedó guardado para el Repaso inteligente.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><button class="btn btn-blue" onclick="startPractice(\'all\')">Otra ronda</button><button class="btn btn-ghost" onclick="go(\'cards\')">Ir a tarjetas →</button></div></div>';confetti();return;}
+  curItem=queue[qIdx];const it=curItem;const idx=ITEMS.indexOf(it);
+  let body;
+  if(it.type==='fill'||it.type==='error'){body='<div class="eq-fill"><input id="fillInput" placeholder="Escribe aquí…" autocomplete="off" onkeydown="if(event.key===\'Enter\')submitAnswer()"></div>';}
+  else{body='<div class="eq-opts">'+it.o.map((o,j)=>'<button class="eq-opt" onclick="submitAnswer('+j+')">'+o+'</button>').join('')+'</div>';}
+  const instr=it.type==='fill'?'Escribe la forma correcta y pulsa Enter.':it.type==='error'?'Detecta el error y escribe la corrección.':'Elige la opción correcta.';
+  e.innerHTML='<div class="engine-top"><span class="skilltag">'+SKILLS[it.sk]+'</span><div class="barwrap"><i style="width:'+(qIdx/queue.length*100)+'%"></i></div><span class="cnt">'+(qIdx+1)+'/'+queue.length+'</span></div>'
+    +'<div class="eq-q">'+it.q+'</div><div class="eq-instr">'+instr+'</div>'+body
+    +'<div class="fb" id="engFb"></div><div class="engine-foot" id="engFoot"></div>';
+  if(it.type!=='mc')setTimeout(()=>document.getElementById('fillInput').focus(),50);
+}
+function norm(s){return s.trim().toLowerCase().replace(/\s+/g,' ').replace(/[.]/g,'');}
+function submitAnswer(choice){const it=curItem;const idx=ITEMS.indexOf(it);let correct;
+  if(it.type==='mc'){const btns=document.querySelectorAll('.eq-opt');if(btns[0].disabled)return;btns.forEach(b=>b.disabled=true);correct=(choice===it.a);btns[it.a].classList.add('correct');if(!correct)btns[choice].classList.add('wrong');}
+  else{const inp=document.getElementById('fillInput');if(inp.disabled)return;inp.disabled=true;correct=norm(inp.value)===norm(it.a);inp.style.borderColor=correct?'var(--ok)':'var(--bad)';}
+  const fb=document.getElementById('engFb');fb.className='fb show '+(correct?'right':'wrong');
+  fb.innerHTML='<div class="fb-head">'+(correct?'✅ ¡Correcto!':'💡 Respuesta: '+it.a)+'</div><div class="fb-rule">'+it.fb+'</div>';
+  recordAnswer(it.sk,correct);
+  if(correct){addXP(10);toast('¡Correcto! +10 XP','good');state.review=state.review.filter(x=>x!==idx);}
+  else{toast('Revisa la regla 👇','bad');if(!state.review.includes(idx))state.review.push(idx);}
+  persist();updateReviewBadge();
+  const foot=document.getElementById('engFoot');const b=document.createElement('button');b.className='btn btn-blue';b.textContent=(qIdx+1>=queue.length)?'Ver resultados →':'Siguiente →';b.onclick=()=>{qIdx++;renderItem();};foot.appendChild(b);}
+function updateReviewBadge(){const n=state.review.length;document.getElementById('reviewBtn').textContent='🔁 Repaso inteligente'+(n?' ('+n+')':'');document.getElementById('statReview')&&(document.getElementById('statReview').textContent=n);}
+
+/* ============================================================
+   FLASHCARDS (Leitner)
+   ============================================================ */
+const CARDS=[
+ {id:'c1',f:'will + ?',b:'will + verbo BASE',e:'I will go. / She will help.'},
+ {id:'c2',f:'going to + ?',b:'am/is/are + going to + verbo BASE',e:"It's going to rain."},
+ {id:'c3',f:'Future Perfect',b:'will have + PARTICIPIO pasado',e:'By 9, she will have left.'},
+ {id:'c4',f:'Future Perfect Continuous',b:'will have been + verbo-ING',e:'…will have been waiting for an hour.'},
+ {id:'c5',f:'Present Continuous (futuro)',b:'am/is/are + verbo-ING (plan acordado)',e:"I'm flying tomorrow."},
+ {id:'c6',f:'Present Simple (futuro)',b:'verbo (+s) — horarios fijos',e:'The train leaves at 8.'},
+ {id:'c7',f:'Zero Conditional',b:'If + present simple, present simple',e:'If you heat ice, it melts.'},
+ {id:'c8',f:'First Conditional',b:'If + present simple, will + base',e:'If it rains, I will stay.'},
+ {id:'c9',f:'Second Conditional',b:'If + past simple, would + base',e:'If I were rich, I would travel.'},
+ {id:'c10',f:'¿"will" tras "if"?',b:'NUNCA en first conditional. Tras "if" → presente.',e:'❌ if it will rain ✅ if it rains'},
+ {id:'c11',f:'"to be" en Second Cond.',b:'Usa WERE para todas las personas',e:'If I were you…'},
+ {id:'c12',f:'unless',b:'= if not (si no)',e:'Unless you hurry, you\'ll be late.'}
+];
+let cardOrder=[],cardPos=0;
+function buildDeck(){const box=state.cardBox;cardOrder=CARDS.map(c=>c.id).sort((a,b)=>(box[a]||1)-(box[b]||1));cardPos=0;renderCard();}
+function renderCard(){const d=document.getElementById('deck');if(cardPos>=cardOrder.length){d.innerHTML='<div style="text-align:center;padding:30px"><img src="'+IMG.wave+'" style="width:120px"><h3 style="margin:10px 0">¡Repasaste todas! 🃏</h3><p style="opacity:.7">Vuelve cuando quieras; las difíciles aparecerán primero.</p><button class="btn btn-blue" style="margin-top:12px" onclick="buildDeck()">Repasar de nuevo</button></div>';return;}
+  const c=CARDS.find(x=>x.id===cardOrder[cardPos]);
+  d.innerHTML='<div class="flash-hint">Tarjeta '+(cardPos+1)+' de '+cardOrder.length+' · toca para girar</div>'
+    +'<div class="flashcard" id="fc" onclick="this.classList.toggle(\'flipped\')"><div class="flash-inner">'
+    +'<div class="flash-face flash-front"><div class="lbl">¿Cuál es la estructura?</div><div class="term">'+c.f+'</div></div>'
+    +'<div class="flash-face flash-back"><div class="ans">'+c.b+'</div><div class="eg">🔊 '+c.e+'</div></div>'
+    +'</div></div>'
+    +'<div class="rate-row"><button class="again" onclick="rateCard(\''+c.id+'\',false)">😕 Otra vez</button><button class="good" onclick="rateCard(\''+c.id+'\',true)">😎 La sé</button></div>';
+  const back=d.querySelector('.flash-back');if(back)back.onclick=(ev)=>{ev.stopPropagation();speak(c.e.replace(/^🔊\s*/,''));};
+}
+function rateCard(id,good){const box=state.cardBox;box[id]=good?Math.min(5,(box[id]||1)+1):1;persist();toast(good?'¡Genial! La verás menos 👍':'Tranquilo, volverá pronto 💪',good?'good':'');cardPos++;renderCard();}
+
+/* ============================================================
+   CONDITIONALS
+   ============================================================ */
+const CONDS=[
+ {cls:'c0',n:'0 · Zero Conditional',when:'Verdades generales · hechos · leyes · rutinas',
+  desc:'Cosas que <b>siempre</b> pasan: si ocurre A, B ocurre. Aquí "if" ≈ "when".',
+  fa:'If + present simple',fb:'present simple',
+  uses:[['Ciencia','If you heat ice, it melts.'],['Reglas','If you press this, it starts.'],['Rutinas','If I\'m tired, I drink coffee.']],
+  warn:'Ambas partes en presente simple. Puedes cambiar "if" por "when".'},
+ {cls:'c1',n:'1 · First Conditional',when:'Situaciones reales y posibles en el futuro',
+  desc:'Una condición que <b>probablemente</b> ocurrirá, con resultado futuro real. El condicional de planes y consecuencias.',
+  fa:'If + present simple',fb:'will + base verb',
+  uses:[['Planes','If it\'s sunny, we will go out.'],['Advertencias','If you don\'t study, you\'ll fail.'],['Promesas','If you help me, I\'ll help you.']],
+  warn:'❌ <i>If it will rain…</i> → ✅ <i>If it <b>rains</b>, I will stay.</i> Nunca "will" tras "if".'},
+ {cls:'c2',n:'2 · Second Conditional',when:'Imaginario, improbable o irreal (presente/futuro)',
+  desc:'Imaginamos algo que <b>no es real ahora</b>: sueños, deseos, consejos hipotéticos.',
+  fa:'If + past simple',fb:'would + base verb',
+  uses:[['Sueños','If I won the lottery, I would travel.'],['Consejos','If I were you, I would apologize.'],['Hipótesis','If we had a car, we wouldn\'t walk.']],
+  warn:'Con "to be" usa <b>were</b> para todas las personas: <i>If I were rich…</i>'}
+];
+function renderConds(){const w=document.getElementById('condBlocks');w.innerHTML='';CONDS.forEach(c=>{const uses=c.uses.map(u=>'<div class="use"><h5>'+u[0]+'</h5><p class="ex">🔊 '+u[1]+'</p></div>').join('');const el=document.createElement('div');el.className='cond-block '+c.cls;el.innerHTML='<h3>'+c.n+'</h3><div class="when">'+c.when+'</div><p>'+c.desc+'</p><div class="formula"><span class="ifc">'+c.fa+'</span><span class="plus">,</span><span class="mainc">'+c.fb+'</span></div><div class="real-uses">'+uses+'</div><div class="warn"><b>Ojo:</b> '+c.warn+'</div>';w.appendChild(el);el.querySelectorAll('.use .ex').forEach(p=>p.style.cursor='pointer');el.querySelectorAll('.use .ex').forEach(p=>p.onclick=()=>speak(p.textContent.replace(/^🔊\s*/,'')));});}
+
+const MACHINE=[
+ {lbl:'Siempre verdad',sub:'un hecho que no cambia',type:'Zero Conditional',sent:'If you heat ice, it melts.',ex:'If + presente, presente. (verdad general)'},
+ {lbl:'Posible en el futuro',sub:'probable que pase',type:'First Conditional',sent:'If it rains, we will stay home.',ex:'If + presente, will + base. (futuro real)'},
+ {lbl:'Imaginario / irreal',sub:'sueño o hipótesis',type:'Second Conditional',sent:'If I were rich, I would travel the world.',ex:'If + pasado, would + base. (hipótesis)'}
+];
+function renderMachine(){const s=document.getElementById('machineSlots');s.innerHTML='';MACHINE.forEach((m,i)=>{const d=document.createElement('div');d.className='slot'+(i===0?' active':'');d.innerHTML='<b>'+m.lbl+'</b><p>'+m.sub+'</p>';d.onclick=()=>{s.querySelectorAll('.slot').forEach(x=>x.classList.remove('active'));d.classList.add('active');machineOut(i);};s.appendChild(d);});machineOut(0);}
+function machineOut(i){const m=MACHINE[i];document.getElementById('machineOut').innerHTML='<div class="lbl">'+m.type+'</div><div class="sent">'+m.sent+' <button class="spk" style="vertical-align:middle" onclick="speak(\''+m.sent.replace(/'/g,"\\'")+'\')">🔊</button></div><div class="ex2">'+m.ex+'</div>';}
+
+/* builder */
+const correctOrder=["If","it","rains",",","we","will","stay","home"];let bankWords=[],built=[];
+function initBuilder(){bankWords=shuffle([...correctOrder]);built=[];renderBank();renderBuilt();}
+function renderBank(){const b=document.getElementById('wordBank');b.innerHTML='';bankWords.forEach((w,i)=>{const d=document.createElement('div');d.className='word'+(built.includes(i)?' placed':'');d.textContent=w;d.onclick=()=>{if(!built.includes(i)){built.push(i);renderBuilt();renderBank();}};b.appendChild(d);});}
+function renderBuilt(){const builder=document.getElementById('builder');if(!built.length){builder.innerHTML='<span class="drop-slot">Toca las palabras de arriba…</span>';return;}builder.innerHTML='';built.forEach((idx,pos)=>{const d=document.createElement('div');d.className='word';d.textContent=bankWords[idx];d.onclick=()=>{built.splice(pos,1);renderBuilt();renderBank();};builder.appendChild(d);});}
+function checkBuilder(){const made=built.map(i=>bankWords[i]).join(' ').replace(/ ,/g,',');const target=correctOrder.join(' ').replace(/ ,/g,',');if(made===target){toast('¡Oración perfecta! 🎯','good');addXP(15);}else toast('Revisa el orden y la coma','bad');}
+function resetBuilder(){built=[];renderBuilt();renderBank();}
+
+/* ============================================================
+   WRITING STUDIO (structure detection)
+   ============================================================ */
+const WRITES=[
+ {t:'Promesa (First Conditional)',p:'Escribe: "If I study every day, I will…"',test:s=>/\bif\b/i.test(s)&&/\bwill\b/i.test(s),good:'✓ ¡Veo un First Conditional! "if" + "will".',bad:'Asegúrate de incluir "if …" y "will …" en el resultado.',model:'If I study every day, I will pass my final exam with a great grade.'},
+ {t:'Plan vs decisión (going to / will)',p:'Una oración con "going to" (plan) y otra con "will" (decisión).',test:s=>/going to/i.test(s)&&/\bwill\b|'ll/i.test(s),good:'✓ ¡Bien! Usaste "going to" y "will".',bad:'Incluye una con "going to" y otra con "will" (o \'ll).',model:"I'm going to visit my grandparents this weekend. — The phone is ringing, I'll get it!"},
+ {t:'Hipótesis (Second Conditional)',p:'Completa: "If I were the president, I would…"',test:s=>/if\b.*\bwere\b/i.test(s)&&/would/i.test(s),good:'✓ ¡Perfecto! "if … were" + "would".',bad:'Recuerda: "If I were…" + "I would…".',model:'If I were the president, I would build more schools and libraries.'},
+ {t:'Logro futuro (Future Perfect)',p:'Algo que habrás logrado al terminar 8°.',test:s=>/will have\s+\w+/i.test(s),good:'✓ ¡Excelente Future Perfect! "will have + participio".',bad:'Usa la forma "will have + participio" (ej. will have learned).',model:'By the end of 8th grade, I will have learned all the future tenses.'}
+];
+function renderWrite(){const w=document.getElementById('writeStudio');w.innerHTML='<h3>💻 Escribe y recibe feedback</h3>'+WRITES.map((x,i)=>'<div class="task"><b>'+(i+1)+'. '+x.t+'</b>'+x.p+'<textarea id="wt'+i+'"></textarea><div class="wbtns"><button class="wbtn check" onclick="checkWrite('+i+')">Revisar mi oración</button><button class="wbtn" onclick="var m=document.getElementById(\'wm'+i+'\');m.classList.toggle(\'show\')">Ver modelo</button></div><div class="wfb" id="wf'+i+'"></div><div class="model" id="wm'+i+'">'+x.model+' <button class="spk" onclick="speak(\''+x.model.replace(/'/g,"\\'")+'\')">🔊</button></div></div>').join('');}
+function checkWrite(i){const x=WRITES[i];const v=document.getElementById('wt'+i).value;const fb=document.getElementById('wf'+i);if(!v.trim()){fb.className='wfb bad show';fb.textContent='Escribe algo primero ✍️';return;}const ok=x.test(v);fb.className='wfb show '+(ok?'good':'bad');fb.innerHTML=ok?x.good:'💡 '+x.bad;if(ok){toast('¡Buena estructura! +10 XP','good');addXP(10);}else toast('Casi — revisa la pista','bad');}
+
+/* ============================================================
+   EXAM
+   ============================================================ */
+const EXAM=[
+ {sk:'present-simple',q:'The train ___ at 7 PM. (horario)',o:['will leave','leaves','is leaving','would leave'],a:1},
+ {sk:'will',q:"Don't worry, I ___ help you carry that.",o:['am going to','leave','will','leaves'],a:2},
+ {sk:'going-to',q:'Watch out! You ___ drop the plate!',o:['will','are going to','leave','would'],a:1},
+ {sk:'future-perfect',q:'By 2040, scientists ___ a cure for many diseases.',o:['will find','will have found','find','are finding'],a:1},
+ {sk:'zero',q:'If you heat water to 100°C, it ___ .',o:['will boil','would boil','boils','boiled'],a:2},
+ {sk:'first',q:'If it rains tomorrow, we ___ the trip.',o:['cancel','will cancel','would cancel','cancelled'],a:1},
+ {sk:'second',q:'If I ___ rich, I would help everyone.',o:['am','will be','were','be'],a:2},
+ {sk:'fpc',q:'By next month, I ___ studying here for a year.',o:['will have been','will have','am','have been'],a:0},
+ {sk:'first',q:'___ you hurry, you will miss the bus. (= if not)',o:['If','When','Unless','Because'],a:2},
+ {sk:'second',q:'If I were you, I ___ apologize.',o:['will','would','am going to','do'],a:1},
+ {sk:'present-continuous',q:"I ___ Maria at the airport at 6 (ya quedamos).",o:['meet','am meeting','will meet','meets'],a:1},
+ {sk:'future-perfect',q:'By the time the movie ends, we ___ here for 3 hours.',o:['will sit','will have sat','will have been sitting','sit'],a:2}
+];
+let exIdx=0,exScore=0,exBySkill={};
+function startExam(){exIdx=0;exScore=0;exBySkill={};document.getElementById('examResult').classList.remove('show');document.getElementById('examJudah').style.opacity='.95';document.getElementById('examTitle').textContent='Examen · Futuros + Condicionales';renderExamQ();}
+function renderExamQ(){const body=document.getElementById('examBody');document.getElementById('exProg').style.width=(exIdx/EXAM.length*100)+'%';if(exIdx>=EXAM.length){finishExam();return;}const it=EXAM[exIdx];body.innerHTML='<div class="eq show"><div class="exq-num">Pregunta '+(exIdx+1)+' de '+EXAM.length+' · '+SKILLS[it.sk]+'</div><div class="exq-q">'+it.q+'</div>'+it.o.map((o,j)=>'<button class="eopt" onclick="answerExam('+j+')">'+o+'</button>').join('')+'</div>';}
+function answerExam(j){const it=EXAM[exIdx];const opts=document.querySelectorAll('#examBody .eopt');if(opts[0].disabled)return;opts.forEach(b=>b.disabled=true);const correct=j===it.a;opts[it.a].classList.add('correct');if(!exBySkill[it.sk])exBySkill[it.sk]={c:0,t:0};exBySkill[it.sk].t++;if(correct){exScore++;exBySkill[it.sk].c++;toast('¡Bien! ✓','good');}else{opts[j].classList.add('wrong');toast('Esa no era','bad');}setTimeout(()=>{exIdx++;document.getElementById('exProg').style.width=(exIdx/EXAM.length*100)+'%';renderExamQ();},950);}
+function finishExam(){const r=document.getElementById('examResult');document.getElementById('examBody').innerHTML='';document.getElementById('examJudah').style.opacity='0';document.getElementById('exProg').style.width='100%';const nota=Math.round(exScore/EXAM.length*100);document.getElementById('examGrade').textContent=nota+'%';const rj=document.getElementById('resJudah').querySelector('img');let msg;if(nota>=90){msg='¡Excelente! 🏆 Estás listo para el examen.';rj.src=IMG.wave;award('exam');if(nota===100)award('perfect');}else if(nota>=70){msg='¡Muy bien! 👏 Repasa los puntos débiles abajo.';rj.src=IMG.wave;award('exam');}else if(nota>=50){msg='Vas por buen camino 💪 Enfócate en lo de abajo.';rj.src=IMG.pray;}else{msg='No te rindas 🌱 Vuelve al módulo Aprende y reintenta.';rj.src=IMG.pray;}
+  document.getElementById('examMsg').textContent=msg;
+  // breakdown
+  let bd='<h4>📊 Diagnóstico por habilidad — qué repasar</h4>';const weak=[];Object.keys(exBySkill).forEach(sk=>{const o=exBySkill[sk];const p=Math.round(o.c/o.t*100);const col=p>=70?'#1FAA66':p>=40?'#E9A72C':'#E64545';if(p<70)weak.push(SKILLS[sk]);bd+='<div class="bd-row"><span class="nm">'+SKILLS[sk]+'</span><span class="bar"><i style="width:'+p+'%;background:'+col+'"></i></span><span class="v">'+p+'%</span></div>';});
+  if(weak.length)bd+='<p style="margin-top:10px;font-size:.85rem;opacity:.85">👉 Te recomiendo repasar: <b>'+weak.join(', ')+'</b>. Ve al módulo <b>Aprende</b> o usa <b>Repaso inteligente</b>.</p>';else bd+='<p style="margin-top:10px;font-size:.85rem;opacity:.85">🌟 ¡Dominas todas las habilidades evaluadas! Judah está orgulloso.</p>';
+  document.getElementById('examBreakdown').innerHTML=bd;
+  recordExamToReview();r.classList.add('show');confetti();if(nota>=50)addXP(50);}
+function recordExamToReview(){EXAM.forEach(()=>{});}
+
+/* ===== dashboard render ===== */
+function renderDash(){
+  const mg=document.getElementById('masteryGrid');mg.innerHTML='';
+  ['present-simple','present-continuous','will','going-to','future-perfect','fpc','zero','first','second'].forEach(s=>{const p=masteryPct(s);const col=p>=70?'#1FAA66':p>=40?'#E9A72C':'#C8202E';const circ=2*Math.PI*34;const off=circ*(1-p/100);
+    const d=document.createElement('div');d.className='ring-card';d.onclick=()=>{go(['zero','first','second'].includes(s)?'cond':'learn');setTimeout(()=>{const t=document.getElementById('lesson-'+s);if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},250);};
+    d.innerHTML='<div class="ring"><svg width="84" height="84"><circle cx="42" cy="42" r="34" fill="none" stroke="#E7DCC6" stroke-width="8"/><circle cx="42" cy="42" r="34" fill="none" stroke="'+col+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'"/></svg><div class="pct">'+p+'%</div></div><div class="nm">'+SKILLS[s]+'</div>';mg.appendChild(d);});
+  const br=document.getElementById('badgeRow');br.innerHTML='';BADGES.forEach(b=>{const e=document.createElement('div');e.className='badge'+(state.badges.includes(b.id)?' earned':'');e.innerHTML='<div class="ic">'+b.ic+'</div><div class="nm">'+b.nm+'</div>';br.appendChild(e);});
+  document.getElementById('statAnswered').textContent=state.answered;document.getElementById('statAcc').textContent=state.answered?Math.round(state.correct/state.answered*100)+'%':'—';document.getElementById('statReview').textContent=state.review.length;
+  const hr=new Date().getHours();const greet=hr<12?'¡Buenos días':hr<19?'¡Buenas tardes':'¡Buenas noches';
+  document.getElementById('dashGreeting').innerHTML=greet+', futuro Great Disciple! '+(state.streak>1?'Llevas <b>'+state.streak+' días</b> seguidos 🔥. ':'')+'Tu plataforma para dominar los futuros y condicionales con animaciones, práctica con feedback y un examen diagnóstico.';
+}
+
+/* ===== init ===== */
+function init(){
+  renderHUD();renderLessons();renderCompare();renderConds();renderMachine();initBuilder();renderWrite();buildDeck();renderDash();updateReviewBadge();
+  startPractice('all');startExam();
+  document.querySelectorAll('.tl-box').forEach(b=>tlObserver.observe(b));
+  go('dash');
+}
+init();
+</script>
+</body>
+</html>
