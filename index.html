@@ -680,6 +680,11 @@ window.onerror=function(msg,src,line,col,err){
   console.error('FutureLab Error:',msg,'Line:',line,err);
   return false;
 };
+/* ===== Supabase constants (must be first — used by notice poller and leaderboard) ===== */
+const SB_URL='https://gfjiicfnwpkbkptwgnte.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmamlpY2Zud3BrYmtwdHdnbnRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNzU0NjQsImV4cCI6MjA5Mjc1MTQ2NH0.yFNCdZ5euxNFneh885pPg3t04KBdwJ6uF3BfQAHTXE4';
+const SB_TABLE='futurelab_scores';
+
 /* ===== guarded storage (works deployed, falls back in sandbox) ===== */
 const Store=(()=>{let ok=false,mem={};try{const k="__fl";localStorage.setItem(k,"1");localStorage.removeItem(k);ok=true;}catch(e){ok=false;}
   return{get(k,d){try{if(ok){const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}}catch(e){}return k in mem?mem[k]:d;},
@@ -687,7 +692,8 @@ const Store=(()=>{let ok=false,mem={};try{const k="__fl";localStorage.setItem(k,
 
 /* ===== state ===== */
 const SKILLS={'present-simple':'Present Simple','present-continuous':'Present Continuous','will':'will','going-to':'going to','future-perfect':'Future Perfect','fpc':'Fut. Perf. Continuous','zero':'Zero Cond.','first':'First Cond.','second':'Second Cond.','mixed':'Mixed Cond.','inversion':'Cond. Inversion'};
-let state=Store.get('flstate',null)||{xp:0,level:1,streak:0,lastDay:null,answered:0,correct:0,mastery:{},review:[],badges:[],cardBox:{},seenQ:{},skillLvl:{},skillBadges:{}};
+let state=Store.get('flstate',null)||{xp:0,level:1,streak:0,lastDay:null,answered:0,correct:0,lastExamScore:null,mastery:{},review:[],badges:[],cardBox:{},seenQ:{},skillLvl:{},skillBadges:{}};
+if(state.lastExamScore===undefined)state.lastExamScore=null;
 // migrate missing fields (safe for all old state versions)
 if(!state.seenQ)state.seenQ={};
 if(!state.skillLvl)state.skillLvl={};
@@ -1985,9 +1991,7 @@ function init(){
 /* ============================================================
    SUPABASE LEADERBOARD
    ============================================================ */
-const SB_URL='https://gfjiicfnwpkbkptwgnte.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmamlpY2Zud3BrYmtwdHdnbnRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNzU0NjQsImV4cCI6MjA5Mjc1MTQ2NH0.yFNCdZ5euxNFneh885pPg3t04KBdwJ6uF3BfQAHTXE4';
-const SB_TABLE='futurelab_scores';
+// SB_URL, SB_KEY, SB_TABLE declared at top of script
 
 function sbHeaders(){return{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'};}
 
