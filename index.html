@@ -56,6 +56,7 @@ button{font-family:'Lexend';cursor:pointer}
 .btn-ghost{background:var(--paper);color:var(--ink);border:2px solid var(--ink)}
 .btn-ghost:hover{background:var(--ink);color:#fff}
 .btn-gold{background:var(--gold);color:var(--ink)}
+.btn-sm{font-size:.8rem;padding:9px 16px}
 .btn:disabled{opacity:.45;cursor:default;transform:none!important}
 
 /* ===== DASHBOARD ===== */
@@ -387,6 +388,50 @@ footer img{width:42px;margin-bottom:6px}
 .interv-explain h3:first-child{margin-top:0}
 .interv-spinner{text-align:center;padding:30px 0}
 .interv-spinner .sp{width:38px;height:38px;border:3px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+
+/* ===== SKILL DETAIL MODAL ===== */
+.sk-modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(22,36,74,.55);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:30px 16px 60px}
+.sk-modal{background:var(--paper);border-radius:28px;max-width:620px;width:100%;box-shadow:0 24px 70px rgba(22,36,74,.28);position:relative;overflow:hidden}
+.sk-modal-banner{background:linear-gradient(140deg,var(--ink),#22356b);color:#fff;padding:28px 28px 22px;display:flex;align-items:center;gap:22px;position:relative}
+.sk-modal-banner::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 90% 110%,rgba(233,167,44,.28),transparent 50%)}
+.sk-modal-banner .big-ring{width:100px;height:100px;flex-shrink:0;position:relative;z-index:1}
+.sk-modal-banner .big-ring svg{transform:rotate(-90deg)}
+.sk-modal-banner .big-ring .pct{position:absolute;inset:0;display:grid;place-items:center;font-family:'Bricolage Grotesque';font-weight:800;font-size:1.3rem;color:#fff}
+.sk-modal-banner .sk-info{flex:1;position:relative;z-index:1}
+.sk-modal-banner h2{font-size:1.45rem;font-weight:800;margin-bottom:4px}
+.sk-modal-lv-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.sk-modal-lv{background:rgba(255,255,255,.18);border-radius:20px;padding:3px 12px;font-size:.82rem;font-weight:700}
+.sk-modal-cefr{background:var(--gold);color:var(--ink);border-radius:20px;padding:3px 12px;font-size:.82rem;font-weight:800}
+.sk-xp-bar{background:rgba(255,255,255,.15);border-radius:30px;height:8px;overflow:hidden;margin-top:2px}
+.sk-xp-bar i{display:block;height:100%;background:var(--gold);border-radius:30px;transition:width .5s ease}
+.sk-xp-label{font-size:.65rem;opacity:.75;margin-top:3px}
+.sk-modal-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:1.1rem;cursor:pointer;z-index:2;display:grid;place-items:center}
+.sk-modal-body{padding:22px 24px 28px}
+.sk-stats-row{display:flex;gap:12px;margin-bottom:20px}
+.sk-stat-box{flex:1;background:var(--cream);border-radius:14px;padding:12px;text-align:center}
+.sk-stat-box .val{font-family:'Bricolage Grotesque';font-size:1.5rem;font-weight:800}
+.sk-stat-box .lbl{font-size:.65rem;font-weight:600;opacity:.65;text-transform:uppercase;letter-spacing:.07em}
+.sk-badges-section h3{font-size:.9rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.sk-badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-bottom:22px}
+.sk-badge-item{background:var(--cream);border:2px solid var(--line);border-radius:14px;padding:10px 8px;text-align:center;transition:.2s}
+.sk-badge-item.earned{border-color:var(--gold);background:linear-gradient(135deg,#fffbef,#fff8dc);box-shadow:0 4px 14px rgba(233,167,44,.2)}
+.sk-badge-item.locked{opacity:.38;filter:grayscale(.7)}
+.sk-badge-item .bic{font-size:1.5rem;margin-bottom:4px}
+.sk-badge-item .bnm{font-size:.62rem;font-weight:700;line-height:1.2}
+.sk-badge-item .bdesc{font-size:.56rem;opacity:.7;margin-top:2px;line-height:1.2}
+.sk-suggest{background:linear-gradient(135deg,var(--blue-lt),#e8f0fb);border:2px solid var(--blue);border-radius:16px;padding:16px;margin-bottom:18px;display:flex;align-items:center;gap:14px}
+.sk-suggest .ss-icon{font-size:1.6rem;flex-shrink:0}
+.sk-suggest .ss-txt{flex:1}
+.sk-suggest .ss-txt b{font-size:.88rem;display:block;margin-bottom:2px}
+.sk-suggest .ss-txt small{font-size:.72rem;opacity:.75}
+.sk-suggest .ss-btn{flex-shrink:0}
+.sk-actions{display:flex;gap:10px;flex-wrap:wrap}
+/* skill suggestion banner (post-session) */
+.next-skill-banner{background:linear-gradient(135deg,var(--ink),#1E50A0);color:#fff;border-radius:18px;padding:18px 20px;margin-top:18px;display:flex;align-items:center;gap:14px}
+.next-skill-banner .ns-icon{font-size:1.8rem;flex-shrink:0}
+.next-skill-banner .ns-txt{flex:1}
+.next-skill-banner .ns-txt b{display:block;font-size:.9rem;margin-bottom:2px}
+.next-skill-banner .ns-txt small{font-size:.72rem;opacity:.8}
 </style>
 </head>
 <body>
@@ -623,7 +668,8 @@ const SKILLS={'present-simple':'Present Simple','present-continuous':'Present Co
 let state=Store.get('flstate',null)||{xp:0,level:1,streak:0,lastDay:null,answered:0,correct:0,mastery:{},review:[],badges:[],cardBox:{},seenQ:{}};
 if(!state.seenQ)state.seenQ={};
 if(!state.skillLvl)state.skillLvl={};
-Object.keys(SKILLS).forEach(s=>{if(!state.mastery[s])state.mastery[s]={seen:0,correct:0};if(!state.skillLvl[s])state.skillLvl[s]={xp:0,lv:1};});
+if(!state.skillBadges)state.skillBadges={};
+Object.keys(SKILLS).forEach(s=>{if(!state.mastery[s])state.mastery[s]={seen:0,correct:0};if(!state.skillLvl[s])state.skillLvl[s]={xp:0,lv:1};if(!state.skillBadges[s])state.skillBadges[s]=[];});
 function save(){Store.set('flstate',state);} // namespaced
 function saveAll(){Store.set('flstate',state);}
 // migrate key
@@ -695,8 +741,40 @@ const BADGES=[
   {id:'tierB2',ic:'⚔️',nm:'B2 Challenger',desc:'Reach Level 6 — B2 unlocked',color:'#E9A72C',gradient:'linear-gradient(135deg,#fef3d0,#C8202E)'},
   {id:'tierB2plus',ic:'👑',nm:'B2+ Champion',desc:'Reach Level 8 — highest tier!',color:'#7A4FB5',gradient:'linear-gradient(135deg,#EDE7F6,#E9A72C)'},
   {id:'exam',ic:'🏆',nm:'Exam Warrior',desc:'Complete the final exam',color:'#E9A72C',gradient:'linear-gradient(135deg,#FCE6C4,#E9A72C)'},
-  {id:'perfect',ic:'💯',nm:'Perfection',desc:'Score 100% on the final exam',color:'#16244A',gradient:'linear-gradient(135deg,#E4ECF8,#16244A)'}
+  {id:'perfect',ic:'💯',nm:'Perfection',desc:'Score 100% on the final exam',color:'#16244A',gradient:'linear-gradient(135deg,#E4ECF8,#16244A)'},
+  {id:'explorer',ic:'🌍',nm:'Explorer',desc:'Reach Level 2 in ALL 11 skills',color:'#1E50A0',gradient:'linear-gradient(135deg,#bde0ff,#1E50A0)'}
 ];
+
+/* ===== per-skill badges ===== */
+const SKILL_BADGES=[
+  {id:'sk_lv2',  ic:'🌱',nm:'First Step',    desc:'Reach Level 2'},
+  {id:'sk_lv5',  ic:'⚡',nm:'Building Up',   desc:'Reach Level 5'},
+  {id:'sk_lv10', ic:'⭐',nm:'A1 Solid',      desc:'Level 10 — A1 firm'},
+  {id:'sk_lv16', ic:'🎯',nm:'A2 Achiever',   desc:'Level 16 — into A2'},
+  {id:'sk_lv31', ic:'🔥',nm:'B1 Breaker',    desc:'Level 31 — B1 territory'},
+  {id:'sk_lv51', ic:'💎',nm:'B2 Builder',    desc:'Level 51 — advanced'},
+  {id:'sk_lv66', ic:'👑',nm:'C1 Champion',   desc:'Level 66 — near-native'},
+  {id:'sk_lv81', ic:'🏆',nm:'Grand Master',  desc:'Level 81 — C2 mastery'},
+  {id:'sk_acc80',ic:'🎓',nm:'Sharp Shooter', desc:'80%+ accuracy (10+ answers)'},
+];
+function checkSkillBadges(sk){
+  if(!state.skillBadges)state.skillBadges={};
+  if(!state.skillBadges[sk])state.skillBadges[sk]=[];
+  var earned=state.skillBadges[sk];
+  var sl=state.skillLvl[sk]||{lv:1,xp:0};
+  var m=state.mastery[sk]||{seen:0,correct:0};
+  var pct=m.seen>=10?Math.round(m.correct/m.seen*100):0;
+  var toCheck=[
+    {id:'sk_lv2', cond:sl.lv>=2},{id:'sk_lv5', cond:sl.lv>=5},
+    {id:'sk_lv10',cond:sl.lv>=10},{id:'sk_lv16',cond:sl.lv>=16},
+    {id:'sk_lv31',cond:sl.lv>=31},{id:'sk_lv51',cond:sl.lv>=51},
+    {id:'sk_lv66',cond:sl.lv>=66},{id:'sk_lv81',cond:sl.lv>=81},
+    {id:'sk_acc80',cond:pct>=80&&m.seen>=10},
+  ];
+  var newOnes=[];
+  toCheck.forEach(function(b){if(b.cond&&!earned.includes(b.id)){earned.push(b.id);newOnes.push(b.id);}});
+  if(newOnes.length){persist();newOnes.forEach(function(id){var bd=SKILL_BADGES.find(function(x){return x.id===id;});if(bd)toast('🏅 '+SKILLS[sk]+' Badge: '+bd.nm+'! '+bd.ic,'good');});}
+}
 function award(id){if(!state.badges.includes(id)){state.badges.push(id);persist();const b=BADGES.find(x=>x.id===id);toast('🏅 Badge Earned: '+b.nm+'! '+b.ic,'good');confetti();}}
 function checkBadges(){
   const tn=['present-simple','present-continuous','will','going-to','future-perfect','fpc'];
@@ -709,11 +787,12 @@ function checkBadges(){
   if(state.level>=4)award('tierB1');
   if(state.level>=6)award('tierB2');
   if(state.level>=8)award('tierB2plus');
+  if(Object.keys(SKILLS).every(function(s){return(state.skillLvl[s]||{lv:1}).lv>=2;}))award('explorer');
 }
 
 /* ===== mastery ===== */
 function masteryPct(s){const m=state.mastery[s];return m&&m.seen?Math.round(m.correct/m.seen*100):0;}
-function recordAnswer(skill,correct){state.answered++;if(correct)state.correct++;const m=state.mastery[skill];m.seen++;if(correct){m.correct++;addSkillXP(skill,15);}else{addSkillXP(skill,3);}persist();if(state.correct===1)award('first');checkBadges();}
+function recordAnswer(skill,correct){state.answered++;if(correct)state.correct++;const m=state.mastery[skill];m.seen++;if(correct){m.correct++;addSkillXP(skill,15);}else{addSkillXP(skill,3);}persist();if(state.correct===1)award('first');checkBadges();checkSkillBadges(skill);}
 
 /* ============================================================
    DATA: TENSES (with animated-timeline configs)
@@ -951,9 +1030,11 @@ function startPractice(mode){
     qIdx=0;renderItem();
   });
 }
-function fetchAIExercises(callback){
+function fetchAIExercises(callback,focusSkill){
   var skillLevels={};Object.keys(SKILLS).forEach(function(s){skillLevels[s]=(state.skillLvl[s]||{lv:1}).lv;});
-  fetch(SB_URL+'/functions/v1/futurelab-generate-exercises',{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},body:JSON.stringify({level:state.level,mastery:state.mastery||{},skillLevels:skillLevels,count:10,seenQuestions:Object.keys(state.seenQ).slice(-60)})}).then(function(r){return r.json();}).then(function(data){callback(data.exercises||[]);}).catch(function(){callback([]);});
+  var payload={level:state.level,mastery:state.mastery||{},skillLevels:skillLevels,count:10,seenQuestions:Object.keys(state.seenQ).slice(-60)};
+  if(focusSkill)payload.focusSkill=focusSkill;
+  fetch(SB_URL+'/functions/v1/futurelab-generate-exercises',{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},body:JSON.stringify(payload)}).then(function(r){return r.json();}).then(function(data){callback(data.exercises||[]);}).catch(function(){callback([]);});
 }
 function renderItem(){
   const e=document.getElementById('engine');
@@ -963,7 +1044,14 @@ function renderItem(){
     var sessionSkills=queue.map(function(it){return it.sk;}).filter(function(s,i,a){return a.indexOf(s)===i;});
     if(sessionSkills.length){skillSnap='<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:14px 0">';sessionSkills.forEach(function(s){var sl=state.skillLvl[s]||{lv:1};skillSnap+='<div style="background:var(--blue-lt);border-radius:12px;padding:6px 12px;font-size:.78rem;font-weight:700">'+SKILLS[s]+' · Lv '+sl.lv+' <span style="background:var(--blue);color:#fff;border-radius:20px;padding:1px 6px;font-size:.65rem">'+cefrLabel(sl.lv)+'</span></div>';});skillSnap+='</div>';}
     const acc=Math.round(state.correct/Math.max(1,state.answered)*100);
-    e.innerHTML='<div style="text-align:center;padding:10px"><img src="'+IMG.wave+'" style="width:130px"><h3 style="margin:10px 0">Well done, '+firstName()+'! Session complete! 🎉</h3>'+skillSnap+'<p style="opacity:.75">Overall accuracy: '+acc+'%. What you missed has been saved for Smart Review.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><button class="btn btn-blue" onclick="startPractice(\'all\')">Next level round ✨</button><button class="btn btn-ghost" onclick="go(\'cards\')">Go to flashcards →</button></div></div>';
+    // Find next suggested skill (lowest level not recently practiced this session)
+    var sessionSkillSet=new Set(queue.map(function(it){return it.sk;}));
+    var allSk=Object.keys(SKILLS);
+    var notYetSk=allSk.filter(function(s){return!(state.mastery[s]&&state.mastery[s].seen>0);});
+    var suggest=notYetSk.length?notYetSk[0]:allSk.filter(function(s){return!sessionSkillSet.has(s);}).sort(function(a,b){return(state.skillLvl[a]||{lv:1}).lv-(state.skillLvl[b]||{lv:1}).lv;})[0];
+    var nextBanner='';
+    if(suggest){var sLv=(state.skillLvl[suggest]||{lv:1}).lv;nextBanner='<div class="next-skill-banner"><div class="ns-icon">🗺️</div><div class="ns-txt"><b>Don\'t forget: '+SKILLS[suggest]+'</b><small>You\'re at Lv '+sLv+' ('+cefrLabel(sLv)+') there — keep your skills balanced, '+firstName()+'!</small></div><button class="btn btn-gold" style="flex-shrink:0;font-size:.8rem;padding:9px 14px" onclick="startPracticeSkill(\''+suggest+'\')">Explore →</button></div>';}
+    e.innerHTML='<div style="text-align:center;padding:10px"><img src="'+IMG.wave+'" style="width:130px"><h3 style="margin:10px 0">Well done, '+firstName()+'! Session complete! 🎉</h3>'+skillSnap+'<p style="opacity:.75">Overall accuracy: '+acc+'%. What you missed has been saved for Smart Review.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><button class="btn btn-blue" onclick="startPractice(\'all\')">Next level round ✨</button><button class="btn btn-ghost" onclick="go(\'cards\')">Go to flashcards →</button></div>'+nextBanner+'</div>';
     confetti();return;
   }
   curItem=queue[qIdx];hintUsed=false;const it=curItem;const idx=ITEMS.indexOf(it);
@@ -1161,11 +1249,57 @@ function finishExam(){const r=document.getElementById('examResult');document.get
   recordExamToReview();r.classList.add('show');confetti();if(nota>=50)addXP(50);}
 function recordExamToReview(){EXAM.forEach(()=>{});}
 
+/* ===== skill detail modal ===== */
+function showSkillDetail(sk){
+  var sl=state.skillLvl[sk]||{lv:1,xp:0};
+  var m=state.mastery[sk]||{seen:0,correct:0};
+  var p=masteryPct(sk);
+  var cefr=cefrLabel(sl.lv);
+  var need=skillXpNeeded(sl.lv);
+  var xpPct=sl.lv>=100?100:Math.round(sl.xp/need*100);
+  var circ=2*Math.PI*46;
+  var col=p>=70?'#1FAA66':p>=40?'#E9A72C':'#C8202E';
+  var off=circ*(1-p/100);
+  // skill badges
+  var earnedBadges=state.skillBadges[sk]||[];
+  var badgesHTML=SKILL_BADGES.map(function(b){
+    var isEarned=earnedBadges.includes(b.id);
+    return '<div class="sk-badge-item'+(isEarned?' earned':' locked')+'"><div class="bic">'+b.ic+'</div><div class="bnm">'+b.nm+'</div><div class="bdesc">'+b.desc+'</div></div>';
+  }).join('');
+  // find suggested next skill (lowest level, not this one)
+  var otherSkills=Object.keys(SKILLS).filter(function(s){return s!==sk;});
+  otherSkills.sort(function(a,b){return(state.skillLvl[a]||{lv:1}).lv-(state.skillLvl[b]||{lv:1}).lv;});
+  var suggestSk=otherSkills[0];
+  var suggestLv=(state.skillLvl[suggestSk]||{lv:1}).lv;
+  var suggestHTML='<div class="sk-suggest"><div class="ss-icon">💡</div><div class="ss-txt"><b>Also explore: '+SKILLS[suggestSk]+'</b><small>You\'re at Lv '+suggestLv+' ('+cefrLabel(suggestLv)+') there — keep your skills balanced!</small></div><button class="btn btn-blue btn-sm ss-btn" onclick="startPracticeSkill(\''+suggestSk+'\')">Try it →</button></div>';
+  var overlay=document.createElement('div');
+  overlay.className='sk-modal-overlay';overlay.id='skModalOverlay';
+  overlay.onclick=function(e){if(e.target===overlay)closeSkillDetail();};
+  overlay.innerHTML='<div class="sk-modal"><div class="sk-modal-banner"><div class="big-ring"><svg width="100" height="100"><circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="8"/><circle cx="50" cy="50" r="46" fill="none" stroke="'+col+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'"/></svg><div class="pct">'+p+'%</div></div><div class="sk-info"><h2>'+SKILLS[sk]+'</h2><div class="sk-modal-lv-row"><span class="sk-modal-lv">Lv '+sl.lv+'</span><span class="sk-modal-cefr">'+cefr+'</span></div><div class="sk-xp-bar"><i style="width:'+xpPct+'%"></i></div><div class="sk-xp-label">'+sl.xp+' / '+need+' XP to next level'+(sl.lv>=100?' — MAX LEVEL':'')+'</div></div><button class="sk-modal-close" onclick="closeSkillDetail()">✕</button></div><div class="sk-modal-body"><div class="sk-stats-row"><div class="sk-stat-box"><div class="val">'+m.seen+'</div><div class="lbl">Questions seen</div></div><div class="sk-stat-box"><div class="val">'+m.correct+'</div><div class="lbl">Correct</div></div><div class="sk-stat-box"><div class="val">'+(m.seen?p+'%':'—')+'</div><div class="lbl">Accuracy</div></div><div class="sk-stat-box"><div class="val">'+earnedBadges.length+'/'+SKILL_BADGES.length+'</div><div class="lbl">Badges</div></div></div>'+suggestHTML+'<div class="sk-badges-section"><h3>🏅 Skill Badges</h3><div class="sk-badge-grid">'+badgesHTML+'</div></div><div class="sk-actions"><button class="btn btn-primary" onclick="startPracticeSkill(\''+sk+'\')">Practice '+SKILLS[sk]+' →</button><button class="btn btn-ghost" onclick="closeSkillDetail()">Back to Dashboard</button></div></div></div>';
+  document.body.appendChild(overlay);
+}
+function closeSkillDetail(){var o=document.getElementById('skModalOverlay');if(o)o.remove();}
+function startPracticeSkill(sk){
+  closeSkillDetail();
+  go('practice');
+  resetStruggleTracking();
+  sessionMode='skill:'+sk;
+  var e=document.getElementById('engine');
+  var _pm=['✨ Loading '+SKILLS[sk]+' exercises…','🧠 Calibrating to your level…','📝 Building personalized set…','🎯 Almost ready!'];
+  e.innerHTML=flLoaderHTML(_pm);startLoaderRotation(_pm,1300);
+  fetchAIExercises(function(aiItems){
+    stopLoader();
+    if(aiItems&&aiItems.length>=3){queue=aiItems;}
+    else{queue=ITEMS.filter(function(it){return it.sk===sk;});if(!queue.length)queue=ITEMS;}
+    qIdx=0;renderItem();
+  },sk);
+}
+
 /* ===== dashboard render ===== */
 function renderDash(){
   const mg=document.getElementById('masteryGrid');mg.innerHTML='';
   ['present-simple','present-continuous','will','going-to','future-perfect','fpc','zero','first','second','mixed','inversion'].forEach(s=>{const p=masteryPct(s);const col=p>=70?'#1FAA66':p>=40?'#E9A72C':'#C8202E';const circ=2*Math.PI*34;const off=circ*(1-p/100);
-    const d=document.createElement('div');d.className='ring-card';d.onclick=()=>{go(['zero','first','second','mixed','inversion'].includes(s)?'cond':'learn');setTimeout(()=>{const t=document.getElementById('lesson-'+s);if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},250);};
+    const d=document.createElement('div');d.className='ring-card';d.onclick=()=>showSkillDetail(s);
     var sl=state.skillLvl[s]||{lv:1};
     d.innerHTML='<div class="ring"><svg width="84" height="84"><circle cx="42" cy="42" r="34" fill="none" stroke="#E7DCC6" stroke-width="8"/><circle cx="42" cy="42" r="34" fill="none" stroke="'+col+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'"/></svg><div class="pct">'+p+'%</div></div><div class="nm">'+SKILLS[s]+'</div><div class="sk-lv">Lv '+sl.lv+'<span class="cefr-chip">'+cefrLabel(sl.lv)+'</span></div>';mg.appendChild(d);});
   const br=document.getElementById('badgeRow');br.innerHTML='';
