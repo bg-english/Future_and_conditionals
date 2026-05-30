@@ -304,6 +304,10 @@ td { padding: 9px 12px; white-space: nowrap; }
 .attention-tag.gray { border-color: #bbb; color: #888; }
 .none-msg { font-size: 12px; color: #aaa; font-style: italic; }
 
+/* Intervention logs */
+#interventionWrap td { vertical-align: top; }
+#interventionWrap td[style*="max-width"] { word-wrap: break-word; overflow-wrap: break-word; }
+
 /* Weakness analysis */
 .weakness-panel {
   background: var(--paper);
@@ -496,6 +500,7 @@ const SKILLS = [
   { key: 'zero', label: 'Zero Cond.' },
   { key: 'first', label: 'First Cond.' },
   { key: 'second', label: 'Second Cond.' },
+  { key: 'third', label: 'Third Cond.' },
   { key: 'mixed', label: 'Mixed Cond.' },
   { key: 'inversion', label: 'Cond. Inversion' }
 ];
@@ -568,11 +573,17 @@ function render() {
   let html = '';
 
   // Summary cards
+  const avgStreak = avg(students, 'streak');
+  const totalBadges = students.reduce((sum, s) => sum + (Array.isArray(s.badges) ? s.badges.length : 0), 0);
+  const avgBestExam = avg(students.filter(s => s.best_exam_score != null), 'best_exam_score');
   html += `<div class="summary-row">
     <div class="summary-card"><div class="label">Total Students</div><div class="value blue">${totalStudents}</div></div>
     <div class="summary-card"><div class="label">Avg Accuracy</div><div class="value green">${avgAcc != null ? avgAcc.toFixed(1) + '%' : '---'}</div></div>
     <div class="summary-card"><div class="label">Avg Exam Score</div><div class="value gold">${avgExam != null ? avgExam.toFixed(1) + '%' : '---'}</div></div>
+    <div class="summary-card"><div class="label">Avg Best Exam</div><div class="value gold">${avgBestExam != null ? avgBestExam.toFixed(1) + '%' : '---'}</div></div>
     <div class="summary-card"><div class="label">Exams Completed</div><div class="value">${examStudents.length}<span style="font-size:.9rem;color:#8a8a8a">/${totalStudents}</span></div></div>
+    <div class="summary-card"><div class="label">Avg Streak</div><div class="value blue">${avgStreak != null ? avgStreak.toFixed(1) : '---'}</div></div>
+    <div class="summary-card"><div class="label">Total Badges</div><div class="value green">${totalBadges}</div></div>
   </div>`;
 
   // Class overview table
@@ -600,9 +611,12 @@ function render() {
       ${thSort('section','Section')}
       ${thSort('level','Level')}
       ${thSort('xp','XP')}
+      ${thSort('streak','Streak')}
       ${thSort('answered','Answered')}
       ${thSort('accuracy','Accuracy')}
-      ${thSort('exam_score','Exam Score')}
+      ${thSort('exam_score','Last Exam')}
+      ${thSort('best_exam_score','Best Exam')}
+      <th>Badges</th>
       ${thSort('updated_at','Last Active')}
       <th>Status</th>
     </tr></thead><tbody>`;
@@ -610,14 +624,19 @@ function render() {
   for (const s of sorted) {
     const noExam = s.exam_score == null;
     const accVal = s.accuracy != null ? parseFloat(s.accuracy) : 0;
+    const badgeCount = Array.isArray(s.badges) ? s.badges.length : 0;
+    const bestExam = s.best_exam_score;
     html += `<tr class="${noExam ? 'no-exam' : ''}">
       <td style="font-weight:600">${s.student_name || '---'}</td>
       <td><span class="badge ${s.section === 'blue' ? 'badge-blue' : 'badge-red'}">${s.section === 'blue' ? '8th Blue' : '8th Red'}</span></td>
       <td>${s.level ?? 0}</td>
       <td>${(s.xp ?? 0).toLocaleString()}</td>
+      <td>${s.streak ?? 0}🔥</td>
       <td>${s.answered ?? 0}</td>
       <td class="${accClass(accVal)}">${accVal.toFixed(1)}%</td>
       <td>${noExam ? '<span style="color:#bbb">&mdash;</span>' : s.exam_score + '%'}</td>
+      <td>${bestExam != null ? '<b>' + bestExam + '%</b>' : '<span style="color:#bbb">&mdash;</span>'}</td>
+      <td title="${Array.isArray(s.badges) ? s.badges.join(', ') : ''}">${badgeCount > 0 ? '🏅' + badgeCount : '<span style="color:#bbb">0</span>'}</td>
       <td>${relativeTime(s.updated_at)}</td>
       <td><span class="status-dot ${statusClass(s.updated_at)}"></span></td>
     </tr>`;
@@ -761,18 +780,39 @@ function render() {
     const x = avg(arr, 'xp');
     const exArr = arr.filter(s => s.exam_score != null);
     const e = avg(exArr, 'exam_score');
+    const bestArr = arr.filter(s => s.best_exam_score != null);
+    const be = avg(bestArr, 'best_exam_score');
+    const st = avg(arr, 'streak');
+    const bdg = arr.reduce((sum, s) => sum + (Array.isArray(s.badges) ? s.badges.length : 0), 0);
     return `<div class="compare-card">
       <h3><span class="badge ${badgeCls}">${label}</span> <span style="font-size:.85rem;color:#8a8a8a">${arr.length} students</span></h3>
       <div class="stat-row"><span>Avg XP</span><span class="stat-val">${x != null ? Math.round(x).toLocaleString() : '---'}</span></div>
       <div class="stat-row"><span>Avg Accuracy</span><span class="stat-val">${a != null ? a.toFixed(1) + '%' : '---'}</span></div>
-      <div class="stat-row"><span>Avg Exam Score</span><span class="stat-val">${e != null ? e.toFixed(1) + '%' : '---'}</span></div>
+      <div class="stat-row"><span>Avg Last Exam</span><span class="stat-val">${e != null ? e.toFixed(1) + '%' : '---'}</span></div>
+      <div class="stat-row"><span>Avg Best Exam</span><span class="stat-val">${be != null ? be.toFixed(1) + '%' : '---'}</span></div>
       <div class="stat-row"><span>Exams Completed</span><span class="stat-val">${exArr.length} / ${arr.length}</span></div>
+      <div class="stat-row"><span>Avg Streak</span><span class="stat-val">${st != null ? st.toFixed(1) + '🔥' : '---'}</span></div>
+      <div class="stat-row"><span>Total Badges</span><span class="stat-val">🏅 ${bdg}</span></div>
     </div>`;
   }
   html += `<div class="compare-row">
     ${compCard('8th Blue', 'badge-blue', blues)}
     ${compCard('8th Red', 'badge-red', reds)}
   </div>`;
+
+  // === INTERVENTION LOGS ===
+  html += `<div class="section-title">&#129504; Student Intervention Logs (AI Help Requests)</div>`;
+  html += `<div class="table-wrap" id="interventionWrap"><table>
+    <thead><tr>
+      <th style="text-align:left">Student</th>
+      <th style="text-align:left">Section</th>
+      <th style="text-align:left">Skill</th>
+      <th style="text-align:left">Confusion</th>
+      <th style="text-align:left">AI Response</th>
+      <th style="text-align:left">Time</th>
+    </tr></thead>
+    <tbody id="interventionBody"><tr><td colspan="6" style="text-align:center;color:#8a8a8a;padding:20px">Loading interventions...</td></tr></tbody>
+  </table></div>`;
 
   // Students needing attention
   html += `<div class="section-title">Students Needing Attention</div>`;
@@ -806,7 +846,69 @@ function render() {
     </div>
   </div>`;
 
+  // === FLASHCARD PROGRESS (Leitner Boxes) ===
+  const CARD_IDS = ['c1','c2','c3','c4','c5','c6','c7','c8','c9','c10','c11','c12','c13','c14','c15','c16'];
+  const studentsWithCards = students.filter(s => s.card_box && typeof s.card_box === 'object' && Object.keys(s.card_box).length > 0);
+  if (studentsWithCards.length) {
+    html += `<div class="section-title">&#127183; Flashcard Progress (Leitner Boxes)</div>`;
+    html += `<div class="table-wrap"><table>
+      <thead><tr><th style="text-align:left">Student</th><th>Box 1<br><span style="font-weight:400;font-size:10px">New</span></th><th>Box 2</th><th>Box 3</th><th>Box 4</th><th>Box 5<br><span style="font-weight:400;font-size:10px">Mastered</span></th><th>Total Reviewed</th></tr></thead><tbody>`;
+    for (const s of studentsWithCards) {
+      const cb = s.card_box;
+      const boxes = [0,0,0,0,0];
+      let reviewed = 0;
+      for (const cid of CARD_IDS) {
+        const box = cb[cid] || 1;
+        boxes[box - 1]++;
+        if (box > 1) reviewed++;
+      }
+      html += `<tr>
+        <td style="font-weight:600">${s.student_name}</td>
+        <td class="${boxes[0] > 8 ? 'heat-red' : boxes[0] > 4 ? 'heat-yellow' : 'heat-green'}">${boxes[0]}</td>
+        <td class="heat-yellow">${boxes[1]}</td>
+        <td class="heat-yellow">${boxes[2]}</td>
+        <td class="heat-green">${boxes[3]}</td>
+        <td class="heat-green">${boxes[4]}</td>
+        <td><b>${reviewed}</b> / ${CARD_IDS.length}</td>
+      </tr>`;
+    }
+    html += `</tbody></table></div>`;
+  }
+
+  // === BADGES DETAIL ===
+  const BADGE_LABELS = {
+    first: '🎯 First Answer',
+    streak5: '🔥 5-Day Streak',
+    streak10: '🔥 10-Day Streak',
+    perfect10: '💯 10 Perfect',
+    fifty: '📚 50 Answered',
+    hundred: '🏆 100 Answered',
+    exam80: '🎓 Exam 80%+',
+    exam100: '👑 Exam 100%',
+    allskills: '🌟 All Skills',
+    speedster: '⚡ Speedster',
+    comeback: '🔄 Comeback'
+  };
+  const studentsWithBadges = students.filter(s => Array.isArray(s.badges) && s.badges.length > 0);
+  if (studentsWithBadges.length) {
+    html += `<div class="section-title">&#127941; Badges Earned</div>`;
+    html += `<div class="table-wrap"><table>
+      <thead><tr><th style="text-align:left">Student</th><th>Count</th><th style="text-align:left">Badges</th></tr></thead><tbody>`;
+    const badgeSorted = [...studentsWithBadges].sort((a,b) => b.badges.length - a.badges.length);
+    for (const s of badgeSorted) {
+      const blist = s.badges.map(b => BADGE_LABELS[b] || b).join(', ');
+      html += `<tr>
+        <td style="font-weight:600">${s.student_name}</td>
+        <td><b>${s.badges.length}</b></td>
+        <td style="white-space:normal;font-size:12px">${blist}</td>
+      </tr>`;
+    }
+    html += `</tbody></table></div>`;
+  }
+
   document.getElementById('mainContent').innerHTML = html;
+  // After rendering, load interventions if panel exists
+  if (document.getElementById('interventionBody')) loadInterventions();
 }
 
 function setFilter(section, btn) {
@@ -845,15 +947,18 @@ async function refreshData() {
 
 function exportCSV() {
   const students = filtered();
-  const headers = ['Name','Section','Level','XP','Answered','Accuracy','Exam Score','Last Active'];
+  const headers = ['Name','Section','Level','XP','Streak','Answered','Accuracy','Last Exam','Best Exam','Badges','Last Active'];
   const rows = students.map(s => [
     s.student_name,
     s.section === 'blue' ? '8th Blue' : '8th Red',
     s.level,
     s.xp,
+    s.streak ?? 0,
     s.answered,
     s.accuracy != null ? parseFloat(s.accuracy).toFixed(1) + '%' : '',
     s.exam_score != null ? s.exam_score + '%' : '',
+    s.best_exam_score != null ? s.best_exam_score + '%' : '',
+    Array.isArray(s.badges) ? s.badges.join('; ') : '',
     s.updated_at || ''
   ]);
   let csv = headers.join(',') + '\n';
@@ -910,6 +1015,48 @@ async function clearNotice() {
     setTimeout(() => st.textContent = '', 3000);
   } catch(e) {
     st.textContent = '✗ Error: ' + e.message;
+  }
+}
+
+// === INTERVENTION LOGS ===
+const INTERVENTION_TABLE = 'futurelab_interventions';
+async function loadInterventions() {
+  const tbody = document.getElementById('interventionBody');
+  if (!tbody) return;
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/${INTERVENTION_TABLE}?select=*&order=created_at.desc&limit=50`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    );
+    if (!res.ok) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--bad);padding:20px">Could not load interventions (HTTP ${res.status})</td></tr>`;
+      return;
+    }
+    const data = await res.json();
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#8a8a8a;padding:20px">No intervention logs yet</td></tr>`;
+      return;
+    }
+    // Filter by section if needed
+    const rows = currentFilter === 'all' ? data : data.filter(d => d.section === currentFilter);
+    if (!rows.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#8a8a8a;padding:20px">No interventions for this section</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = rows.map(d => {
+      const skillLabel = SKILLS.find(s => s.key === d.skill)?.label || d.skill || '---';
+      const secBadge = d.section === 'blue' ? '<span class="badge badge-blue">Blue</span>' : d.section === 'red' ? '<span class="badge badge-red">Red</span>' : d.section || '---';
+      return `<tr>
+        <td style="font-weight:600">${d.student_name || '---'}</td>
+        <td>${secBadge}</td>
+        <td>${skillLabel}</td>
+        <td style="white-space:normal;max-width:220px;font-size:12px">${d.confusion || '---'}</td>
+        <td style="white-space:normal;max-width:300px;font-size:12px">${d.response || '---'}</td>
+        <td>${relativeTime(d.created_at)}</td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--bad);padding:20px">Error: ${e.message}</td></tr>`;
   }
 }
 
