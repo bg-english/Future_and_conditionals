@@ -386,6 +386,7 @@ footer img{width:42px;margin-bottom:6px}
 .fl-msg{font-family:'Bricolage Grotesque';font-weight:700;font-size:.95rem;color:var(--blue);text-align:center;min-height:1.4em;transition:opacity .25s}
 .fl-msg.fade{opacity:0}
 @keyframes fl-blink{0%,80%,100%{opacity:.15;transform:scale(1)}40%{opacity:1;transform:scale(1.2)}}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 
 /* ===== INTERVENTION MODAL ===== */
 .interv-overlay{position:fixed;inset:0;z-index:300;background:rgba(22,36,74,.7);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
@@ -1870,7 +1871,7 @@ function startPracticeSkill(sk){
 /* ===== dashboard render ===== */
 function renderDash(){
   const mg=document.getElementById('masteryGrid');mg.innerHTML='';
-  ['present-simple','present-continuous','will','going-to','future-perfect','fpc','zero','first','second','mixed','inversion'].forEach(s=>{const p=masteryPct(s);const col=p>=70?'#1FAA66':p>=40?'#E9A72C':'#C8202E';const circ=2*Math.PI*34;const off=circ*(1-p/100);
+  ['present-simple','present-continuous','will','going-to','future-perfect','fpc','zero','first','second','third','mixed','inversion'].forEach(s=>{const p=masteryPct(s);const col=p>=70?'#1FAA66':p>=40?'#E9A72C':'#C8202E';const circ=2*Math.PI*34;const off=circ*(1-p/100);
     const d=document.createElement('div');d.className='ring-card';d.onclick=()=>showSkillDetail(s);
     var sl=state.skillLvl[s]||{lv:1};
     d.innerHTML='<div class="ring"><svg width="84" height="84"><circle cx="42" cy="42" r="34" fill="none" stroke="#E7DCC6" stroke-width="8"/><circle cx="42" cy="42" r="34" fill="none" stroke="'+col+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'"/></svg><div class="pct">'+p+'%</div></div><div class="nm">'+SKILLS[s]+'</div><div class="sk-lv">Lv '+sl.lv+'<span class="cefr-chip">'+cefrLabel(sl.lv)+'</span></div>';mg.appendChild(d);});
