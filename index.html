@@ -945,7 +945,7 @@ const Store=(()=>{let ok=false,mem={};try{const k="__fl";localStorage.setItem(k,
          set(k,v){try{if(ok){localStorage.setItem(k,JSON.stringify(v));return;}}catch(e){}mem[k]=v;}};})();
 
 /* ===== state ===== */
-const SKILLS={'present-simple':'Present Simple','present-continuous':'Present Continuous','will':'will','going-to':'going to','future-perfect':'Future Perfect','fpc':'Fut. Perf. Continuous','zero':'Zero Cond.','first':'First Cond.','second':'Second Cond.','mixed':'Mixed Cond.','inversion':'Cond. Inversion'};
+const SKILLS={'present-simple':'Present Simple','present-continuous':'Present Continuous','will':'will','going-to':'going to','future-perfect':'Future Perfect','fpc':'Fut. Perf. Continuous','zero':'Zero Cond.','first':'First Cond.','second':'Second Cond.','third':'Third Cond.','mixed':'Mixed Cond.','inversion':'Cond. Inversion'};
 let state=Store.get('flstate',null)||{xp:0,level:1,streak:0,lastDay:null,answered:0,correct:0,lastExamScore:null,mastery:{},review:[],badges:[],cardBox:{},seenQ:{},skillLvl:{},skillBadges:{}};
 if(state.lastExamScore===undefined)state.lastExamScore=null;
 if(state.bestExamScore===undefined)state.bestExamScore=null;
@@ -1094,7 +1094,7 @@ function award(id){if(!state.badges.includes(id)){state.badges.push(id);persist(
 function checkBadges(){
   const tn=['present-simple','present-continuous','will','going-to','future-perfect','fpc'];
   if(tn.every(s=>masteryPct(s)>=80))award('tense');
-  if(['zero','first','second','mixed','inversion'].every(s=>masteryPct(s)>=80))award('cond');
+  if(['zero','first','second','third','mixed','inversion'].every(s=>masteryPct(s)>=80))award('cond');
   if(state.streak>=3)award('streak3');
   if(state.answered>=50)award('practice50');
   if(state.answered>=100)award('practice100');
@@ -1166,6 +1166,15 @@ const TENSES=[
   signals:['by … for','how long','since'],
   worked:['Future point: June. DURATION matters.','will have been + verb-ing.','study → studying, with "for 3 years".','✅ By June, I <b>will have been studying</b> for 3 years.'],
   check:{q:'By 2030, they ___ here for 10 years (duration).',opts:['will live','will have been living','are living'],a:1,fb:'Duration up to a future point → <b>will have been living</b>.'}},
+
+ {id:'third',color:'#8B5CF6',name:'Third Conditional',tag:'Imaginary past',
+  concept:'For <b>imaginary situations in the past</b> — things that did NOT happen. We imagine a different past and its result. It is too late to change anything.',
+  tl:'third',tlcap:'An unreal past condition and its imaginary past result',
+  struct:['If + <b>had</b> + <span class="verb">past participle</span>, would have + <span class="verb">past participle</span>'],
+  ex:[['If I had studied harder, I would have passed the exam.','If I had studied harder, I would have passed (but I did not study).'],['If she had known, she would have helped.','If she had known, she would have helped (but she did not know).']],
+  signals:['if I had…','would have…','could have…','might have…'],
+  worked:['Fact: I did NOT study. I did NOT pass.','Can I change the past? No → Third Conditional.','If + had + past participle → "had studied".','Result: would have + past participle → "would have passed".','✅ If I <b>had studied</b> harder, I <b>would have passed</b>.'],
+  check:{q:'If I ___ the alarm, I would not have been late.',opts:['heard','had heard','have heard'],a:1,fb:'Imaginary past → Third Conditional: <b>had heard</b>.'}},
 
  {id:'mixed',color:'#D946EF',name:'Mixed Conditional',tag:'Cross-time conditions',
   concept:'Mixes <b>two different time frames</b>. A past condition with a present result, or a present condition with a past result. The times do not match.',
@@ -1545,6 +1554,13 @@ const ITEMS=[
 {"sk":"zero","type":"fill","q":"If you drop eggs on the floor, they ___.","a":"break","fb":"Zero conditional for natural facts. Both clauses in present simple tense.","tier":1,"hint":"What happens to eggs when they fall?"},
 {"sk":"zero","type":"mc","q":"If you don't sleep, you ___ tired.","o":["feel","feels","felt","feeling"],"a":0,"fb":"Zero conditional for facts about consequences. You + feel: you feel tired.","tier":1,"hint":"How do you feel without sleep? Use simple form."},
 {"sk":"zero","type":"fill","q":"If you freeze water, it ___ solid.","a":"becomes","fb":"Zero conditional shows unchanging results. Water always becomes solid when frozen.","tier":1,"hint":"What happens to water when you freeze it?"},
+/* ====== THIRD CONDITIONAL ====== */
+{"sk":"third","type":"mc","q":"If I had studied harder, I ___ the exam.","o":["would pass","would have passed","will pass","passed"],"a":1,"fb":"Third Conditional: If + had + PP, would have + PP. Imaginary past result.","tier":2,"hint":"This is about an imaginary past — something that did NOT happen."},
+{"sk":"third","type":"mc","q":"If she ___ the truth, she would have been angry.","o":["knows","knew","had known","has known"],"a":2,"fb":"Third Conditional: the IF clause uses <b>had + past participle</b>.","tier":2,"hint":"We need past perfect in the if-clause for Third Conditional."},
+{"sk":"third","type":"fill","q":"If they had left earlier, they ___ the flight. (catch)","a":"would have caught","fb":"Third Conditional: would have + past participle. They did NOT leave early, so they missed it.","tier":2,"hint":"Use would have + past participle of 'catch'."},
+{"sk":"third","type":"mc","q":"If we had taken a taxi, we ___ late.","o":["wouldn't be","wouldn't have been","won't be","aren't"],"a":1,"fb":"Third Conditional: would not have been. The past cannot be changed.","tier":3,"hint":"Imaginary past result uses would (not) have + PP."},
+{"sk":"third","type":"fill","q":"If he had asked me, I ___ him. (help)","a":"would have helped","fb":"Third Conditional: If + had + PP, would have + PP. He did NOT ask, so I did NOT help.","tier":2,"hint":"Would have + past participle of 'help'."},
+{"sk":"third","type":"mc","q":"If it ___ so much, we would have gone to the beach.","o":["didn't rain","hadn't rained","doesn't rain","won't rain"],"a":1,"fb":"Third Conditional IF clause: <b>had + past participle</b> (hadn't rained).","tier":3,"hint":"Use past perfect negative in the if-clause."},
 /* ====== MIXED CONDITIONAL ====== */
 {"sk":"mixed","type":"mc","q":"If I had accepted that job, I ___ in New York now.","o":["will live","would live","would have lived","lived"],"a":1,"fb":"Mixed Conditional (past→present): If + had + PP, would + base verb. Past decision affects present.","tier":3,"hint":"Past condition, but the result is about NOW."},
 {"sk":"mixed","type":"mc","q":"If she were not so stubborn, she ___ the compromise yesterday.","o":["would accept","would have accepted","will accept","accepts"],"a":1,"fb":"Mixed Conditional (present→past): present trait → past result. Would have + PP.","tier":4,"hint":"Her stubbornness is a present trait affecting a past event."},
@@ -1662,6 +1678,8 @@ const CARDS=[
  {id:'c10',sk:'first',f:'Can you use "will" after "if"?',b:'NEVER — after if use present simple',e:'❌ if it will rain ✅ if it rains'},
  {id:'c11',sk:'second',f:'"to be" in Second Conditional?',b:'Use WERE for all persons (not was)',e:'If I were you… / If she were here…'},
  {id:'c12',sk:'first',f:'unless = ?',b:'if not',e:'Unless you hurry = If you do not hurry'},
+ {id:'c13',sk:'third',f:'Third Conditional structure?',b:'If + had + PP, would have + PP',e:'If I had known, I would have helped.'},
+ {id:'c14',sk:'third',f:'Can Third Conditional change the past?',b:'NO — it imagines a different past that did NOT happen',e:'If I had studied… (but I didn\'t study)'},
  {id:'c15',sk:'mixed',f:'Mixed Conditional: past→present?',b:'If + had + PP, would + base verb',e:'If I had saved, I would own a car now.'},
  {id:'c16',sk:'mixed',f:'Mixed Conditional: present→past?',b:'If + past simple/were, would have + PP',e:'If she weren\'t shy, she would have spoken up.'}
 ];
@@ -1746,7 +1764,12 @@ const CONDS=[
   fa:'If + past simple',fb:'would + base verb',
   uses:[['Dreams','If I won the lottery, I would travel.'],['Advice','If I were you, I would apologize.'],['Hypothetical','If we had a car, we wouldn\'t walk.']],
   warn:'With "to be" use <b>were</b> for all persons: <i>If I were rich…</i>'},
- {cls:'c3',n:'Mixed Conditional',when:'Mixing time frames · past↔present',
+ {cls:'c3',n:'3 · Third Conditional',when:'Imaginary past · regrets · things that did NOT happen',
+  desc:'For situations that <b>did not happen in the past</b>. We imagine a different past and a different result. It is too late to change.',
+  fa:'If + had + past participle',fb:'would have + past participle',
+  uses:[['Regrets','If I had studied, I would have passed.'],['Missed chances','If she had called, I would have answered.'],['Imaginary past','If we had left earlier, we would have arrived on time.']],
+  warn:'Both parts refer to the PAST. You cannot use "would" in the if-clause: ❌ <i>If I would have known…</i> → ✅ <i>If I <b>had known</b>…</i>'},
+ {cls:'c4',n:'Mixed Conditional',when:'Mixing time frames · past↔present',
   desc:'Combines <b>two different time frames</b>. A past condition affecting a present result, or a present condition affecting a past result.',
   fa:'If + had + PP / were',fb:'would + base / would have + PP',
   uses:[['Past→Present','If I had saved money, I would own a car now.'],['Present→Past','If she weren\'t so shy, she would have spoken up yesterday.'],['Personality→Past','If he were more careful, he wouldn\'t have had the accident.']],
@@ -1758,6 +1781,7 @@ const MACHINE=[
  {lbl:'Always true',sub:'a fact that does not change',type:'Zero Conditional',sent:'If you heat ice, it melts.',ex:'If + present, present. (general truth)'},
  {lbl:'Possible in the future',sub:'likely to happen',type:'First Conditional',sent:'If it rains, we will stay home.',ex:'If + present, will + base. (real future)'},
  {lbl:'Imaginary / unreal',sub:'dream or hypothesis',type:'Second Conditional',sent:'If I were rich, I would travel the world.',ex:'If + past, would + base. (hypothesis)'},
+ {lbl:'Imaginary past',sub:'too late to change',type:'Third Conditional',sent:'If I had studied, I would have passed.',ex:'If + had + PP, would have + PP. (unreal past)'},
  {lbl:'Cross-time',sub:'mixing past ↔ present',type:'Mixed Conditional',sent:'If I had saved money, I would own a car now.',ex:'If + had + PP, would + base. (past→present)'}
 ];
 function renderMachine(){const s=document.getElementById('machineSlots');s.innerHTML='';MACHINE.forEach((m,i)=>{const d=document.createElement('div');d.className='slot'+(i===0?' active':'');d.innerHTML='<b>'+m.lbl+'</b><p>'+m.sub+'</p>';d.onclick=()=>{s.querySelectorAll('.slot').forEach(x=>x.classList.remove('active'));d.classList.add('active');machineOut(i);};s.appendChild(d);});machineOut(0);}
@@ -1872,7 +1896,7 @@ function startPracticeSkill(sk){
 /* ===== dashboard render ===== */
 function renderDash(){
   const mg=document.getElementById('masteryGrid');mg.innerHTML='';
-  ['present-simple','present-continuous','will','going-to','future-perfect','fpc','zero','first','second','mixed','inversion'].forEach(s=>{const p=masteryPct(s);const col=p>=70?'#1FAA66':p>=40?'#E9A72C':'#C8202E';const circ=2*Math.PI*34;const off=circ*(1-p/100);
+  ['present-simple','present-continuous','will','going-to','future-perfect','fpc','zero','first','second','third','mixed','inversion'].forEach(s=>{const p=masteryPct(s);const col=p>=70?'#1FAA66':p>=40?'#E9A72C':'#C8202E';const circ=2*Math.PI*34;const off=circ*(1-p/100);
     const d=document.createElement('div');d.className='ring-card';d.onclick=()=>showSkillDetail(s);
     var sl=state.skillLvl[s]||{lv:1};
     d.innerHTML='<div class="ring"><svg width="84" height="84"><circle cx="42" cy="42" r="34" fill="none" stroke="#E7DCC6" stroke-width="8"/><circle cx="42" cy="42" r="34" fill="none" stroke="'+col+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'"/></svg><div class="pct">'+p+'%</div></div><div class="nm">'+SKILLS[s]+'</div><div class="sk-lv">Lv '+sl.lv+'<span class="cefr-chip">'+cefrLabel(sl.lv)+'</span></div>';mg.appendChild(d);});
@@ -2275,16 +2299,6 @@ function showWelcomeBack(){
 
 /* ===== teacher notice polling ===== */
 var _lastNoticeId=null;
-var _noticeAcked={};
-function ackNotice(noticeId){
-  if(!playerName||_noticeAcked[noticeId])return;
-  _noticeAcked[noticeId]=true;
-  fetch(SB_URL+'/rest/v1/futurelab_notice_reads',{
-    method:'POST',
-    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-    body:JSON.stringify({notice_id:noticeId,student_name:playerName,section:playerSection||null,read_at:new Date().toISOString()})
-  }).catch(function(){});
-}
 function checkNotice(){
   fetch(SB_URL+'/rest/v1/futurelab_notices?active=eq.true&order=created_at.desc&limit=1',
     {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}})
@@ -2299,7 +2313,6 @@ function checkNotice(){
         _lastNoticeId=row.id;
         msg.textContent='📢 '+row.message;
         bar.style.display='block';
-        ackNotice(row.id);
       }
     } else {
       bar.style.display='none';
@@ -2535,7 +2548,7 @@ var SKILL_LABELS={
   'present-simple':'Present Simple','present-continuous':'Present Continuous',
   'will':'Will (Future)','going-to':'Going To','future-perfect':'Future Perfect',
   'fpc':'Future Perfect Continuous','zero':'Zero Conditional','first':'First Conditional',
-  'second':'Second Conditional','mixed':'Mixed Conditional','inversion':'Conditional Inversion'
+  'second':'Second Conditional','third':'Third Conditional','mixed':'Mixed Conditional','inversion':'Conditional Inversion'
 };
 
 function resetStruggleTracking(){sessionWrong={};intervShownFor={};}
