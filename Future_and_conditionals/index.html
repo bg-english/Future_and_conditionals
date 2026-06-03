@@ -1774,22 +1774,26 @@ function updateReviewBadge(){const n=state.review.length;document.getElementById
    FLASHCARDS (Leitner)
    ============================================================ */
 const CARDS=[
- {id:'c1',sk:'will',f:'Complete the structure: will + ___',b:'will + BASE verb',e:'I will go. / She will help.'},
- {id:'c2',sk:'going-to',f:'Complete the structure: going to + ___',b:'am/is/are + going to + BASE verb',e:"It's going to rain."},
- {id:'c3',sk:'future-perfect',f:'What is the Future Perfect structure',b:'will have + PAST PARTICIPLE',e:'By 9, she will have left.'},
- {id:'c4',sk:'fpc',f:'What is the Future Perfect Continuous structure',b:'will have been + verb-ING',e:'…will have been waiting for an hour.'},
- {id:'c5',sk:'present-continuous',f:'How do we use Present Continuous for the future',b:'am/is/are + verb-ING (arranged plan)',e:"I'm flying tomorrow."},
- {id:'c6',sk:'present-simple',f:'How do we use Present Simple for the future',b:'verb (+s) — fixed schedules',e:'The train leaves at 8.'},
- {id:'c7',sk:'zero',f:'What is the Zero Conditional structure',b:'If + present simple, present simple',e:'If you heat ice, it melts.'},
- {id:'c8',sk:'first',f:'What is the First Conditional structure',b:'If + present simple, will + base verb',e:'If it rains, I will stay.'},
- {id:'c9',sk:'second',f:'What is the Second Conditional structure',b:'If + past simple, would + base verb',e:'If I were rich, I would travel.'},
- {id:'c10',sk:'first',f:'Can you use "will" after "if"?',b:'NEVER — after if use present simple',e:'❌ if it will rain ✅ if it rains'},
- {id:'c11',sk:'second',f:'"to be" in Second Conditional — was or were?',b:'Use WERE for all persons (not was)',e:'If I were you… / If she were here…'},
- {id:'c12',sk:'first',f:'What does "unless" mean',b:'if not',e:'Unless you hurry = If you do not hurry'},
- {id:'c13',sk:'third',f:'What is the Third Conditional structure',b:'If + had + PP, would have + PP',e:'If I had known, I would have helped.'},
- {id:'c14',sk:'third',f:'Can Third Conditional change the past?',b:'NO — it imagines a different past that did NOT happen',e:'If I had studied… (but I didn\'t study)'},
- {id:'c15',sk:'mixed',f:'Mixed Conditional: past condition → present result',b:'If + had + PP, would + base verb',e:'If I had saved, I would own a car now.'},
- {id:'c16',sk:'mixed',f:'Mixed Conditional: present condition → past result',b:'If + past simple/were, would have + PP',e:'If she weren\'t shy, she would have spoken up.'}
+ {id:'c1',sk:'will',f:'✅ Affirmative: Future with "will"',b:'S + will + base verb',e:'I will go. / She will help.',ph:'S + will + ...'},
+ {id:'c2',sk:'will',f:'❌ Negative: Future with "will"',b:'S + will not (won\'t) + base verb',e:'I will not go. / She won\'t help.',ph:'S + will not + ...'},
+ {id:'c3',sk:'will',f:'❓ Question: Future with "will"',b:'Will + S + base verb?',e:'Will you go? / Will she help?',ph:'Will + S + ...?'},
+ {id:'c4',sk:'going-to',f:'✅ Affirmative: Future with "going to"',b:'S + am/is/are + going to + base verb',e:"I am going to study. / She is going to travel.",ph:'S + am/is/are + going to + ...'},
+ {id:'c5',sk:'going-to',f:'❌ Negative: Future with "going to"',b:'S + am/is/are + not + going to + base verb',e:"I am not going to study. / She isn't going to travel.",ph:'S + am/is/are + not + going to + ...'},
+ {id:'c6',sk:'going-to',f:'❓ Question: Future with "going to"',b:'Am/Is/Are + S + going to + base verb?',e:'Are you going to study? / Is she going to travel?',ph:'Am/Is/Are + S + going to + ...?'},
+ {id:'c7',sk:'future-perfect',f:'✅ Affirmative: Future Perfect',b:'S + will have + past participle',e:'By 9, she will have left.',ph:'S + will have + past participle'},
+ {id:'c8',sk:'fpc',f:'✅ Affirmative: Future Perfect Continuous',b:'S + will have been + verb-ING',e:'By 5 PM, I will have been waiting for an hour.',ph:'S + will have been + verb-ING'},
+ {id:'c9',sk:'present-continuous',f:'✅ Affirmative: Present Continuous for future plans',b:'S + am/is/are + verb-ING (arranged plan)',e:"I'm flying to Miami tomorrow.",ph:'S + am/is/are + verb-ING'},
+ {id:'c10',sk:'present-simple',f:'✅ Affirmative: Present Simple for future schedules',b:'S + verb (+s/es for he/she/it)',e:'The train leaves at 8.',ph:'S + verb (+s/es)'},
+ {id:'c11',sk:'zero',f:'✅ Zero Conditional (always true facts)',b:'If + S + present simple, S + present simple',e:'If you heat ice, it melts.',ph:'If + S + present simple, S + present simple'},
+ {id:'c12',sk:'first',f:'✅ First Conditional (real/possible future)',b:'If + S + present simple, S + will + base verb',e:'If it rains, I will stay home.',ph:'If + S + present simple, S + will + ...'},
+ {id:'c13',sk:'second',f:'✅ Second Conditional (unreal/imaginary now)',b:'If + S + past simple, S + would + base verb',e:'If I were rich, I would travel.',ph:'If + S + past simple, S + would + ...'},
+ {id:'c14',sk:'first',f:'Can you use "will" after "if"?',b:'NEVER — after "if" use present simple',e:'❌ if it will rain ✅ if it rains',ph:'Yes or No'},
+ {id:'c15',sk:'second',f:'"to be" in Second Conditional — was or were?',b:'Always use WERE for all subjects (not was)',e:'If I were you… / If she were here…',ph:'was or were'},
+ {id:'c16',sk:'first',f:'What does "unless" mean',b:'unless = if not',e:'Unless you hurry = If you do not hurry',ph:'unless = ...'},
+ {id:'c17',sk:'third',f:'✅ Third Conditional (unreal past)',b:'If + S + had + past participle, S + would have + past participle',e:'If I had known, I would have helped.',ph:'If + S + had + PP, S + would have + PP'},
+ {id:'c18',sk:'third',f:'Can Third Conditional change the past?',b:'NO — it imagines a different past that did NOT happen',e:'If I had studied… (but I didn\'t study)',ph:'Yes or No'},
+ {id:'c19',sk:'mixed',f:'✅ Mixed Conditional: past condition → present result',b:'If + S + had + past participle, S + would + base verb',e:'If I had saved money, I would own a car now.',ph:'If + S + had + PP, S + would + ...'},
+ {id:'c20',sk:'mixed',f:'✅ Mixed Conditional: present condition → past result',b:'If + S + past simple/were, S + would have + past participle',e:'If she weren\'t shy, she would have spoken up.',ph:'If + S + past/were, S + would have + PP'}
 ];
 let cardOrder=[],cardPos=0;
 if(!state.cardWrong)state.cardWrong=[];
@@ -1806,11 +1810,11 @@ function renderCard(){
   const c=CARDS.find(x=>x.id===cardOrder[cardPos]);
   d.innerHTML='<div class="flash-hint">Card '+(cardPos+1)+' of '+cardOrder.length+'</div>'
     +'<div class="flashcard" id="fc"><div class="flash-inner">'
-    +'<div class="flash-face flash-front"><div class="lbl">'+c.f+'</div><div class="term" style="font-size:1.1rem;margin-top:8px;opacity:.8">Write the structure below ↓</div></div>'
+    +'<div class="flash-face flash-front"><div class="lbl">'+c.f+'</div><div class="term" style="font-size:.92rem;margin-top:8px;opacity:.7">'+(c.f.startsWith('✅')?'Write the structure starting from Subject (S)':c.f.startsWith('❌')?'Write the structure with the auxiliary + not':c.f.startsWith('❓')?'Write the structure starting from the auxiliary verb':'Write your answer below')+'  ↓</div></div>'
     +'<div class="flash-face flash-back"><div class="ans">'+c.b+'</div><div class="eg" style="cursor:pointer" onclick="speak(\''+c.e.replace(/'/g,"\\'")+'\')" title="Tap to hear">🔊 '+c.e+'</div></div>'
     +'</div></div>'
     +'<div class="flash-input-area" id="flashInputArea">'
-    +'<input type="text" id="flashInput" placeholder="Type the grammar structure…" autocomplete="off" onkeydown="if(event.key===\'Enter\')checkCard(\''+c.id+'\')">'
+    +'<input type="text" id="flashInput" placeholder="'+(c.ph||'Type the grammar structure…')+'" autocomplete="off" onkeydown="if(event.key===\'Enter\')checkCard(\''+c.id+'\')">'
     +'<button class="btn btn-blue" id="flashCheckBtn" onclick="checkCard(\''+c.id+'\')">Check ✓</button>'
     +'</div>'
     +'<div id="flashResult" style="display:none"></div>'

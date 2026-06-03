@@ -765,18 +765,21 @@ function updateReviewBadge(){const n=state.review.length;document.getElementById
    FLASHCARDS (Leitner)
    ============================================================ */
 const CARDS=[
- {id:'c1',f:'Complete the structure: will + ___',b:'will + BASE verb',e:'I will go. / She will help.'},
- {id:'c2',f:'Complete the structure: going to + ___',b:'am/is/are + going to + BASE verb',e:"It's going to rain."},
- {id:'c3',f:'What is the Future Perfect structure',b:'will have + PAST PARTICIPLE',e:'By 9, she will have left.'},
- {id:'c4',f:'What is the Future Perfect Continuous structure',b:'will have been + verb-ING',e:'…will have been waiting for an hour.'},
- {id:'c5',f:'How do we use Present Continuous for the future',b:'am/is/are + verb-ING (arranged plan)',e:"I'm flying tomorrow."},
- {id:'c6',f:'How do we use Present Simple for the future',b:'verb (+s) — fixed schedules',e:'The train leaves at 8.'},
- {id:'c7',f:'What is the Zero Conditional structure',b:'If + present simple, present simple',e:'If you heat ice, it melts.'},
- {id:'c8',f:'What is the First Conditional structure',b:'If + present simple, will + base',e:'If it rains, I will stay.'},
- {id:'c9',f:'What is the Second Conditional structure',b:'If + past simple, would + base',e:'If I were rich, I would travel.'},
- {id:'c10',f:'Can you use "will" after "if"?',b:'NEVER in first conditional. After "if" → present.',e:'❌ if it will rain ✅ if it rains'},
- {id:'c11',f:'"to be" in Second Cond. — was or were?',b:'Use WERE for all persons',e:'If I were you…'},
- {id:'c12',f:'What does "unless" mean',b:'= if not',e:'Unless you hurry, you\'ll be late.'}
+ {id:'c1',f:'✅ Affirmative: Future with "will"',b:'S + will + base verb',e:'I will go. / She will help.',ph:'S + will + ...'},
+ {id:'c2',f:'❌ Negative: Future with "will"',b:'S + will not (won\'t) + base verb',e:'I will not go. / She won\'t help.',ph:'S + will not + ...'},
+ {id:'c3',f:'❓ Question: Future with "will"',b:'Will + S + base verb?',e:'Will you go? / Will she help?',ph:'Will + S + ...?'},
+ {id:'c4',f:'✅ Affirmative: Future with "going to"',b:'S + am/is/are + going to + base verb',e:"I am going to study. / She is going to travel.",ph:'S + am/is/are + going to + ...'},
+ {id:'c5',f:'❌ Negative: Future with "going to"',b:'S + am/is/are + not + going to + base verb',e:"I am not going to study. / She isn't going to travel.",ph:'S + am/is/are + not + going to + ...'},
+ {id:'c6',f:'❓ Question: Future with "going to"',b:'Am/Is/Are + S + going to + base verb?',e:'Are you going to study? / Is she going to travel?',ph:'Am/Is/Are + S + going to + ...?'},
+ {id:'c7',f:'✅ Affirmative: Future Perfect',b:'S + will have + past participle',e:'By 9, she will have left.',ph:'S + will have + past participle'},
+ {id:'c8',f:'✅ Affirmative: Future Perfect Continuous',b:'S + will have been + verb-ING',e:'By 5 PM, I will have been waiting for an hour.',ph:'S + will have been + verb-ING'},
+ {id:'c9',f:'✅ Affirmative: Present Continuous for future plans',b:'S + am/is/are + verb-ING (arranged plan)',e:"I'm flying to Miami tomorrow.",ph:'S + am/is/are + verb-ING'},
+ {id:'c10',f:'✅ Affirmative: Present Simple for future schedules',b:'S + verb (+s/es for he/she/it)',e:'The train leaves at 8.',ph:'S + verb (+s/es)'},
+ {id:'c11',f:'✅ Zero Conditional (always true facts)',b:'If + S + present simple, S + present simple',e:'If you heat ice, it melts.',ph:'If + S + present simple, S + present simple'},
+ {id:'c12',f:'✅ First Conditional (real/possible future)',b:'If + S + present simple, S + will + base verb',e:'If it rains, I will stay home.',ph:'If + S + present simple, S + will + ...'},
+ {id:'c13',f:'✅ Second Conditional (unreal/imaginary now)',b:'If + S + past simple, S + would + base verb',e:'If I were rich, I would travel.',ph:'If + S + past simple, S + would + ...'},
+ {id:'c14',f:'Can you use "will" after "if"?',b:'NEVER — after "if" use present simple',e:'❌ if it will rain ✅ if it rains',ph:'Yes or No'},
+ {id:'c15',f:'"to be" in Second Conditional — was or were?',b:'Always use WERE for all subjects (not was)',e:'If I were you… / If she were here…',ph:'was or were'}
 ];
 let cardOrder=[],cardPos=0;
 function buildDeck(){const box=state.cardBox;cardOrder=CARDS.map(c=>c.id).sort((a,b)=>(box[a]||1)-(box[b]||1));cardPos=0;renderCard();}
@@ -784,7 +787,7 @@ function renderCard(){const d=document.getElementById('deck');if(cardPos>=cardOr
   const c=CARDS.find(x=>x.id===cardOrder[cardPos]);
   d.innerHTML='<div class="flash-hint">Card '+(cardPos+1)+' of '+cardOrder.length+' · tap to flip</div>'
     +'<div class="flashcard" id="fc" onclick="this.classList.toggle(\'flipped\')"><div class="flash-inner">'
-    +'<div class="flash-face flash-front"><div class="lbl">What is the structure?</div><div class="term">'+c.f+'</div></div>'
+    +'<div class="flash-face flash-front"><div class="lbl">'+c.f+'</div><div class="term" style="font-size:.92rem;margin-top:8px;opacity:.7">'+(c.f.startsWith('✅')?'Write the structure starting from Subject (S)':c.f.startsWith('❌')?'Write the structure with the auxiliary + not':c.f.startsWith('❓')?'Write the structure starting from the auxiliary verb':'Write your answer below')+'</div></div>'
     +'<div class="flash-face flash-back"><div class="ans">'+c.b+'</div><div class="eg">🔊 '+c.e+'</div></div>'
     +'</div></div>'
     +'<div class="rate-row"><button class="again" onclick="rateCard(\''+c.id+'\',false)">😕 Again</button><button class="good" onclick="rateCard(\''+c.id+'\',true)">😎 Got it</button></div>';
