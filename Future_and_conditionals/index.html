@@ -204,6 +204,10 @@ button{font-family:'Lexend';cursor:pointer}
 .engine-top .barwrap i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--gold));transition:width .4s;width:0}
 .engine-top .cnt{font-size:.78rem;font-weight:700;opacity:.6}
 .eq-q{font-size:1.3rem;font-weight:700;font-family:'Bricolage Grotesque';margin-bottom:6px;line-height:1.3}
+.eq-q .blank{display:inline-block;min-width:100px;border-bottom:3px dashed var(--blue);margin:0 4px}
+.eq-q .verb-hint{display:inline-block;background:var(--gold);color:var(--ink);font-family:'Lexend';font-weight:700;font-size:.78rem;padding:3px 12px;border-radius:20px;margin-left:6px;vertical-align:middle;letter-spacing:.02em;box-shadow:0 2px 6px rgba(233,167,44,.35);animation:pulse-hint 2s ease-in-out infinite}
+.eq-q u{text-decoration:none;background:var(--bad);color:#fff;padding:2px 8px;border-radius:6px;font-weight:700}
+@keyframes pulse-hint{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 .eq-instr{font-size:.82rem;opacity:.6;margin-bottom:18px}
 .eq-opts{display:grid;gap:11px}
 .eq-opt{background:var(--cream);border:2px solid var(--line);border-radius:14px;padding:14px 18px;font-weight:600;font-size:.98rem;transition:.18s;text-align:left}
@@ -1698,10 +1702,31 @@ function renderItem(){
   let body;
   if(it.type==='fill'||it.type==='error'){body='<div class="eq-fill"><input id="fillInput" placeholder="Type here…" autocomplete="off" onkeydown="if(event.key===\'Enter\')submitAnswer()"></div>';}
   else{body='<div class="eq-opts">'+it.o.map((o,j)=>'<button class="eq-opt" onclick="submitAnswer('+j+')">'+o+'</button>').join('')+'</div>';}
-  const instr=it.type==='fill'?'Type the correct form and press Enter.':it.type==='error'?'Find the error and type the correction.':'Choose the correct option.';
+  const instr=it.type==='fill'?'Use the highlighted verb 🔤 — type the correct form and press Enter.':it.type==='error'?'The verb in red is wrong — type the correct form.':'Choose the correct option.';
+  // Extract base verb for fill questions that don't already have (verb) in the question
+  var qHTML=it.q;
+  if(it.type==='fill'||it.type==='error'){
+    var hasParenVerb=/\((\w+)\)/.test(it.q);
+    if(hasParenVerb){
+      // Already has (verb) — style it as a hint pill
+      qHTML=it.q.replace(/___\s*\((\w+)\)/g,'<span class="blank"></span> <span class="verb-hint">🔤 $1</span>').replace(/\((\w+)\)\s*$/,'<span class="verb-hint">🔤 $1</span>');
+    } else if(it.type==='fill'){
+      // No (verb) — extract last word from answer as base verb hint
+      var words=it.a.trim().split(/\s+/);var baseVerb=words[words.length-1];
+      // For answers like "will" "would" "am going to" where the verb is already in the sentence, show the full answer structure
+      if(words.length===1 && /^(will|would|could|should|please|had|were|was|am|is|are)$/i.test(baseVerb)){
+        // The verb is visible in the sentence already — extract it from the sentence after ___
+        var afterBlank=it.q.split('___')[1];
+        if(afterBlank){var nextWord=afterBlank.trim().split(/\s+/)[0].replace(/[.,!?]/g,'');if(nextWord)baseVerb=nextWord;}
+      }
+      qHTML=it.q.replace(/___/g,'<span class="blank"></span> <span class="verb-hint">🔤 '+baseVerb+'</span>');
+    }
+    // Style blanks that weren't already replaced
+    qHTML=qHTML.replace(/___/g,'<span class="blank"></span>');
+  }
   var tierLabels=['','A2/B1','B1+','B2','B2+'];var tierColors=['','var(--ok)','var(--gold)','var(--red)','#7A4FB5'];
   e.innerHTML='<div class="engine-top"><span class="skilltag">'+SKILLS[it.sk]+'</span><span class="skilltag" style="background:'+tierColors[it.tier]+';color:#fff">'+tierLabels[it.tier]+'</span>'+(it.aiGenerated?'<span class="skilltag" style="background:linear-gradient(135deg,#7C3AED,#1E50A0);color:#fff;font-size:.68rem">✨ AI</span>':'')+'<div class="barwrap"><i style="width:'+(qIdx/queue.length*100)+'%"></i></div><span class="cnt">'+(qIdx+1)+'/'+queue.length+'</span></div>'
-    +'<div class="eq-q">'+it.q+'</div><div class="eq-instr">'+instr+'</div>'+body
+    +'<div class="eq-q">'+qHTML+'</div><div class="eq-instr">'+instr+'</div>'+body
     +'<div class="fb" id="engFb"></div><div class="engine-foot" id="engFoot"></div>';
   if(it.type!=='mc')setTimeout(()=>document.getElementById('fillInput').focus(),50);
 }
