@@ -698,13 +698,51 @@ let queue=[],qIdx=0,sessionMode='all',curItem=null;
 function buildQueue(mode){if(mode==='review'){const ids=state.review.slice();queue=ids.map(i=>ITEMS[i]).filter(Boolean);if(!queue.length){queue=[];}}else{queue=shuffle(ITEMS.map((_,i)=>i)).slice(0,10).map(i=>ITEMS[i]);} }
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);}
 function startPractice(mode){sessionMode=mode;buildQueue(mode);qIdx=0;if(mode==='review'&&!queue.length){document.getElementById('engine').innerHTML='<div style="text-align:center;padding:20px"><img src="'+IMG.wave+'" style="width:120px"><h3 style="margin:10px 0">Review queue empty!</h3><p style="opacity:.7">You have no pending errors. Do a mixed practice to fill your review if you miss something.</p><button class="btn btn-blue" style="margin-top:14px" onclick="startPractice(\'all\')">Mixed Practice</button></div>';return;}renderItem();}
+/* Base-verb extractor (shared logic) */
+var _irregPP={found:'find',caught:'catch',bought:'buy',taken:'take',driven:'drive',spoken:'speak',written:'write',eaten:'eat',seen:'see',done:'do',gone:'go',been:'be',made:'make',given:'give',known:'know',thought:'think',brought:'bring',taught:'teach',worn:'wear',broken:'break',chosen:'choose',forgotten:'forget',frozen:'freeze',hidden:'hide',ridden:'ride',risen:'rise',stolen:'steal',read:'read',put:'put',cut:'cut',shut:'shut',hurt:'hurt',met:'meet',kept:'keep',left:'leave',felt:'feel',built:'build',sent:'send',spent:'spend',lost:'lose',won:'win',paid:'pay',sold:'sell',sat:'sit',stood:'stand',understood:'understand',begun:'begin',sung:'sing',drunk:'drink',grown:'grow',drawn:'draw',thrown:'throw',blown:'blow',flown:'fly'};
+var _irregPast={had:'have',knew:'know',were:'be',was:'be',went:'go',came:'come',took:'take',gave:'give',saw:'see',did:'do',made:'make',got:'get',thought:'think',told:'tell',found:'find',left:'leave',felt:'feel',became:'become',kept:'keep',began:'begin',ran:'run',wrote:'write',sat:'sit',stood:'stand',ate:'eat',fell:'fall',broke:'break',chose:'choose',drove:'drive',spoke:'speak',woke:'wake',wore:'wear',grew:'grow',drew:'draw',threw:'throw',flew:'fly',sang:'sing',drank:'drink',swam:'swim',caught:'catch',bought:'buy',brought:'bring',taught:'teach',built:'build',sent:'send',spent:'spend',lost:'lose',won:'win',paid:'pay',sold:'sell',met:'meet',understood:'understand'};
+function _stripConj(w){
+  w=w.toLowerCase();
+  if(_irregPP[w])return _irregPP[w];if(_irregPast[w])return _irregPast[w];
+  if(/ing$/.test(w)&&w.length>4){if(/([b-df-hj-np-tv-z])\1ing$/.test(w))return w.replace(/([b-df-hj-np-tv-z])\1ing$/,'$1');var s=w.replace(/ing$/,'');if(/[aeiou]$/.test(s))return s;return s+'e';}
+  if(/ies$/.test(w))return w.replace(/ies$/,'y');
+  if(/(sh|ch|tch|x|z|ss)es$/.test(w))return w.replace(/es$/,'');
+  if(/[^s]s$/.test(w))return w.replace(/s$/,'');
+  if(/ied$/.test(w))return w.replace(/ied$/,'y');
+  if(/([b-df-hj-np-tv-z])\1ed$/.test(w))return w.replace(/([b-df-hj-np-tv-z])\1ed$/,'$1');
+  if(/[^aeiou]ed$/.test(w)&&w.length>3){var b=w.replace(/ed$/,'');return/[aeiou]/.test(b)?b:b;}
+  if(/[aeiou][^aeiou]ed$/.test(w))return w.replace(/ed$/,'');
+  if(/ed$/.test(w)&&w.length>3)return w.replace(/d$/,'');
+  return w;
+}
+function _baseVerb(answer,question){
+  var a=answer.trim().toLowerCase();
+  var auxRe=/^(will not |will |would not |would |could not |could |should not |should |am going to |are going to |is going to |am not |are not |is not |am |are |is |have been |has been |had been |will have been |would have been |will have |would have |have |has |had |do not |does not |did not |do |does |did |not )+/;
+  var core=a.replace(auxRe,'').trim();
+  if(!core||/^(will|would|could|should|shall|may|might|am|are|is|do|does|did|have|has|had|not|please|been|going|to)$/i.test(core)){
+    var parts=question.split(/_{2,}/);for(var i=1;i<parts.length;i++){var nw=parts[i].trim().split(/\s+/)[0].replace(/[.,!?;:'"]/g,'');if(nw&&!/^(for|at|in|on|to|the|a|an|if|that|this|it|my|your|his|her|our|their|better|more|not|here|there|now|today|tomorrow|and|or|but|with|about|very|so)$/i.test(nw))return nw;}
+    return a.split(/\s+/).pop();
+  }
+  var coreWords=core.split(/\s+/);var main=coreWords[0];var rest=coreWords.length>1?' '+coreWords.slice(1).join(' '):'';
+  return _stripConj(main)+rest;
+}
 function renderItem(){const e=document.getElementById('engine');if(qIdx>=queue.length){const acc=Math.round(state.correct/Math.max(1,state.answered)*100);e.innerHTML='<div style="text-align:center;padding:10px"><img src="'+IMG.wave+'" style="width:130px"><h3 style="margin:10px 0">Session complete! 🎉</h3><p style="opacity:.75">Overall accuracy: '+acc+'%. What you missed has been saved for Smart Review.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px"><button class="btn btn-blue" onclick="startPractice(\'all\')">Another round</button><button class="btn btn-ghost" onclick="go(\'cards\')">Go to flashcards →</button></div></div>';confetti();return;}
   curItem=queue[qIdx];const it=curItem;const idx=ITEMS.indexOf(it);
   let body;
   if(it.type==='fill'||it.type==='error'){body='<div class="eq-fill"><input id="fillInput" placeholder="Type here…" autocomplete="off" onkeydown="if(event.key===\'Enter\')submitAnswer()"></div>';}
   else{body='<div class="eq-opts">'+it.o.map((o,j)=>'<button class="eq-opt" onclick="submitAnswer('+j+')">'+o+'</button>').join('')+'</div>';}
   const instr=it.type==='fill'?'Use the highlighted verb 🔤 — type the correct form and press Enter.':it.type==='error'?'The verb in red is wrong — type the correct form.':'Choose the correct option.';
-  let qHTML=it.q.replace(/___\s*\((\w+)\)/g,'<span class="blank"></span> <span class="verb-hint">🔤 $1</span>').replace(/___/g,'<span class="blank"></span>');
+  var qHTML=it.q;
+  if(it.type==='fill'||it.type==='error'){
+    var hasParenVerb=/\(([^)]+)\)/.test(it.q);
+    if(hasParenVerb){
+      qHTML=it.q.replace(/___\s*\(([^)]+)\)/g,'<span class="blank"></span> <span class="verb-hint">🔤 $1</span>').replace(/\(([^)]+)\)\s*([.!?]?)$/,'<span class="verb-hint">🔤 $1</span>$2');
+    } else if(it.type==='fill'){
+      var baseVerb=_baseVerb(it.a,it.q);
+      qHTML=it.q.replace(/___/,'<span class="blank"></span> <span class="verb-hint">🔤 '+baseVerb+'</span>');
+    }
+    qHTML=qHTML.replace(/___/g,'<span class="blank"></span>');
+  }
   e.innerHTML='<div class="engine-top"><span class="skilltag">'+SKILLS[it.sk]+'</span><div class="barwrap"><i style="width:'+(qIdx/queue.length*100)+'%"></i></div><span class="cnt">'+(qIdx+1)+'/'+queue.length+'</span></div>'
     +'<div class="eq-q">'+qHTML+'</div><div class="eq-instr">'+instr+'</div>'+body
     +'<div class="fb" id="engFb"></div><div class="engine-foot" id="engFoot"></div>';
@@ -727,18 +765,18 @@ function updateReviewBadge(){const n=state.review.length;document.getElementById
    FLASHCARDS (Leitner)
    ============================================================ */
 const CARDS=[
- {id:'c1',f:'will + ?',b:'will + BASE verb',e:'I will go. / She will help.'},
- {id:'c2',f:'going to + ?',b:'am/is/are + going to + BASE verb',e:"It's going to rain."},
- {id:'c3',f:'Future Perfect',b:'will have + PAST PARTICIPLE',e:'By 9, she will have left.'},
- {id:'c4',f:'Future Perfect Continuous',b:'will have been + verb-ING',e:'…will have been waiting for an hour.'},
- {id:'c5',f:'Present Continuous (futuro)',b:'am/is/are + verb-ING (arranged plan)',e:"I'm flying tomorrow."},
- {id:'c6',f:'Present Simple (futuro)',b:'verb (+s) — fixed schedules',e:'The train leaves at 8.'},
- {id:'c7',f:'Zero Conditional',b:'If + present simple, present simple',e:'If you heat ice, it melts.'},
- {id:'c8',f:'First Conditional',b:'If + present simple, will + base',e:'If it rains, I will stay.'},
- {id:'c9',f:'Second Conditional',b:'If + past simple, would + base',e:'If I were rich, I would travel.'},
- {id:'c10',f:'"will" after "if"?',b:'NEVER in first conditional. After "if" → present.',e:'❌ if it will rain ✅ if it rains'},
- {id:'c11',f:'"to be" in Second Cond.',b:'Use WERE for all persons',e:'If I were you…'},
- {id:'c12',f:'unless',b:'= if not',e:'Unless you hurry, you\'ll be late.'}
+ {id:'c1',f:'Complete the structure: will + ___',b:'will + BASE verb',e:'I will go. / She will help.'},
+ {id:'c2',f:'Complete the structure: going to + ___',b:'am/is/are + going to + BASE verb',e:"It's going to rain."},
+ {id:'c3',f:'What is the Future Perfect structure',b:'will have + PAST PARTICIPLE',e:'By 9, she will have left.'},
+ {id:'c4',f:'What is the Future Perfect Continuous structure',b:'will have been + verb-ING',e:'…will have been waiting for an hour.'},
+ {id:'c5',f:'How do we use Present Continuous for the future',b:'am/is/are + verb-ING (arranged plan)',e:"I'm flying tomorrow."},
+ {id:'c6',f:'How do we use Present Simple for the future',b:'verb (+s) — fixed schedules',e:'The train leaves at 8.'},
+ {id:'c7',f:'What is the Zero Conditional structure',b:'If + present simple, present simple',e:'If you heat ice, it melts.'},
+ {id:'c8',f:'What is the First Conditional structure',b:'If + present simple, will + base',e:'If it rains, I will stay.'},
+ {id:'c9',f:'What is the Second Conditional structure',b:'If + past simple, would + base',e:'If I were rich, I would travel.'},
+ {id:'c10',f:'Can you use "will" after "if"?',b:'NEVER in first conditional. After "if" → present.',e:'❌ if it will rain ✅ if it rains'},
+ {id:'c11',f:'"to be" in Second Cond. — was or were?',b:'Use WERE for all persons',e:'If I were you…'},
+ {id:'c12',f:'What does "unless" mean',b:'= if not',e:'Unless you hurry, you\'ll be late.'}
 ];
 let cardOrder=[],cardPos=0;
 function buildDeck(){const box=state.cardBox;cardOrder=CARDS.map(c=>c.id).sort((a,b)=>(box[a]||1)-(box[b]||1));cardPos=0;renderCard();}
