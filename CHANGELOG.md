@@ -1,5 +1,78 @@
 # FutureLab - Changelog
 
+## v2.1.0 — Bug Fixes, Inversion Lesson & Cleanup (2026-06-02)
+
+### Bug Fixes
+
+#### XP Double-Counting (Critical)
+- **Fixed**: `recordAnswer()` was calling `addXP(15)` for correct and `addXP(3)` for wrong answers, ON TOP of the XP each module already awarded. Students received 25-45 XP per correct practice answer while the UI showed 10-30.
+- **Fix**: Removed `addXP()` calls from `recordAnswer()`. Each module now controls its own XP independently. `recordAnswer()` only handles mastery tracking and skill XP via `addSkillXP()`.
+- **Added**: `addXP(2)` for wrong answers in Practice and Reinforce to reward participation without inflating scores.
+
+#### SVG Timeline Overlaps
+- **Third Conditional**: Title text "imaginary past → imaginary past result" overlapped with formula labels "If + had + PP" and "would have + PP". Fixed by separating vertical positions (title at y=60, formulas at y=78) and shortening title text.
+- **Mixed Conditional**: Long title "past condition → present/future result (or vice versa)" touched the lateral formula labels on both sides. Fixed by raising title to y=60, reducing formula font-size to 10px, and shortening title.
+- **Inversion (new)**: Strikethrough "✗ if" annotation collided with formula text "If I had known…". Fixed by repositioning strikethrough to the left (x=95-125) and below the formula (y=88 vs y=76).
+
+#### Leaderboard Filter Button
+- **Fixed**: `filterSection('all')` did not properly highlight the "All" button — it reapplied `btn-ghost` class and only used inline styles inconsistently. Now all buttons are fully reset (class + inline styles) before applying the active state.
+
+---
+
+### New Content
+
+#### Conditional Inversion (Learn Module)
+- **Learn Module**: Full lesson card with concept explanation (3 patterns: Had, Were, Should), animated timeline SVG showing "If I had known → Had I known" transformation, 2 example sentences with TTS, signal words, worked example with step-by-step reasoning, and mini-check quiz.
+- Previously, students had practice exercises and exam questions for Inversion but no lesson to learn the concept. Now integrated into the Learn tab alongside all other tenses/conditionals.
+
+#### Inversion Exercise Tier Correction
+- **Fixed**: 17 AI-generated Conditional Inversion exercises were incorrectly marked as `tier:1` (A2/B1). Changed to `tier:3` (B2) since Conditional Inversion is an advanced topic. Beginner students will no longer receive these questions.
+
+---
+
+### Sync & Cleanup
+
+#### Teacher Dashboard
+- Added `third` (Third Conditional) to the skill mastery heatmap — was missing from the skills array while present in student data.
+- Synced `teacher.html` between root and `Future_and_conditionals/` directory, preserving Read Receipts feature from root.
+
+#### Third Conditional Restoration
+- Upstream commit `6ed4c0b` had removed Third Conditional content from root `index.html`. Restored from `Future_and_conditionals/index.html` which retained the complete content (SKILLS entry, TENSES lesson, 6 practice items, flashcards c13/c14, conditionals block, sentence machine slot, badge check).
+
+#### Legacy File Archival
+- Moved `futurelab.html` (v1, no XP/badges/Supabase) and `template2.html` (v1.5, basic XP only) to `archive/` directory. These are obsolete predecessors of `index.html` and should not be used or maintained.
+
+---
+
+### Technical Details
+
+#### Modified Functions
+| Function | Change |
+|----------|--------|
+| `recordAnswer()` | Removed `addXP(15)` and `addXP(3)` calls — now only tracks mastery + skill XP |
+| `submitAnswer()` | Now sole source of practice XP; added `addXP(2)` for wrong answers |
+| `submitRfAnswer()` | Added `addXP(2)` for wrong answers in Reinforce |
+| `filterSection()` | Full inline style reset before applying active state |
+| `timelineSVG()` | Added `inversion` handler; fixed coordinates in `third` and `mixed` |
+
+#### New TENSES Entry
+| Skill ID | Name | Color | Timeline Type |
+|----------|------|-------|---------------|
+| `inversion` | Conditional Inversion | `#0D9488` | `inversion` |
+
+#### Files Changed
+| File | Change |
+|------|--------|
+| `index.html` | All bug fixes + new inversion lesson |
+| `Future_and_conditionals/index.html` | Synced copy of root |
+| `teacher.html` | Added `third` to heatmap skills |
+| `Future_and_conditionals/teacher.html` | Synced copy of root |
+| `futurelab.html` | Moved to `archive/` |
+| `template2.html` | Moved to `archive/` |
+| `CLAUDE.md` | Created — project guide for AI assistants |
+
+---
+
 ## v2.0.0 — Major Platform Upgrade (2026-05-30)
 
 ### Bug Fixes
