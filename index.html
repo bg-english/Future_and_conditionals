@@ -1370,7 +1370,7 @@ const ITEMS=[
  {sk:'second',type:'mc',q:'If I ___ a millionaire, I would help my school.',o:['am','was','were','will be'],a:2,fb:'Unreal hypothesis → <b>Second</b>; with "to be" use <b>were</b>.',tier:1},
  {sk:'will',type:'fill',q:'Prediction: I think our team ___ (win) the match.',a:'will win',fb:'Prediction/opinion → <b>will</b> + base: will win.',tier:1},
  {sk:'going-to',type:'fill',q:'Plan: This weekend I ___ (visit) my grandparents.',a:'am going to visit',fb:'Decided plan → <b>am going to</b> + base: am going to visit.',tier:1},
- {sk:'first',type:'fill',q:'If you ___ (study), you will pass.',a:'study',fb:'After "if" → present simple: study.',tier:1},
+ {sk:'first',type:'fill',q:'If you ___ (study) hard, you will pass the exam.',a:'study',fb:'After "if" in first conditional → present simple. The subject is "you" so the base form stays: study.',tier:1},
  {sk:'second',type:'fill',q:'If we ___ (have) more time, we would travel.',a:'had',fb:'Second conditional: after "if" → past simple: had.',tier:1},
  {sk:'present-simple',type:'error',q:'Correct: "The class will start at 9 every day." (write only the correct verb form)',a:'starts',fb:'Fixed schedule → present simple: starts (no "will").',tier:1},
  {sk:'zero',type:'fill',q:'If you heat ice, it ___ (melt).',a:'melts',fb:'Zero conditional → present simple in both parts: melts.',tier:1},
@@ -1416,7 +1416,7 @@ const ITEMS=[
  {sk:'mixed',type:'mc',q:'If she had taken the medicine, she ___ better today.',o:['will feel','would feel','feels','felt'],a:1,fb:'<b>Mixed conditional</b>: if + past perfect → would + base (present result).',tier:4,hint:'Past condition (had taken) → result about TODAY. For a present result of a past condition: would + base verb.'},
  {sk:'mixed',type:'mc',q:'If he were more organized, he ___ his passport yesterday.',o:['would not lose','would not have lost','did not lose','will not lose'],a:1,fb:'<b>Mixed conditional</b>: present trait (were organized) → past result (would not have lost).',tier:4,hint:'Present trait (were organized) → past result (yesterday). For a past result: would + have + past participle.'},
  {sk:'mixed',type:'fill',q:'If I had not moved to Boston, I ___ (not know) any of you today.',a:'would not know',fb:'<b>Mixed conditional</b>: past action → present result: would not know.',tier:4,hint:'Past action (had not moved) → present result (today). Present result = would + base verb. Do not forget the negation!'},
- {sk:'inversion',type:'fill',q:'Rewrite: "If I had seen you, I would have said hello." Start with "Had".',a:'Had I seen you, I would have said hello',fb:'<b>Conditional inversion</b>: Had + subject + past participle.',tier:4,hint:'Remove "if," move "had" to the front: Had + subject + past participle, then keep the result clause the same.'},
+ {sk:'inversion',type:'error',q:'Rewrite with inversion: "If I had seen you, I would have said hello." Start with "Had".',a:'Had I seen you, I would have said hello',fb:'<b>Conditional inversion</b>: Had + subject + past participle.',tier:4,hint:'Remove "if," move "had" to the front: Had + subject + past participle, then keep the result clause the same.'},
  {sk:'mixed',type:'error',q:'Correct: "If she studied law, she will be a lawyer now." (write the corrected result clause verb)',a:'would be',fb:'Unreal present result needs <b>would + base</b>: would be.',tier:4,hint:'The result is unreal/hypothetical (she did NOT study law). Unreal results never use "will" — they use...?'},
  {sk:'second',type:'mc',q:'Without your help, we ___ never have finished on time.',o:['will','would','could','can'],a:1,fb:'<b>Implied conditional</b>: Without your help = If it had not been for your help → would.',tier:4,hint:'"Without your help" = an implied condition (If you had not helped). Implied past conditionals use which modal?'},
  {sk:'fpc',type:'mc',q:'By the time the rescue team arrives, the hikers ___ in the cold for over 12 hours.',o:['will wait','will have waited','will have been waiting','are waiting'],a:2,fb:'Duration emphasis up to a future point → <b>FPC</b>: will have been waiting.',tier:4,hint:'"For over 12 hours" emphasizes DURATION. Which future form stresses the ongoing nature of an action up to a future point?'},
@@ -1728,9 +1728,9 @@ function renderItem(){
   curItem=queue[qIdx];hintUsed=false;const it=curItem;const idx=ITEMS.indexOf(it);
   if(it.q)state.seenQ[norm(it.q)]=true;
   let body;
-  if(it.type==='fill'||it.type==='error'){body='<div class="eq-fill"><input id="fillInput" placeholder="Type here…" autocomplete="off" onkeydown="if(event.key===\'Enter\')submitAnswer()"></div>';}
+  if(it.type==='fill'||it.type==='error'){var phText=(it.type==='error'&&it.q.indexOf('Rewrite')===0)?'Type the full rewritten sentence…':'Type here…';body='<div class="eq-fill"><input id="fillInput" placeholder="'+phText+'" autocomplete="off" onkeydown="if(event.key===\'Enter\')submitAnswer()"></div>';}
   else{body='<div class="eq-opts">'+it.o.map((o,j)=>'<button class="eq-opt" onclick="submitAnswer('+j+')">'+o+'</button>').join('')+'</div>';}
-  const instr=it.type==='fill'?'Use the highlighted verb 🔤 — type the correct form and press Enter.':it.type==='error'?'The verb in red is wrong — type the correct form.':'Choose the correct option.';
+  const instr=it.type==='fill'?'Use the highlighted verb 🔤 — type the correct form and press Enter.':it.type==='error'?(it.q.indexOf('Rewrite')===0?'Type the full rewritten sentence and press Enter.':'The verb in red is wrong — type the correct form.'):'Choose the correct option.';
   var qHTML=it.q;
   if(it.type==='fill'||it.type==='error'){
     var hasParenVerb=/\(([^)]+)\)/.test(it.q);
@@ -2188,7 +2188,7 @@ const RF_EXERCISES={
 ],
 'zero':[
   {diff:'easy',type:'mc',q:'If you heat water to 100°C, it ___.',o:['will boil','boils','is boiling','would boil'],a:1,fb:'Scientific fact (always true) → zero conditional: boils.'},
-  {diff:'easy',type:'fill',q:'If plants do not get water, they ___ (die).',a:'die',fb:'General truth → zero conditional: die.'},
+  {diff:'easy',type:'fill',q:'If plants do not get water, they ___ (die) quickly.',a:'die',fb:'Zero conditional: general truth. Subject is "they" (plural) → base form: die.',tier:1},
   {diff:'medium',type:'mc',q:'If you ___ ice in water, it floats.',o:['will put','put','would put','are putting'],a:1,fb:'Scientific fact → present simple in both clauses: put.'},
   {diff:'medium',type:'fill',q:'If it ___ (rain) a lot, the rivers flood.',a:'rains',fb:'General truth → zero conditional: rains.'},
   {diff:'hard',type:'error',q:'Correct: "If you will touch fire, you get burned."',a:'touch',fb:'Zero conditional: no "will" → If you touch fire, you get burned.'}
@@ -2197,7 +2197,7 @@ const RF_EXERCISES={
   {diff:'easy',type:'mc',q:'If it rains, I ___ an umbrella.',o:['take','will take','would take','took'],a:1,fb:'Real possibility → first conditional: will take.'},
   {diff:'easy',type:'fill',q:'If you ___ (not hurry), you will be late.',a:'do not hurry',fb:'First conditional: present simple after "if": do not hurry.'},
   {diff:'medium',type:'mc',q:'___ you study hard, you will get good grades.',o:['Unless','If','Would','Were'],a:1,fb:'Real condition → first conditional: If.'},
-  {diff:'medium',type:'fill',q:'You will not pass ___ you study. (= if you do not study)',a:'unless',fb:'Unless = if not: You will not pass unless you study.'},
+  {diff:'medium',type:'fill',q:'You will not pass ___ (unless) you study.',a:'unless',fb:'Unless = if not: You will not pass unless you study.'},
   {diff:'hard',type:'error',q:'Correct: "If you will arrive on time, we will start together."',a:'arrive',fb:'NEVER "will" after "if" in first conditional → arrive.'}
 ],
 'second':[
@@ -2216,9 +2216,9 @@ const RF_EXERCISES={
 ],
 'inversion':[
   {diff:'easy',type:'mc',q:'___ I known about the delay, I would have left earlier.',o:['If','Had','Would','Should'],a:1,fb:'Inversion of "If I had known" → Had I known.'},
-  {diff:'easy',type:'fill',q:'Rewrite with inversion: "If she had called, I would have answered." Start with "Had".',a:'Had she called, I would have answered',fb:'Had + subject + PP: Had she called.'},
+  {diff:'easy',type:'error',q:'Rewrite with inversion: "If she had called, I would have answered." Start with "Had".',a:'Had she called, I would have answered',fb:'Had + subject + PP: Had she called.'},
   {diff:'medium',type:'mc',q:'___ you need any help, please ask.',o:['If','Had','Were','Should'],a:3,fb:'Formal first cond. inversion: Should you need = If you should need.'},
-  {diff:'medium',type:'fill',q:'Rewrite: "If I were to win the lottery, I would donate half." Start with "Were".',a:'Were I to win the lottery, I would donate half',fb:'Were + subject + to-infinitive: Were I to win.'},
+  {diff:'medium',type:'error',q:'Rewrite with inversion: "If I were to win the lottery, I would donate half." Start with "Were".',a:'Were I to win the lottery, I would donate half',fb:'Were + subject + to-infinitive: Were I to win.'},
   {diff:'hard',type:'mc',q:'___ it not been for your help, we would have failed.',o:['Had','Were','Should','If'],a:0,fb:'Inversion of "If it had not been for" → Had it not been for.'}
 ]
 };
