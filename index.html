@@ -1167,6 +1167,33 @@ const TENSES=[
   worked:['Future point: June. DURATION matters.','will have been + verb-ing.','study → studying, with "for 3 years".','✅ By June, I <b>will have been studying</b> for 3 years.'],
   check:{q:'By 2030, they ___ here for 10 years (duration).',opts:['will live','will have been living','are living'],a:1,fb:'Duration up to a future point → <b>will have been living</b>.'}},
 
+ {id:'zero',color:'#059669',name:'Zero Conditional',tag:'General truths & facts',
+  concept:'For things that are <b>always true</b> — scientific facts, natural laws, and general truths. If the condition happens, the result <b>always</b> happens. Here "if" means the same as "when".',
+  tl:'zero',tlcap:'If A happens, B always happens (fact)',
+  struct:['If + <span class="verb">present simple</span>, <span class="verb">present simple</span>'],
+  ex:[['If you heat water, it boils.','If you heat water, it boils (always true — scientific fact).'],['If I drink coffee at night, I can\'t sleep.','If I drink coffee at night, I can\'t sleep (personal truth — always happens).']],
+  signals:['always','every time','when','generally'],
+  worked:['Question: What happens if you mix red and blue?','Is this always true? Yes → Zero Conditional.','Both clauses use present simple.','If + present (mix) → present (get).','✅ If you <b>mix</b> red and blue, you <b>get</b> purple.'],
+  check:{q:'If you freeze water, it ___ solid. (always true)',opts:['will become','becomes','became'],a:1,fb:'A fact that is always true → Zero Conditional: <b>becomes</b> (present simple in both parts).'}},
+
+ {id:'first',color:'#2563EB',name:'First Conditional',tag:'Real future possibility',
+  concept:'For <b>real and possible situations</b> in the future. The condition is likely to happen, and if it does, there will be a real result. Used for plans, warnings, and promises.',
+  tl:'first',tlcap:'A real condition now leads to a real result in the future',
+  struct:['If + <span class="verb">present simple</span>, <b>will</b> + <span class="verb">base verb</span>'],
+  ex:[['If it rains tomorrow, I will stay home.','If it rains tomorrow, I will stay home (real possibility).'],['If you don\'t study, you will fail the test.','If you don\'t study, you will fail the test (warning — likely consequence).']],
+  signals:['tomorrow','if','unless','as soon as'],
+  worked:['Situation: It might rain tomorrow (real possibility).','Is it possible/likely? Yes → First Conditional.','If-clause: present simple → "if it rains".','Result: will + base verb → "will stay".','✅ If it <b>rains</b> tomorrow, I <b>will stay</b> home.'],
+  check:{q:'If you study hard, you ___ the exam. (real possibility)',opts:['pass','will pass','would pass'],a:1,fb:'Real future possibility → First Conditional: <b>will pass</b> (will + base verb).'}},
+
+ {id:'second',color:'#D97706',name:'Second Conditional',tag:'Imaginary present',
+  concept:'For <b>imaginary, unlikely, or unreal situations</b> in the present or future. We dream, wish, or give hypothetical advice. It is NOT real — just imagination.',
+  tl:'second',tlcap:'An unreal condition now leads to an imaginary result',
+  struct:['If + <span class="verb">past simple</span>, <b>would</b> + <span class="verb">base verb</span>'],
+  ex:[['If I had a million dollars, I would travel the world.','If I had a million dollars, I would travel (but I don\'t have it — imaginary).'],['If I were you, I would apologize.','If I were you, I would apologize (advice — I am not you).']],
+  signals:['if I were…','would','imagine','what if…'],
+  worked:['Dream: What would you do with a million dollars?','Is it real? No, it is imaginary → Second Conditional.','If-clause: past simple → "if I had".','Result: would + base verb → "would travel".','✅ If I <b>had</b> a million dollars, I <b>would travel</b> the world.'],
+  check:{q:'If I ___ a superpower, I would fly. (imaginary)',opts:['have','had','will have'],a:1,fb:'Imaginary situation → Second Conditional: <b>had</b> (past simple in the if-clause).'}},
+
  {id:'third',color:'#8B5CF6',name:'Third Conditional',tag:'Imaginary past',
   concept:'For <b>imaginary situations in the past</b> — things that did NOT happen. We imagine a different past and its result. It is too late to change anything.',
   tl:'third',tlcap:'An unreal past condition and its imaginary past result',
@@ -1232,6 +1259,28 @@ function timelineSVG(type){
     extra+=`<rect class="tl-bar" x="200" y="${base-40}" width="300" height="16" rx="8" fill="#138A72"/>
       <path d="M200 ${base-52} L500 ${base-52}" stroke="#138A72" stroke-width="2" class="tl-fade" style="--d:1s"/>
       <text x="350" y="${base-60}" text-anchor="middle" font-size="13" fill="#138A72" font-weight="700" class="tl-fade" style="--d:1.1s">DURATION (for…) up to the point</text>`;
+  } else if(type==='zero'){
+    extra+=mark(past,'CONDITION','if this…','#059669')+NOW+mark(fut,'RESULT','…then this','#059669');
+    extra+=`<path class="tl-draw" d="M${past} ${base-35} L${fut} ${base-35}" stroke="#059669" stroke-width="4" fill="none" marker-end="url(#arz)"/>
+      <g class="tl-pop" style="--d:.4s"><text x="${past}" y="${base-50}" text-anchor="middle" font-size="11" fill="#059669" font-weight="700">If + present</text></g>
+      <g class="tl-pop" style="--d:.8s"><text x="${fut}" y="${base-50}" text-anchor="middle" font-size="11" fill="#059669" font-weight="700">present</text></g>
+      <text x="${(past+fut)/2}" y="${base-68}" text-anchor="middle" font-size="12" fill="#059669" font-weight="700" class="tl-fade" style="--d:1s">always true · fact · law</text>
+      <g class="tl-pop" style="--d:1.1s"><text x="${(past+fut)/2}" y="${base-48}" text-anchor="middle" font-size="18" fill="#059669">♻️</text></g>`;
+  } else if(type==='first'){
+    extra+=NOW+FUT('RESULT','future');
+    extra+=`<g class="tl-pop" style="--d:.3s"><text x="${now}" y="${base-50}" text-anchor="middle" font-size="11" fill="#2563EB" font-weight="700">If + present</text></g>
+      <path class="tl-draw" d="M${now} ${base-35} L${fut} ${base-35}" stroke="#2563EB" stroke-width="4" fill="none" marker-end="url(#arf)"/>
+      <g class="tl-pop" style="--d:.8s"><text x="${fut}" y="${base-50}" text-anchor="middle" font-size="11" fill="#2563EB" font-weight="700">will + verb</text></g>
+      <text x="${(now+fut)/2}" y="${base-68}" text-anchor="middle" font-size="12" fill="#2563EB" font-weight="700" class="tl-fade" style="--d:1s">real possibility → real result</text>
+      <g class="tl-pop" style="--d:1.2s"><circle cx="${now}" cy="${base-35}" r="12" fill="none" stroke="#2563EB" stroke-width="2" stroke-dasharray="4 3"/><text x="${now}" y="${base-30}" text-anchor="middle" font-size="11" fill="#2563EB">?</text></g>`;
+  } else if(type==='second'){
+    extra+=NOW+FUT('RESULT','imaginary');
+    extra+=`<g class="tl-pop" style="--d:.3s"><text x="${now}" y="${base-50}" text-anchor="middle" font-size="11" fill="#D97706" font-weight="700">If + past simple</text></g>
+      <path class="tl-draw" d="M${now} ${base-35} L${fut} ${base-35}" stroke="#D97706" stroke-width="4" stroke-dasharray="8 5" fill="none" marker-end="url(#ars)"/>
+      <g class="tl-pop" style="--d:.8s"><text x="${fut}" y="${base-50}" text-anchor="middle" font-size="11" fill="#D97706" font-weight="700">would + verb</text></g>
+      <text x="${(now+fut)/2}" y="${base-68}" text-anchor="middle" font-size="12" fill="#D97706" font-weight="700" class="tl-fade" style="--d:1s">imaginary · not real · dream</text>
+      <g class="tl-pop" style="--d:1.1s"><circle cx="${now}" cy="${base-35}" r="12" fill="none" stroke="#D97706" stroke-width="2"/><text x="${now}" y="${base-30}" text-anchor="middle" font-size="13" fill="#D97706">💭</text></g>
+      <g class="tl-pop" style="--d:1.3s"><circle cx="${fut}" cy="${base-35}" r="12" fill="none" stroke="#E64545" stroke-width="2"/><text x="${fut}" y="${base-31}" text-anchor="middle" font-size="11" fill="#E64545">✗</text></g>`;
   } else if(type==='third'){
     extra+=mark(past,'PAST','unreal','#8B5CF6')+NOW;
     extra+=`<g class="tl-pop" style="--d:.4s"><text x="${past}" y="${base-50}" text-anchor="middle" font-size="11" fill="#8B5CF6" font-weight="700">If + had + PP</text></g>
@@ -1258,6 +1307,9 @@ function timelineSVG(type){
       <marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="#0F76C2"/></marker>
       <marker id="arr" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="#C8202E"/></marker>
       <marker id="arg" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="#E9A72C"/></marker>
+      <marker id="arz" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="#059669"/></marker>
+      <marker id="arf" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="#2563EB"/></marker>
+      <marker id="ars" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="#D97706"/></marker>
     </defs>${axis}${extra}</svg>`;
 }
 

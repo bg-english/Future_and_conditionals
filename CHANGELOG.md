@@ -1,5 +1,43 @@
 # FutureLab - Changelog
 
+## v2.2.0 — Zero, First & Second Conditional Lessons (2026-06-03)
+
+### New Content
+
+#### Zero Conditional (Learn Module)
+- Full lesson card: concept explanation (facts, laws, general truths), animated timeline SVG with recycling symbol showing "always true" relationship, structure formula (If + present simple, present simple), 2 example sentences with TTS, signal words (always, every time, when, generally), worked example with step-by-step reasoning, and mini-check quiz.
+- Color: `#059669` (emerald green). Timeline type: `zero`.
+
+#### First Conditional (Learn Module)
+- Full lesson card: concept explanation (real future possibilities), animated timeline SVG showing condition-to-future arrow with question mark, structure formula (If + present simple, will + base verb), 2 example sentences with TTS, signal words (tomorrow, if, unless, as soon as), worked example, and mini-check quiz.
+- Color: `#2563EB` (blue). Timeline type: `first`.
+
+#### Second Conditional (Learn Module)
+- Full lesson card: concept explanation (imaginary/unreal present), animated timeline SVG with thought bubble and X mark showing unreality, structure formula (If + past simple, would + base verb), 2 example sentences with TTS, signal words (if I were, would, imagine, what if), worked example, and mini-check quiz.
+- Color: `#D97706` (amber). Timeline type: `second`.
+
+### Technical Details
+
+#### New TENSES Entries
+| Skill ID | Name | Color | Timeline Type |
+|----------|------|-------|---------------|
+| `zero` | Zero Conditional | `#059669` | `zero` |
+| `first` | First Conditional | `#2563EB` | `first` |
+| `second` | Second Conditional | `#D97706` | `second` |
+
+#### Modified Functions
+| Function | Change |
+|----------|--------|
+| `timelineSVG()` | Added `zero`, `first`, `second` handlers with new SVG markers |
+
+#### Files Changed
+| File | Change |
+|------|--------|
+| `index.html` | 3 new TENSES entries + 3 new SVG timeline handlers + 3 arrow markers |
+| `Future_and_conditionals/index.html` | Synced copy of root |
+
+---
+
 ## v2.1.0 — Bug Fixes, Inversion Lesson & Cleanup (2026-06-02)
 
 ### Bug Fixes
