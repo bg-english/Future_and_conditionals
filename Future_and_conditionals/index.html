@@ -1235,8 +1235,7 @@ function timelineSVG(type){
   const NOW=mark(now,'NOW','now','#16244A');
   const FUT=(lbl,sub)=>mark(fut,lbl||'FUTURE',sub||'future','#1E50A0');
   if(type==='repeat'){
-    [180,300,420].forEach((x,i)=>extra+=`<g class="tl-pop" style="--d:${.3+i*.25}s"><circle cx="${x}" cy="${base-40}" r="15" fill="none" stroke="#1E50A0" stroke-width="3"/><text x="${x}" y="${base-35}" text-anchor="middle" font-size="14">🕘</text></g>`);
-    extra+=NOW;extra+=`<text x="500" y="${base-60}" text-anchor="middle" font-size="13" fill="#1E50A0" font-weight="700" class="tl-fade" style="--d:1.1s">fixed schedule · repeats</text>`;
+    return `<img src="infographic/PRESENT%20SIMPLE%20FOR%20FUTURE.png" style="width:100%;max-width:640px;display:block;margin:0 auto" alt="Present Simple for Future infographic"/>`;
   } else if(type==='arrange'){
     extra+=NOW+FUT('PLAN','set date');
     extra+=`<path class="tl-draw" d="M${now} ${base-30} L${fut} ${base-30}" stroke="#0F76C2" stroke-width="4" fill="none" marker-end="url(#ar)"/>
