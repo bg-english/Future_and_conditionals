@@ -1107,7 +1107,7 @@ function checkBadges(){
 
 /* ===== mastery ===== */
 function masteryPct(s){const m=state.mastery[s];return m&&m.seen?Math.round(m.correct/m.seen*100):0;}
-function recordAnswer(skill,correct){state.answered++;if(correct)state.correct++;const m=state.mastery[skill];m.seen++;if(correct){m.correct++;addSkillXP(skill,15);addXP(15);}else{addSkillXP(skill,3);addXP(3);}persist();if(state.correct===1)award('first');checkBadges();checkSkillBadges(skill);}
+function recordAnswer(skill,correct){state.answered++;if(correct)state.correct++;const m=state.mastery[skill];m.seen++;if(correct){m.correct++;addSkillXP(skill,15);}else{addSkillXP(skill,3);}persist();if(state.correct===1)award('first');checkBadges();checkSkillBadges(skill);}
 
 /* ============================================================
    DATA: TENSES (with animated-timeline configs)
@@ -1174,7 +1174,16 @@ const TENSES=[
   ex:[['If I had accepted that job, I would live in New York now.','Past condition → present result (I did not accept, so I do not live there now).'],['If she were not so stubborn, she would have accepted the offer yesterday.','Present trait → past result (she IS stubborn, so she did NOT accept).']],
   signals:['now','yesterday','at that time','today'],
   worked:['Fact: I did NOT accept the job (past). I do NOT live in New York (present).','Different time frames? Yes → Mixed Conditional.','Past condition: If + had + PP → "had accepted".','Present result: would + base → "would live".','✅ If I <b>had accepted</b> that job, I <b>would live</b> in New York now.'],
-  check:{q:'If I had saved money, I ___ a car now.',opts:['would have','would own','will own'],a:1,fb:'Past condition → present result → Mixed Conditional: <b>would own</b>.'}}
+  check:{q:'If I had saved money, I ___ a car now.',opts:['would have','would own','will own'],a:1,fb:'Past condition → present result → Mixed Conditional: <b>would own</b>.'}},
+
+ {id:'inversion',color:'#0D9488',name:'Conditional Inversion',tag:'Formal conditionals',
+  concept:'In formal English, we can <b>remove "if"</b> and <b>invert the subject and auxiliary verb</b>. This creates an elegant, formal style used in academic writing and speeches. There are three patterns: <b>Had</b>, <b>Were</b>, and <b>Should</b>.',
+  tl:'inversion',tlcap:'Remove "if" and move the auxiliary before the subject',
+  struct:['<div class="struct-label">Pattern 1 — Had (past unreal)</div><b>Had</b> + subject + PP → If + subject + had + PP','<div class="struct-label">Pattern 2 — Were (present unreal)</div><b>Were</b> + subject + to + base verb → If + subject + were to…','<div class="struct-label">Pattern 3 — Should (formal possibility)</div><b>Should</b> + subject + base verb → If + subject + should…'],
+  ex:[['Had I known about the delay, I would have left earlier.','Had I known = If I had known (formal third conditional).'],['Should you need any help, please contact us.','Should you need = If you should need (formal/polite possibility).']],
+  signals:['Had…','Were…to…','Should…'],
+  worked:['Original: "If I had seen you, I would have said hello."','Can we make it more formal? Yes → Conditional Inversion.','Remove "if", move "had" before the subject.','Had + I + past participle → "Had I seen".','✅ <b>Had I seen</b> you, I would have said hello.'],
+  check:{q:'___ she call, tell her I am busy. (formal for: If she should call)',opts:['If','Had','Should'],a:2,fb:'Formal inversion of "If she should call" → <b>Should she call</b>.'}}
 ];
 
 /* ----- animated timeline SVG ----- */
@@ -1214,12 +1223,26 @@ function timelineSVG(type){
     extra+=`<rect class="tl-bar" x="200" y="${base-40}" width="300" height="16" rx="8" fill="#138A72"/>
       <path d="M200 ${base-52} L500 ${base-52}" stroke="#138A72" stroke-width="2" class="tl-fade" style="--d:1s"/>
       <text x="350" y="${base-60}" text-anchor="middle" font-size="13" fill="#138A72" font-weight="700" class="tl-fade" style="--d:1.1s">DURATION (for…) up to the point</text>`;
+  } else if(type==='third'){
+    extra+=mark(past,'PAST','unreal','#8B5CF6')+NOW;
+    extra+=`<g class="tl-pop" style="--d:.4s"><text x="${past}" y="${base-50}" text-anchor="middle" font-size="11" fill="#8B5CF6" font-weight="700">If + had + PP</text></g>
+      <g class="tl-pop" style="--d:.8s"><text x="${now}" y="${base-50}" text-anchor="middle" font-size="11" fill="#8B5CF6" font-weight="700">would have + PP</text></g>
+      <path class="tl-draw" d="M${past} ${base-35} L${now} ${base-35}" stroke="#8B5CF6" stroke-width="4" stroke-dasharray="8 5" fill="none"/>
+      <text x="${(past+now)/2}" y="${base-68}" text-anchor="middle" font-size="12" fill="#8B5CF6" font-weight="700" class="tl-fade" style="--d:1.1s">imaginary past → imaginary result</text>
+      <g class="tl-pop" style="--d:1.2s"><circle cx="${past}" cy="${base-35}" r="12" fill="none" stroke="#E64545" stroke-width="2"/><text x="${past}" y="${base-31}" text-anchor="middle" font-size="11" fill="#E64545">✗</text></g>`;
   } else if(type==='mixed'){
     extra+=mark(past,'PAST','condition','#D946EF')+NOW+FUT('NOW/FUT','result');
     extra+=`<path class="tl-draw" d="M${past} ${base-35} L${fut} ${base-35}" stroke="#D946EF" stroke-width="4" stroke-dasharray="8 5" fill="none"/>
-      <text x="${(past+fut)/2}" y="${base-55}" text-anchor="middle" font-size="13" fill="#D946EF" font-weight="700" class="tl-fade" style="--d:1s">past condition → present/future result (or vice versa)</text>
-      <g class="tl-pop" style="--d:.5s"><text x="${past}" y="${base-50}" text-anchor="middle" font-size="11" fill="#D946EF" font-weight="700">If + had/were</text></g>
-      <g class="tl-pop" style="--d:.9s"><text x="${fut}" y="${base-50}" text-anchor="middle" font-size="11" fill="#D946EF" font-weight="700">would (have)</text></g>`;
+      <text x="${(past+fut)/2}" y="${base-68}" text-anchor="middle" font-size="12" fill="#D946EF" font-weight="700" class="tl-fade" style="--d:1s">past condition → present/future result</text>
+      <g class="tl-pop" style="--d:.5s"><text x="${past}" y="${base-50}" text-anchor="middle" font-size="10" fill="#D946EF" font-weight="700">If + had/were</text></g>
+      <g class="tl-pop" style="--d:.9s"><text x="${fut}" y="${base-50}" text-anchor="middle" font-size="10" fill="#D946EF" font-weight="700">would (have)</text></g>`;
+  } else if(type==='inversion'){
+    extra+=mark(past,'IF-CLAUSE','original','#0D9488')+NOW+mark(fut,'INVERTED','formal','#0D9488');
+    extra+=`<g class="tl-pop" style="--d:.4s"><text x="${past}" y="${base-52}" text-anchor="middle" font-size="11" fill="#0D9488" font-weight="700">If I had known…</text></g>
+      <g class="tl-pop" style="--d:.7s"><text x="${now}" y="${base-40}" text-anchor="middle" font-size="22" fill="#0D9488" font-weight="700">→</text></g>
+      <g class="tl-pop" style="--d:1s"><text x="${fut}" y="${base-52}" text-anchor="middle" font-size="11" fill="#0D9488" font-weight="700">Had I known…</text></g>
+      <text x="${(past+fut)/2}" y="${base-72}" text-anchor="middle" font-size="12" fill="#0D9488" font-weight="700" class="tl-fade" style="--d:1.2s">remove "if" · invert subject + auxiliary</text>
+      <g class="tl-pop" style="--d:1.3s"><line x1="${past-25}" y1="${base-40}" x2="${past+5}" y2="${base-40}" stroke="#E64545" stroke-width="3"/><text x="${past-10}" y="${base-43}" text-anchor="middle" font-size="9" fill="#E64545" font-weight="700">✗ if</text></g>`;
   }
   return `<svg viewBox="0 0 ${W} ${H}" role="img">
     <defs>
@@ -1416,23 +1439,23 @@ const ITEMS=[
 {"sk":"going-to","type":"mc","q":"Ana and Pedro ___ to swim at the pool tomorrow.","o":["is going to","are going to","am going to","be going to"],"a":1,"fb":"Multiple people (plural) use 'are going to' + base verb for future plans.","tier":1,"hint":"Two people together are plural, use 'are'."},
 {"sk":"going-to","type":"fill","q":"I ___ ___ eat lunch at noon tomorrow.","a":"am going to","fb":"First person singular 'I' uses 'am going to' + base verb for future plans.","tier":1,"hint":"Always use 'am' with the subject 'I'."},
 {"sk":"going-to","type":"mc","q":"The ball ___ to roll down the hill.","o":["are going to","am going to","is going to","going to"],"a":2,"fb":"Singular subject 'the ball' requires 'is going to' + base verb for future actions.","tier":1,"hint":"Singular nouns use 'is'."},
-{"sk":"inversion","type":"mc","q":"If I were you, I ___ eat more vegetables.","o":["would","will","am","be"],"a":0,"fb":"With 'were' in conditional inversion, use 'would' in the main clause. Pattern: If I were..., I would...","tier":1,"hint":"After 'were' in conditionals, what modal verb comes next?"},
-{"sk":"inversion","type":"fill","q":"Should you need help with homework, ___ call me.","a":"you should","fb":"Conditional inversion with 'should': invert subject and auxiliary verb. Pattern: Should you..., you should...","tier":1,"hint":"After 'should', invert the subject and verb order."},
-{"sk":"inversion","type":"mc","q":"Were I your teacher, I ___ give less homework.","o":["would","will","could","should"],"a":0,"fb":"'Were' inversion requires 'would' in the main clause to show hypothetical situation. Pattern: Were I..., I would...","tier":1,"hint":"What modal follows 'were' in inverted conditionals?"},
-{"sk":"inversion","type":"fill","q":"Had she studied harder, she ___ passed the test.","a":"would have","fb":"'Had' inversion is used for past conditionals. Use 'would have' + past participle. Pattern: Had she..., she would have...","tier":1,"hint":"After 'had', use which two-word modal phrase?"},
-{"sk":"inversion","type":"mc","q":"Should you finish your lunch, you ___ play football.","o":["can","will","could","would"],"a":0,"fb":"With 'should' inversion, use 'can' or 'will' for future possibility. Pattern: Should you..., you can...","tier":1,"hint":"What permission modal follows 'should' inversion?"},
-{"sk":"inversion","type":"fill","q":"Were they at school, they ___ participate in sports.","a":"would","fb":"'Were' inversion creates hypothetical conditions. Use 'would' in result clause. Pattern: Were they..., they would...","tier":1,"hint":"What modal verb follows the result clause after 'were'?"},
-{"sk":"inversion","type":"mc","q":"Had I known about the party, I ___ gone.","o":["would have","will","would","have"],"a":0,"fb":"'Had' inversion requires 'would have' + past participle for past conditions. Pattern: Had I..., I would have...","tier":1,"hint":"Which two-word phrase completes 'Had I' sentences?"},
-{"sk":"inversion","type":"fill","q":"Should you see Maria, ___ tell her about the meeting.","a":"please","fb":"With 'should' inversion, the imperative or 'please' can start the result. Pattern: Should you..., please/imperative...","tier":1,"hint":"What polite word can start the result clause?"},
-{"sk":"inversion","type":"mc","q":"Were she my sister, I ___ lend her my bike.","o":["would","will","could","am"],"a":0,"fb":"'Were' creates hypothetical situations. Use 'would' to show what might happen. Pattern: Were she..., I would...","tier":1,"hint":"What modal shows a hypothetical action after 'were'?"},
-{"sk":"inversion","type":"fill","q":"Had you asked, I ___ helped you with Spanish.","a":"would have","fb":"'Had' inversion for past: 'would have' + past participle. Indicates regret about a missed opportunity.","tier":1,"hint":"Complete with the past conditional form."},
-{"sk":"inversion","type":"mc","q":"Should I be wrong, you ___ correct me.","o":["can","should","will","must"],"a":1,"fb":"'Should' inversion can mean 'if in case'. Use 'should' or 'can' in result. Pattern: Should I..., you should...","tier":1,"hint":"What verb can follow 'you' in a 'should' inversion?"},
-{"sk":"inversion","type":"fill","q":"Were I in your position, I ___ accept the offer.","a":"would","fb":"'Were' creates hypothetical conditions with 'would'. Shows what the speaker would do in someone else's situation.","tier":1,"hint":"What single modal verb completes this hypothetical sentence?"},
-{"sk":"inversion","type":"mc","q":"Had the game started, the players ___ on the field.","o":["would be","will be","are","would"],"a":0,"fb":"'Had' + condition requires 'would be' for continuous past hypotheticals. Pattern: Had the game..., players would be...","tier":1,"hint":"What form follows 'would' when describing location?"},
-{"sk":"inversion","type":"fill","q":"Should you arrive late, ___ wait for you.","a":"I will not","fb":"'Should' inversion with future consequence. Use 'will' or 'won't' to show result. Pattern: Should you..., I will/won't...","tier":1,"hint":"Use a future tense verb to show what happens if they're late."},
-{"sk":"inversion","type":"mc","q":"Were I rich, I ___ buy a big house.","o":["would","will","could","am"],"a":0,"fb":"'Were' inversion expresses wishes or hypothetical situations. Always use 'would' in the result clause.","tier":1,"hint":"What modal verb indicates a hypothetical action?"},
-{"sk":"inversion","type":"fill","q":"Had she practiced more, she ___ won the race.","a":"would have","fb":"'Had' inversion for past regret: 'would have' + past participle. Shows something that didn't happen but could have.","tier":1,"hint":"Use the past conditional form with 'would'."},
-{"sk":"inversion","type":"mc","q":"Should you feel tired, you ___ rest.","o":["should","can","must","could"],"a":1,"fb":"'Should' inversion with permission: use 'can' or 'may'. Pattern: Should you..., you can...","tier":1,"hint":"What permission modal fits best here?"},
+{"sk":"inversion","type":"mc","q":"If I were you, I ___ eat more vegetables.","o":["would","will","am","be"],"a":0,"fb":"With 'were' in conditional inversion, use 'would' in the main clause. Pattern: If I were..., I would...","tier":3,"hint":"After 'were' in conditionals, what modal verb comes next?"},
+{"sk":"inversion","type":"fill","q":"Should you need help with homework, ___ call me.","a":"you should","fb":"Conditional inversion with 'should': invert subject and auxiliary verb. Pattern: Should you..., you should...","tier":3,"hint":"After 'should', invert the subject and verb order."},
+{"sk":"inversion","type":"mc","q":"Were I your teacher, I ___ give less homework.","o":["would","will","could","should"],"a":0,"fb":"'Were' inversion requires 'would' in the main clause to show hypothetical situation. Pattern: Were I..., I would...","tier":3,"hint":"What modal follows 'were' in inverted conditionals?"},
+{"sk":"inversion","type":"fill","q":"Had she studied harder, she ___ passed the test.","a":"would have","fb":"'Had' inversion is used for past conditionals. Use 'would have' + past participle. Pattern: Had she..., she would have...","tier":3,"hint":"After 'had', use which two-word modal phrase?"},
+{"sk":"inversion","type":"mc","q":"Should you finish your lunch, you ___ play football.","o":["can","will","could","would"],"a":0,"fb":"With 'should' inversion, use 'can' or 'will' for future possibility. Pattern: Should you..., you can...","tier":3,"hint":"What permission modal follows 'should' inversion?"},
+{"sk":"inversion","type":"fill","q":"Were they at school, they ___ participate in sports.","a":"would","fb":"'Were' inversion creates hypothetical conditions. Use 'would' in result clause. Pattern: Were they..., they would...","tier":3,"hint":"What modal verb follows the result clause after 'were'?"},
+{"sk":"inversion","type":"mc","q":"Had I known about the party, I ___ gone.","o":["would have","will","would","have"],"a":0,"fb":"'Had' inversion requires 'would have' + past participle for past conditions. Pattern: Had I..., I would have...","tier":3,"hint":"Which two-word phrase completes 'Had I' sentences?"},
+{"sk":"inversion","type":"fill","q":"Should you see Maria, ___ tell her about the meeting.","a":"please","fb":"With 'should' inversion, the imperative or 'please' can start the result. Pattern: Should you..., please/imperative...","tier":3,"hint":"What polite word can start the result clause?"},
+{"sk":"inversion","type":"mc","q":"Were she my sister, I ___ lend her my bike.","o":["would","will","could","am"],"a":0,"fb":"'Were' creates hypothetical situations. Use 'would' to show what might happen. Pattern: Were she..., I would...","tier":3,"hint":"What modal shows a hypothetical action after 'were'?"},
+{"sk":"inversion","type":"fill","q":"Had you asked, I ___ helped you with Spanish.","a":"would have","fb":"'Had' inversion for past: 'would have' + past participle. Indicates regret about a missed opportunity.","tier":3,"hint":"Complete with the past conditional form."},
+{"sk":"inversion","type":"mc","q":"Should I be wrong, you ___ correct me.","o":["can","should","will","must"],"a":1,"fb":"'Should' inversion can mean 'if in case'. Use 'should' or 'can' in result. Pattern: Should I..., you should...","tier":3,"hint":"What verb can follow 'you' in a 'should' inversion?"},
+{"sk":"inversion","type":"fill","q":"Were I in your position, I ___ accept the offer.","a":"would","fb":"'Were' creates hypothetical conditions with 'would'. Shows what the speaker would do in someone else's situation.","tier":3,"hint":"What single modal verb completes this hypothetical sentence?"},
+{"sk":"inversion","type":"mc","q":"Had the game started, the players ___ on the field.","o":["would be","will be","are","would"],"a":0,"fb":"'Had' + condition requires 'would be' for continuous past hypotheticals. Pattern: Had the game..., players would be...","tier":3,"hint":"What form follows 'would' when describing location?"},
+{"sk":"inversion","type":"fill","q":"Should you arrive late, ___ wait for you.","a":"I will not","fb":"'Should' inversion with future consequence. Use 'will' or 'won't' to show result. Pattern: Should you..., I will/won't...","tier":3,"hint":"Use a future tense verb to show what happens if they're late."},
+{"sk":"inversion","type":"mc","q":"Were I rich, I ___ buy a big house.","o":["would","will","could","am"],"a":0,"fb":"'Were' inversion expresses wishes or hypothetical situations. Always use 'would' in the result clause.","tier":3,"hint":"What modal verb indicates a hypothetical action?"},
+{"sk":"inversion","type":"fill","q":"Had she practiced more, she ___ won the race.","a":"would have","fb":"'Had' inversion for past regret: 'would have' + past participle. Shows something that didn't happen but could have.","tier":3,"hint":"Use the past conditional form with 'would'."},
+{"sk":"inversion","type":"mc","q":"Should you feel tired, you ___ rest.","o":["should","can","must","could"],"a":1,"fb":"'Should' inversion with permission: use 'can' or 'may'. Pattern: Should you..., you can...","tier":3,"hint":"What permission modal fits best here?"},
 {"sk":"mixed","type":"mc","q":"If I studied yesterday, I ___ know the answer now.","o":["would","will","would have","am"],"a":0,"fb":"Mixed conditional: past condition + present result. Use 'would' to show present consequence of past action.","tier":1,"hint":"Something happened in the past, so what about now?"},
 {"sk":"mixed","type":"fill","q":"If she practiced tennis yesterday, she ___ win the match today.","a":"would","fb":"Mixed conditional: past condition + present result. Use 'would' for present consequence of past action.","tier":1,"hint":"Past practice leads to what result today?"},
 {"sk":"mixed","type":"mc","q":"If you ate breakfast this morning, you ___ not be hungry now.","o":["would","will","did","are"],"a":0,"fb":"Mixed conditional: past action creates present state. Use 'would' to connect past eating to present hunger.","tier":1,"hint":"Did you eat breakfast? How does that affect hunger now?"},
@@ -1618,7 +1641,7 @@ function submitAnswer(choice){const it=curItem;const idx=ITEMS.indexOf(it);let c
   var xpReward=curItem.tier===1?10:curItem.tier===2?15:curItem.tier===3?20:30;
   if(correct&&hintUsed)xpReward=Math.ceil(xpReward*0.6);
   if(correct){addXP(xpReward);miniConfetti();toast('Correct, '+firstName()+'! +'+xpReward+' XP 🌟','good');if(idx>=0)state.review=state.review.filter(x=>x!==idx);}
-  else{toast('Review the rule 👇','bad');if(idx>=0&&!state.review.includes(idx))state.review.push(idx);trackWrong(it.sk);}
+  else{addXP(2);toast('Review the rule 👇','bad');if(idx>=0&&!state.review.includes(idx))state.review.push(idx);trackWrong(it.sk);}
   persist();updateReviewBadge();
   var foot=document.getElementById('engFoot');foot.innerHTML='';var b=document.createElement('button');b.className='btn btn-blue';b.textContent=(qIdx+1>=queue.length)?'See results →':'Next →';b.onclick=()=>{qIdx++;renderItem();};foot.appendChild(b);}
 function updateReviewBadge(){const n=state.review.length;document.getElementById('reviewBtn').textContent='🔁 Smart Review'+(n?' ('+n+')':'');document.getElementById('statReview')&&(document.getElementById('statReview').textContent=n);}
@@ -2208,7 +2231,7 @@ function submitRfAnswer(idx,choice){
   fb.innerHTML='<div class="fb-head">'+(correct?'✅ Correct, '+firstName()+'!':'💡 Answer: '+ex.a)+'</div><div class="fb-rule">'+ex.fb+'</div>';
   es.answered.push(idx);
   if(correct){es.correct++;addXP(8);miniConfetti();recordAnswer(s,true);}
-  else{recordAnswer(s,false);trackWrong(s);}
+  else{addXP(2);recordAnswer(s,false);trackWrong(s);}
   // Scroll to next unanswered or completion
   setTimeout(function(){
     var next=null;
@@ -2450,13 +2473,13 @@ let currentSort='xp';
 let currentFilter='all';
 function filterSection(sec){
   currentFilter=sec;
-  document.getElementById('secAll').className='btn btn-ghost';
-  document.getElementById('secBlue').className='btn btn-ghost';
-  document.getElementById('secRed').className='btn btn-ghost';
-  if(sec==='all')document.getElementById('secAll').className='btn btn-ghost';
-  if(sec==='blue')document.getElementById('secBlue').className='btn btn-blue';
-  if(sec==='red')document.getElementById('secRed').className='btn btn-primary';
-  if(sec==='all'){document.getElementById('secAll').style.borderColor='var(--ink)';document.getElementById('secAll').style.fontWeight='800';}
+  var all=document.getElementById('secAll'),blue=document.getElementById('secBlue'),red=document.getElementById('secRed');
+  all.className='btn btn-ghost';all.style.borderColor='';all.style.fontWeight='';
+  blue.className='btn btn-ghost';blue.style.borderColor='';blue.style.fontWeight='';
+  red.className='btn btn-ghost';red.style.borderColor='';red.style.fontWeight='';
+  if(sec==='all'){all.className='btn btn-ghost';all.style.borderColor='var(--ink)';all.style.fontWeight='800';}
+  if(sec==='blue')blue.className='btn btn-blue';
+  if(sec==='red')red.className='btn btn-primary';
   loadBoard(currentSort);
 }
 function loadBoard(sort,btn){
